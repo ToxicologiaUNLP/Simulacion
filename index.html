@@ -247,19 +247,32 @@
       logo.src = 'logo.png';
 
       logo.onload = () => {
-        ctx.drawImage(logo, (width - 150) / 2, 20, 150, 150);
+        // Mantener proporción del logo
+        const maxLogoWidth = 150;
+        const maxLogoHeight = 150;
+        let logoWidth = logo.width;
+        let logoHeight = logo.height;
+
+        const ratio = Math.min(maxLogoWidth / logoWidth, maxLogoHeight / logoHeight);
+        logoWidth = logoWidth * ratio;
+        logoHeight = logoHeight * ratio;
+
+        const logoX = (width - logoWidth) / 2;
+        const logoY = 20;
+
+        ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
 
         ctx.fillStyle = '#38828f';
         ctx.font = 'bold 24px "Open Sans", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, 190);
+        ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
 
         ctx.fillStyle = '#000000';
         ctx.font = '18px "Open Sans", sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
-        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
-        ctx.fillText(`Turno: ${turno}`, 40, 280);
+        ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
+        ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
+        ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
 
         document.getElementById('guardarBtn').style.display = 'inline-block';
       };
