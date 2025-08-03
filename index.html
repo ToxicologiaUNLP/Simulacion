@@ -234,11 +234,18 @@
 
       const canvas = document.getElementById('descargaCanvas');
       const ctx = canvas.getContext('2d');
+
       const width = 600;
       const height = 300;
+      const scale = window.devicePixelRatio || 1;
 
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, width, height);
@@ -247,7 +254,6 @@
       logo.src = 'logo.png';
 
       logo.onload = () => {
-        // Mantener proporción del logo
         const maxLogoWidth = 150;
         const maxLogoHeight = 150;
         let logoWidth = logo.width;
