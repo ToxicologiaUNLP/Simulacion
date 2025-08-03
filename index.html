@@ -141,7 +141,7 @@
 
     function formatearFechaArgentina(fechaISO) {
       const [anio, mes, dia] = fechaISO.split('-');
-      return ${dia}/${mes}/${anio};
+      return `${dia}/${mes}/${anio}`;
     }
 
     function esFechaValida(fechaISO) {
@@ -169,7 +169,7 @@
               const option = document.createElement('option');
               option.value = turno.id;
               const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos});
+              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
               turnoSelect.appendChild(option);
             }
           });
@@ -257,9 +257,9 @@
         ctx.fillStyle = '#000000';
         ctx.font = '18px "Open Sans", sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(Nombre: ${nombre}, 40, 220);
-        ctx.fillText(Legajo: ${legajo}, 40, 250);
-        ctx.fillText(Turno: ${turno}, 40, 280);
+        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
+        ctx.fillText(`Turno: ${turno}`, 40, 280);
 
         document.getElementById('guardarBtn').style.display = 'inline-block';
       };
@@ -274,9 +274,9 @@
         ctx.fillStyle = '#000000';
         ctx.font = '18px "Open Sans", sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(Nombre: ${nombre}, 40, 140);
-        ctx.fillText(Legajo: ${legajo}, 40, 170);
-        ctx.fillText(Turno: ${turno}, 40, 200);
+        ctx.fillText(`Nombre: ${nombre}`, 40, 140);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 170);
+        ctx.fillText(`Turno: ${turno}`, 40, 200);
 
         document.getElementById('guardarBtn').style.display = 'inline-block';
       };
