@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="logo2.png" rel="icon" type="image/png"/>
+<title>Taller de simulación - Toxicología-FCM,UNLP</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #38828f;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #38828f;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2a6a73;
+    }
+    #logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 150px;
+    }
+    .contacto {
+      text-align: center;
+      margin-top: 30px;
+      color: #333;
+      font-size: 14px;
+    }
+    #guardarBtn {
+      display: none;
+      background-color: #4caf50;
+      width: auto;
+      padding: 10px 20px;
+      margin: 15px auto 0;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    #aviso-descarga {
+      display: none;
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+      color: #d84315;
+    }
+    #popup, #popup-error {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 30px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+    }
+    #popup {
+      background-color: #e0f2f1;
+      border: 2px solid #38828f;
+      color: #004d40;
+    }
+    #popup-error {
+      background-color: #ffebee;
+      border: 2px solid #c62828;
+      color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+<img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
+<h1>Inscripción al taller de simulación</h1>
+<form id="inscripcionForm">
+<label for="nombre">Alumno:</label>
+<input id="nombre" name="nombre" placeholder="Apellido y nombre" required="" type="text"/>
+<label for="legajo">Legajo:</label>
+<input id="legajo" name="legajo" placeholder="Ej: 12345/6" required="" type="text"/>
+<label for="email">Email personal:</label>
+<input id="email" name="email" placeholder="Ej: alumno@gmail.com" required="" type="email"/>
+<label for="turno">Seleccioná turno:</label>
+<select id="turno" name="turno" required="">
+<option disabled="" selected="" value="">Seleccioná una opción...</option>
+</select>
+<button type="submit">Inscribirme</button>
+</form>
+<div id="aviso-descarga">Debés descargar la constancia para que tu inscripción sea válida.</div>
+<button id="guardarBtn">Descargar constancia de inscripción</button>
+<canvas id="descargaCanvas" style="display:none;"></canvas>
+<div id="mensaje"></div>
+<div id="popup">Inscripción exitosa. Te esperamos en el Hospital de simulación en tu fecha seleccionada.</div>
+<div id="popup-error">Usted ya posee una fecha reservada, no es posible realizar una nueva.</div>
+<div class="contacto">
+    Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
+<strong>toxicoalumnos@gmail.com</strong>
+</div>
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+
+    function formatearFechaArgentina(fechaISO) {
+      const [anio, mes, dia] = fechaISO.split('-');
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    function esFechaValida(fechaISO) {
+      const fechaTurno = new Date(fechaISO);
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const manana = new Date(hoy);
+      manana.setDate(manana.getDate() + 1);
+      return fechaTurno > manana;
+    }
+
+    function actualizarTurnos() {
+      fetch(scriptURL + '?action=turnos')
+        .then((res) => res.json())
+        .then((data) => {
+          const turnoSelect = document.getElementById('turno');
+          turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
+
+          data.forEach((turno) => {
+            const partes = turno.id.split('-');
+            const fechaISO = partes.slice(0, 3).join('-');
+            const hora = partes[3];
+
+            if (esFechaValida(fechaISO) && turno.disponible) {
+              const option = document.createElement('option');
+              option.value = turno.id;
+              const fechaFormateada = formatearFechaArgentina(fechaISO);
+              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
+              turnoSelect.appendChild(option);
+            }
+          });
+        })
+        .catch(() => {
+          alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+        });
+    }
+
+    actualizarTurnos();
+
+    document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = document.getElementById('inscripcionForm');
+      const formData = new FormData(form);
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      })
+      .then((response) => response.text())
+      .then((respuesta) => {
+        if (respuesta.toLowerCase().includes('duplicado')) {
+          document.getElementById('popup-error').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('popup-error').style.display = 'none';
+          }, 5000);
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
+        } else if (respuesta.toLowerCase().includes('error')) {
+          alert('Error en la inscripción. Por favor, intente nuevamente.');
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
+        } else {
+          generarImagenConfirmacion();
+          document.getElementById('aviso-descarga').style.display = 'block';
+          document.getElementById('popup').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('popup').style.display = 'none';
+          }, 4000);
+        }
+      })
+      .catch(() => {
+        alert('Error en la inscripción. Por favor, intente nuevamente.');
+        document.getElementById('guardarBtn').style.display = 'none';
+        document.getElementById('aviso-descarga').style.display = 'none';
+      });
+    });
+
+    document.getElementById('guardarBtn').addEventListener('click', function () {
+      const canvas = document.getElementById('descargaCanvas');
+      const enlace = document.createElement('a');
+      enlace.download = 'confirmacion_turno.png';
+      enlace.href = canvas.toDataURL('image/png');
+      enlace.click();
+    });
+
+    function generarImagenConfirmacion() {
+      const nombre = document.getElementById('nombre').value;
+      const legajo = document.getElementById('legajo').value;
+      const turno = document.getElementById('turno').selectedOptions[0].textContent;
+
+      const canvas = document.getElementById('descargaCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = 600;
+      const height = 300;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      const logo = new Image();
+      logo.src = 'logo.png';
+
+      logo.onload = () => {
+        ctx.drawImage(logo, (width - 150) / 2, 20, 150, 150);
+
+        ctx.fillStyle = '#38828f';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Confirmación de inscripción', width / 2, 190);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '18px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
+        ctx.fillText(`Turno: ${turno}`, 40, 280);
+
+        document.getElementById('guardarBtn').style.display = 'inline-block';
+      };
+
+      logo.onerror = () => {
+        alert('Error al cargar el logo, la constancia se generará sin logo.');
+        ctx.fillStyle = '#38828f';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Confirmación de inscripción', width / 2, 100);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '18px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Nombre: ${nombre}`, 40, 140);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 170);
+        ctx.fillText(`Turno: ${turno}`, 40, 200);
+
+        document.getElementById('guardarBtn').style.display = 'inline-block';
+      };
+    }
+  </script>
+</body>
+</html>
