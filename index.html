@@ -184,4 +184,96 @@
       })
       .then((response) => response.text())
       .then((respuesta) => {
+        if (respuesta.toLowerCase().includes('duplicado')) {
+          document.getElementById('popup-error').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('popup-error').style.display = 'none';
+          }, 5000);
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
+        } else if (respuesta.toLowerCase().includes('error')) {
+          alert('Error en la inscripción. Por favor, intente nuevamente.');
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
+        } else {
+          generarImagenConfirmacion();
+          document.getElementById('aviso-descarga').style.display = 'block';
+          document.getElementById('popup').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('popup').style.display = 'none';
+          }, 4000);
+        }
+      })
+      .catch(() => {
+        alert('Error en la inscripción. Por favor, intente nuevamente.');
+        document.getElementById('guardarBtn').style.display = 'none';
+        document.getElementById('aviso-descarga').style.display = 'none';
+      });
+    });
+
+    document.getElementById('guardarBtn').addEventListener('click', function () {
+      const canvas = document.getElementById('descargaCanvas');
+      const enlace = document.createElement('a');
+      enlace.download = 'confirmacion_turno.png';
+      enlace.href = canvas.toDataURL('image/png');
+      enlace.click();
+    });
+
+    function generarImagenConfirmacion() {
+      const nombre = document.getElementById('nombre').value;
+      const legajo = document.getElementById('legajo').value;
+      const turno = document.getElementById('turno').selectedOptions[0].textContent;
+
+      const canvas = document.getElementById('descargaCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = 600;
+      const height = 300;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      const logo = new Image();
+      logo.src = 'logo.png';
+
+      logo.onload = () => {
+        ctx.drawImage(logo, (width - 150) / 2, 20, 150, 150);
+
+        ctx.fillStyle = '#38828f';
+        ctx.font = 'bold 24px "Open Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Confirmación de inscripción', width / 2, 190);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '18px "Open Sans", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
+        ctx.fillText(`Turno: ${turno}`, 40, 280);
+
+        document.getElementById('guardarBtn').style.display = 'inline-block';
+      };
+
+      logo.onerror = () => {
+        alert('Error al cargar el logo, la constancia se generará sin logo.');
+        ctx.fillStyle = '#38828f';
+        ctx.font = 'bold 24px "Open Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Confirmación de inscripción', width / 2, 100);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '18px "Open Sans", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Nombre: ${nombre}`, 40, 140);
+        ctx.fillText(`Legajo: ${legajo}`, 40, 170);
+        ctx.fillText(`Turno: ${turno}`, 40, 200);
+
+        document.getElementById('guardarBtn').style.display = 'inline-block';
+      };
+    }
+</script>
+</body>
+</html>
 
