@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="logo2.png" rel="icon" type="image/png"/>
-<title>Taller de simulación - Toxicología-FCM,UNLP</title>
-<style>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <link href="logo2.png" rel="icon" type="image/png"/>
+  <title>Taller de simulación - Toxicología-FCM,UNLP</title>
+  <!-- Fuente Open Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Open Sans', sans-serif;
       background: #f9f9f9;
       padding: 20px;
       max-width: 600px;
@@ -123,7 +125,7 @@
 <div id="popup">Inscripción exitosa. Te esperamos en el Hospital de simulación en tu fecha seleccionada.</div>
 <div id="popup-error">Usted ya posee una fecha reservada, no es posible realizar una nueva.</div>
 <div class="contacto">
-    ©Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
+    © Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
 <strong>toxicoalumnos@gmail.com</strong>
 </div>
 <script>
@@ -182,95 +184,4 @@
       })
       .then((response) => response.text())
       .then((respuesta) => {
-        if (respuesta.toLowerCase().includes('duplicado')) {
-          document.getElementById('popup-error').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup-error').style.display = 'none';
-          }, 5000);
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else if (respuesta.toLowerCase().includes('error')) {
-          alert('Error en la inscripción. Por favor, intente nuevamente.');
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else {
-          generarImagenConfirmacion();
-          document.getElementById('aviso-descarga').style.display = 'block';
-          document.getElementById('popup').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup').style.display = 'none';
-          }, 4000);
-        }
-      })
-      .catch(() => {
-        alert('Error en la inscripción. Por favor, intente nuevamente.');
-        document.getElementById('guardarBtn').style.display = 'none';
-        document.getElementById('aviso-descarga').style.display = 'none';
-      });
-    });
 
-    document.getElementById('guardarBtn').addEventListener('click', function () {
-      const canvas = document.getElementById('descargaCanvas');
-      const enlace = document.createElement('a');
-      enlace.download = 'confirmacion_turno.png';
-      enlace.href = canvas.toDataURL('image/png');
-      enlace.click();
-    });
-
-    function generarImagenConfirmacion() {
-      const nombre = document.getElementById('nombre').value;
-      const legajo = document.getElementById('legajo').value;
-      const turno = document.getElementById('turno').selectedOptions[0].textContent;
-
-      const canvas = document.getElementById('descargaCanvas');
-      const ctx = canvas.getContext('2d');
-      const width = 600;
-      const height = 300;
-
-      canvas.width = width;
-      canvas.height = height;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
-
-      const logo = new Image();
-      logo.src = 'logo.png';
-
-      logo.onload = () => {
-        ctx.drawImage(logo, (width - 150) / 2, 20, 150, 150);
-
-        ctx.fillStyle = '#38828f';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, 190);
-
-        ctx.fillStyle = '#000000';
-        ctx.font = '18px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
-        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
-        ctx.fillText(`Turno: ${turno}`, 40, 280);
-
-        document.getElementById('guardarBtn').style.display = 'inline-block';
-      };
-
-      logo.onerror = () => {
-        alert('Error al cargar el logo, la constancia se generará sin logo.');
-        ctx.fillStyle = '#38828f';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, 100);
-
-        ctx.fillStyle = '#000000';
-        ctx.font = '18px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, 140);
-        ctx.fillText(`Legajo: ${legajo}`, 40, 170);
-        ctx.fillText(`Turno: ${turno}`, 40, 200);
-
-        document.getElementById('guardarBtn').style.display = 'inline-block';
-      };
-    }
-  </script>
-</body>
-</html>
