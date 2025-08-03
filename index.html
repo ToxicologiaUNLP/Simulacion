@@ -48,10 +48,18 @@
     button:hover {
       background-color: #2a6a73;
     }
+    /* Aquí modifico sólo el logo para tamaño adaptativo */
     #logo {
       display: block;
       margin: 0 auto 20px;
       max-width: 600px;
+      width: 100%;
+      height: auto;
+    }
+    @media (max-width: 600px) {
+      #logo {
+        max-width: 90%;
+      }
     }
     .contacto {
       text-align: center;
@@ -126,7 +134,7 @@
 <div id="popup-error">Usted ya posee una fecha reservada, no es posible realizar una nueva.</div>
 <div class="contacto">
     © Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
-<strong>toxicoalumnos@gmail.com<strong>
+<strong>toxicoalumnos@gmail.com</strong>
 </div>
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
