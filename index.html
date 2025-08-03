@@ -1,231 +1,130 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <link href="logo2.png" rel="icon" type="image/png"/>
-  <title>Taller de simulación - Toxicología-FCM,UNLP</title>
-  <!-- Fuente Open Sans -->
+  <meta charset="UTF-8">
+  <title>Inscripción a Simulación Clínica - Toxicología UNLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Open Sans', sans-serif;
-      background: #f9f9f9;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      background: white;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
     }
     h1 {
       text-align: center;
       color: #38828f;
     }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
     label {
       display: block;
-      margin-top: 15px;
+      margin: 15px 0 5px;
+      font-weight: bold;
     }
-    input, select, button {
+    input, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
+      padding: 8px;
       border-radius: 5px;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
     }
     button {
+      margin-top: 20px;
       background-color: #38828f;
       color: white;
+      padding: 10px 20px;
       border: none;
-      margin-top: 20px;
-      font-size: 16px;
+      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
     }
     button:hover {
-      background-color: #2a6a73;
+      background-color: #2e6772;
     }
-    /* Aquí modifico sólo el logo para tamaño adaptativo */
-    #logo {
+    canvas {
       display: block;
-      margin: 0 auto 20px;
-      max-width: 600px;
-      width: 100%;
-      height: auto;
+      margin: 20px auto;
+      border: 1px solid #ccc;
     }
-    @media (max-width: 600px) {
-      #logo {
-        max-width: 90%;
-      }
-    }
-    .contacto {
-      text-align: center;
-      margin-top: 30px;
-      color: #333;
-      font-size: 14px;
-    }
-    #guardarBtn {
-      display: none;
-      background-color: #4caf50;
-      width: auto;
-      padding: 10px 20px;
-      margin: 15px auto 0;
-      cursor: pointer;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    #aviso-descarga {
-      display: none;
-      margin-top: 15px;
-      font-size: 14px;
-      text-align: center;
-      color: #d84315;
-    }
-    #popup, #popup-error {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 30px;
-      border-radius: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      z-index: 1000;
-      box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
-    }
-    #popup {
-      background-color: #e0f2f1;
-      border: 2px solid #38828f;
-      color: #004d40;
-    }
-    #popup-error {
-      background-color: #ffebee;
-      border: 2px solid #c62828;
-      color: #b71c1c;
+    #turno option[disabled] {
+      color: red;
     }
   </style>
 </head>
 <body>
-<img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
-<h1>INSCRIPCIÓN A SIMULACIÓN</h1>
-<form id="inscripcionForm">
-<label for="nombre">Alumno:</label>
-<input id="nombre" name="nombre" placeholder="Apellido y Nombre" required="" type="text"/>
-<label for="legajo">Legajo:</label>
-<input id="legajo" name="legajo" placeholder="12345/6" required="" type="text"/>
-<label for="email">Email personal:</label>
-<input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
-<label for="turno">Seleccioná fecha disponible:</label>
-<select id="turno" name="turno" required="">
-<option disabled="" selected="" value="">Seleccioná una opción...</option>
-</select>
-<button type="submit">Inscribirme</button>
-</form>
-<div id="aviso-descarga">Debés descargar la constancia para que tu inscripción sea válida.</div>
-<button id="guardarBtn">Descargar constancia de inscripción</button>
-<canvas id="descargaCanvas" style="display:none;"></canvas>
-<div id="mensaje"></div>
-<div id="popup">Inscripción exitosa. Te esperamos en el Hospital de simulación en tu fecha seleccionada.</div>
-<div id="popup-error">Usted ya posee una fecha reservada, no es posible realizar una nueva.</div>
-<div class="contacto">
-    © Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
-<strong>toxicoalumnos@gmail.com</strong>
-</div>
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+  <div class="container">
+    <h1>Inscripción a Simulación Clínica</h1>
+    <form id="formulario">
+      <label for="nombre">Apellido y Nombre</label>
+      <input type="text" id="nombre" name="nombre" placeholder="Ej: González, María" required>
 
-    function formatearFechaArgentina(fechaISO) {
-      const [anio, mes, dia] = fechaISO.split('-');
-      return `${dia}/${mes}/${anio}`;
-    }
+      <label for="legajo">Legajo</label>
+      <input type="text" id="legajo" name="legajo" placeholder="Ej: 12345/6" required>
 
-    function esFechaValida(fechaISO) {
-      const fechaTurno = new Date(fechaISO);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      const manana = new Date(hoy);
-      manana.setDate(manana.getDate() + 1);
-      return fechaTurno > manana;
-    }
+      <label for="email">Email personal</label>
+      <input type="email" id="email" name="email" placeholder="Ej: ejemplo@gmail.com" required>
 
-    function actualizarTurnos() {
-      fetch(scriptURL + '?action=turnos')
-        .then((res) => res.json())
-        .then((data) => {
-          const turnoSelect = document.getElementById('turno');
-          turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
+      <label for="turno">Seleccioná un turno</label>
+      <select id="turno" name="turno" required>
+        <option value="">Cargando turnos...</option>
+      </select>
 
-          data.forEach((turno) => {
-            const partes = turno.id.split('-');
-            const fechaISO = partes.slice(0, 3).join('-');
-            const hora = partes[3];
+      <button type="submit">Inscribirme</button>
+    </form>
 
-            if (esFechaValida(fechaISO) && turno.disponible) {
-              const option = document.createElement('option');
-              option.value = turno.id;
-              const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
-              turnoSelect.appendChild(option);
-            }
-          });
-        })
-        .catch(() => {
-          alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+    <canvas id="descargaCanvas" width="600" height="300"></canvas>
+    <button id="guardarBtn" style="display:none;" onclick="guardarImagen()">Descargar comprobante</button>
+  </div>
+
+  <script>
+    const formulario = document.getElementById('formulario');
+    const selectTurno = document.getElementById('turno');
+
+    const urlTurnos = 'https://docs.google.com/spreadsheets/d/.../gviz/tq?tqx=out:json&tq=SELECT%20*'; // reemplazar con tu URL real
+
+    fetch(urlTurnos)
+      .then(res => res.text())
+      .then(text => JSON.parse(text.substr(47).slice(0, -2)))
+      .then(data => {
+        const filas = data.table.rows;
+        selectTurno.innerHTML = '<option value="">Seleccioná un turno</option>';
+        filas.forEach(row => {
+          const id = row.c[0].v;
+          const fecha = row.c[1].f;
+          const hora = row.c[2].v;
+          const cupoMax = row.c[3].v;
+          const ocupados = row.c[4].v;
+
+          const disponibles = cupoMax - ocupados;
+          const label = `${fecha} - ${hora} (${disponibles} disponibles)`;
+
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = label;
+          option.disabled = disponibles <= 0;
+          selectTurno.appendChild(option);
         });
-    }
-
-    actualizarTurnos();
-
-    document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const form = document.getElementById('inscripcionForm');
-      const formData = new FormData(form);
-
-      fetch(scriptURL, {
-        method: 'POST',
-        body: formData
-      })
-      .then((response) => response.text())
-      .then((respuesta) => {
-        if (respuesta.toLowerCase().includes('duplicado')) {
-          document.getElementById('popup-error').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup-error').style.display = 'none';
-          }, 5000);
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else if (respuesta.toLowerCase().includes('error')) {
-          alert('Error en la inscripción. Por favor, intente nuevamente.');
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else {
-          generarImagenConfirmacion();
-          document.getElementById('aviso-descarga').style.display = 'block';
-          document.getElementById('popup').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup').style.display = 'none';
-          }, 4000);
-        }
-      })
-      .catch(() => {
-        alert('Error en la inscripción. Por favor, intente nuevamente.');
-        document.getElementById('guardarBtn').style.display = 'none';
-        document.getElementById('aviso-descarga').style.display = 'none';
       });
+
+    formulario.addEventListener('submit', e => {
+      e.preventDefault();
+      generarImagenConfirmacion();
     });
 
-    document.getElementById('guardarBtn').addEventListener('click', function () {
+    function guardarImagen() {
       const canvas = document.getElementById('descargaCanvas');
-      const enlace = document.createElement('a');
-      enlace.download = 'confirmacion_turno.png';
-      enlace.href = canvas.toDataURL('image/png');
-      enlace.click();
-    });
+      const link = document.createElement('a');
+      link.download = 'comprobante_inscripcion.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
 
     function generarImagenConfirmacion() {
       const nombre = document.getElementById('nombre').value;
@@ -247,25 +146,34 @@
       logo.src = 'logo.png';
 
       logo.onload = () => {
-        ctx.drawImage(logo, (width - 150) / 2, 20, 150, 150);
+        const logoWidth = 220;
+        const aspectRatio = logo.naturalHeight / logo.naturalWidth;
+        const logoHeight = logoWidth * aspectRatio;
+        const logoX = (width - logoWidth) / 2;
+        const logoY = 20;
+
+        ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+
+        const textoBaseY = logoY + logoHeight + 30;
 
         ctx.fillStyle = '#38828f';
         ctx.font = 'bold 24px "Open Sans", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, 190);
+        ctx.fillText('Confirmación de inscripción', width / 2, textoBaseY);
 
         ctx.fillStyle = '#000000';
         ctx.font = '18px "Open Sans", sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, 220);
-        ctx.fillText(`Legajo: ${legajo}`, 40, 250);
-        ctx.fillText(`Turno: ${turno}`, 40, 280);
+        ctx.fillText(`Nombre: ${nombre}`, 40, textoBaseY + 30);
+        ctx.fillText(`Legajo: ${legajo}`, 40, textoBaseY + 60);
+        ctx.fillText(`Turno: ${turno}`, 40, textoBaseY + 90);
 
         document.getElementById('guardarBtn').style.display = 'inline-block';
       };
 
       logo.onerror = () => {
         alert('Error al cargar el logo, la constancia se generará sin logo.');
+
         ctx.fillStyle = '#38828f';
         ctx.font = 'bold 24px "Open Sans", sans-serif';
         ctx.textAlign = 'center';
@@ -281,7 +189,7 @@
         document.getElementById('guardarBtn').style.display = 'inline-block';
       };
     }
-</script>
+  </script>
 </body>
 </html>
 
