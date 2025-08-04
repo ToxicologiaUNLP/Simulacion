@@ -165,20 +165,18 @@
           let totalInscriptos = 0;
 
           data.forEach((turno) => {
-            // Asumo cupoMax si existe, sino uso cupos como total inicial para ese turno
-            const cupoMax = turno.cupoMax ? turno.cupoMax : turno.cupos;
-            totalCupos += cupoMax;
-            totalInscriptos += (cupoMax - turno.cupos);
+            totalCupos += turno.cupoMax;
+            totalInscriptos += turno.ocupados;
 
-            const partes = turno.id.split('-');
-            const fechaISO = partes.slice(0, 3).join('-');
-            const hora = partes[3];
+            const fechaISO = turno.fecha;
+            const hora = turno.hora;
 
             if (esFechaValida(fechaISO) && turno.disponible) {
               const option = document.createElement('option');
               option.value = turno.id;
               const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
+              const cuposRestantes = turno.cupoMax - turno.ocupados;
+              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${cuposRestantes})`;
               turnoSelect.appendChild(option);
             }
           });
