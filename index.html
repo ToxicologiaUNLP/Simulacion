@@ -48,7 +48,6 @@
     button:hover {
       background-color: #2a6a73;
     }
-    /* Aquí modifico sólo el logo para tamaño adaptativo */
     #logo {
       display: block;
       margin: 0 auto 20px;
@@ -120,7 +119,10 @@
 <input id="legajo" name="legajo" placeholder="12345/6" required="" type="text"/>
 <label for="email">Email personal:</label>
 <input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
-<label for="turno">Seleccioná fecha disponible:</label>
+<label for="turno">
+  Seleccione fecha disponible:
+  <span id="ocupacionTotal" style="font-weight:bold;"></span>
+</label>
 <select id="turno" name="turno" required="">
 <option disabled="" selected="" value="">Seleccioná una opción...</option>
 </select>
@@ -160,7 +162,13 @@
           const turnoSelect = document.getElementById('turno');
           turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
 
+          let totalCupos = 0;
+          let totalOcupados = 0;
+
           data.forEach((turno) => {
+            totalCupos += turno.cupoMax;
+            totalOcupados += turno.ocupados;
+
             const partes = turno.id.split('-');
             const fechaISO = partes.slice(0, 3).join('-');
             const hora = partes[3];
@@ -173,6 +181,20 @@
               turnoSelect.appendChild(option);
             }
           });
+
+          if (totalCupos > 0) {
+            const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
+            const ocupacionSpan = document.getElementById('ocupacionTotal');
+            ocupacionSpan.textContent = `${porcentaje}% ocupado`;
+
+            if (porcentaje <= 50) {
+              ocupacionSpan.style.color = 'green';
+            } else if (porcentaje <= 80) {
+              ocupacionSpan.style.color = 'orange';
+            } else {
+              ocupacionSpan.style.color = 'red';
+            }
+          }
         })
         .catch(() => {
           alert('Error al cargar los turnos. Intente nuevamente más tarde.');
@@ -303,3 +325,4 @@
 </script>
 </body>
 </html>
+
