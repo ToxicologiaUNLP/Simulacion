@@ -113,17 +113,16 @@
 <h1>INSCRIPCIÓN A SIMULACIÓN</h1>
 <form id="inscripcionForm">
 <label for="nombre">Alumno:</label>
-<input id="nombre" name="nombre" placeholder="Apellido y Nombre" required="" type="text"/>
+<input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
 <label for="legajo">Legajo:</label>
-<input id="legajo" name="legajo" placeholder="12345/6" required="" type="text"/>
+<input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
 <label for="email">Email personal:</label>
-<input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
+<input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
 <label for="turno">
-  Seleccioná fecha disponible:
-  <span id="ocupacionTotal" style="font-weight:bold;"></span>
+  Seleccioná fecha disponible: <span id="ocupacionTotal" style="font-weight:bold;"></span>
 </label>
-<select id="turno" name="turno" required="">
-<option disabled="" selected="" value="">Seleccioná una opción...</option>
+<select id="turno" name="turno" required>
+  <option disabled selected value="">Seleccioná una opción...</option>
 </select>
 <button type="submit">Inscribirme</button>
 </form>
@@ -159,40 +158,36 @@
       .then(res => res.json())
       .then(data => {
         const turnoSelect = document.getElementById('turno');
-        turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
+        turnoSelect.innerHTML = '<option disabled selected value="">Seleccioná una opción...</option>';
 
         let totalCupos = 0;
         let totalOcupados = 0;
 
         data.forEach(turno => {
-          const cupoMax = Number(turno.cupoMax) || 0;
-          const ocupados = Number(turno.ocupados) || 0;
-
-          totalCupos += cupoMax;
-          totalOcupados += ocupados;
+          totalCupos += Number(turno.cupoMax);
+          totalOcupados += Number(turno.ocupados);
 
           const partes = turno.id.split('-');
-          const fechaISO = partes.slice(0, 3).join('-');
+          const fechaISO = partes.slice(0,3).join('-');
           const hora = partes[3];
 
           if (esFechaValida(fechaISO) && turno.disponible) {
             const option = document.createElement('option');
             option.value = turno.id;
             const fechaFormateada = formatearFechaArgentina(fechaISO);
-            option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Restantes: ${cupoMax - ocupados})`;
+            // Mostrar cupos disponibles como vienen (turno.cupos)
+            option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
             turnoSelect.appendChild(option);
           }
         });
 
         const ocupacionSpan = document.getElementById('ocupacionTotal');
-
-        if (totalCupos > 0) {
+        if(totalCupos > 0){
           const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
           ocupacionSpan.textContent = `${porcentaje}% ocupado`;
-
-          if (porcentaje <= 50) {
+          if(porcentaje <= 50){
             ocupacionSpan.style.color = 'green';
-          } else if (porcentaje <= 80) {
+          } else if(porcentaje <= 80){
             ocupacionSpan.style.color = 'orange';
           } else {
             ocupacionSpan.style.color = 'red';
@@ -213,37 +208,34 @@
     const form = document.getElementById('inscripcionForm');
     const formData = new FormData(form);
 
-    fetch(scriptURL, { method: 'POST', body: formData })
-      .then(response => response.text())
-      .then(respuesta => {
-        if (respuesta.toLowerCase().includes('duplicado')) {
-          document.getElementById('popup-error').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup-error').style.display = 'none';
-          }, 5000);
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else if (respuesta.toLowerCase().includes('error')) {
-          alert('Error en la inscripción. Por favor, intente nuevamente.');
-          document.getElementById('guardarBtn').style.display = 'none';
-          document.getElementById('aviso-descarga').style.display = 'none';
-        } else {
-          generarImagenConfirmacion();
-          document.getElementById('aviso-descarga').style.display = 'block';
-          document.getElementById('popup').style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('popup').style.display = 'none';
-          }, 4000);
-        }
-      })
-      .catch(() => {
+    fetch(scriptURL, {method: 'POST', body: formData})
+    .then(response => response.text())
+    .then(respuesta => {
+      if(respuesta.toLowerCase().includes('duplicado')){
+        document.getElementById('popup-error').style.display = 'block';
+        setTimeout(() => { document.getElementById('popup-error').style.display = 'none'; }, 5000);
+        document.getElementById('guardarBtn').style.display = 'none';
+        document.getElementById('aviso-descarga').style.display = 'none';
+      } else if(respuesta.toLowerCase().includes('error')){
         alert('Error en la inscripción. Por favor, intente nuevamente.');
         document.getElementById('guardarBtn').style.display = 'none';
         document.getElementById('aviso-descarga').style.display = 'none';
-      });
+      } else {
+        generarImagenConfirmacion();
+        document.getElementById('aviso-descarga').style.display = 'block';
+        document.getElementById('popup').style.display = 'block';
+        setTimeout(() => { document.getElementById('popup').style.display = 'none'; }, 4000);
+        actualizarTurnos(); // Actualizo el porcentaje y turnos al inscribir
+      }
+    })
+    .catch(() => {
+      alert('Error en la inscripción. Por favor, intente nuevamente.');
+      document.getElementById('guardarBtn').style.display = 'none';
+      document.getElementById('aviso-descarga').style.display = 'none';
+    });
   });
 
-  document.getElementById('guardarBtn').addEventListener('click', () => {
+  document.getElementById('guardarBtn').addEventListener('click', function(){
     const canvas = document.getElementById('descargaCanvas');
     const enlace = document.createElement('a');
     enlace.download = 'confirmacion_turno.png';
@@ -251,7 +243,7 @@
     enlace.click();
   });
 
-  function generarImagenConfirmacion() {
+  function generarImagenConfirmacion(){
     const nombre = document.getElementById('nombre').value;
     const legajo = document.getElementById('legajo').value;
     const turno = document.getElementById('turno').selectedOptions[0].textContent;
