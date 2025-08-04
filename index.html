@@ -116,14 +116,14 @@
 <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required="" type="text"/>
 <label for="legajo">Legajo:</label>
 <input id="legajo" name="legajo" placeholder="12345/6" required="" type="text"/>
-<label for="email">Correo electrónico:</label>
+<label for="email">Email personal:</label>
 <input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
 <label for="turno">
-  Seleccione fecha disponible:
-  <span id="ocupacionTotal" style="font-weight:bold;"></span>
+  Seleccioná fecha disponible:
+  <span id="ocupacionTotal" style="font-weight:bold; margin-left: 10px;"></span>
 </label>
 <select id="turno" name="turno" required="">
-<option disabled="" selected="" value="">Seleccione una opción...</option>
+<option disabled="" selected="" value="">Seleccioná una opción...</option>
 </select>
 <button type="submit">Inscribirme</button>
 </form>
@@ -156,49 +156,54 @@
 
     function actualizarTurnos() {
       fetch(scriptURL + '?action=turnos')
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           const turnoSelect = document.getElementById('turno');
-          turnoSelect.innerHTML = '<option disabled selected value="">Seleccioná una opción...</option>';
+          const ocupacionSpan = document.getElementById('ocupacionTotal');
+          turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
+          ocupacionSpan.textContent = '';
+          ocupacionSpan.style.color = '';
 
           let totalCupos = 0;
           let totalOcupados = 0;
 
-          data.forEach(turno => {
-            totalCupos += Number(turno.cupoMax);
-            totalOcupados += Number(turno.ocupados);
+          data.forEach((turno) => {
+            if (!turno.cupoMax || !turno.ocupados) return; // si faltan datos, salteo
+
+            totalCupos += parseInt(turno.cupoMax);
+            totalOcupados += parseInt(turno.ocupados);
 
             const partes = turno.id.split('-');
-            const fechaISO = partes.slice(0,3).join('-');
+            const fechaISO = partes.slice(0, 3).join('-');
             const hora = partes[3];
 
             if (esFechaValida(fechaISO) && turno.disponible) {
               const option = document.createElement('option');
               option.value = turno.id;
               const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos: ${turno.cupos})`;
+              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos disponibles: ${turno.cupoMax - turno.ocupados})`;
               turnoSelect.appendChild(option);
             }
           });
 
-          const ocupacionSpan = document.getElementById('ocupacionTotal');
-          if(totalCupos > 0){
+          if (totalCupos > 0) {
             const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
-            console.log("Total cupos:", totalCupos, "Total ocupados:", totalOcupados, "Porcentaje:", porcentaje);
             ocupacionSpan.textContent = `${porcentaje}% ocupado`;
-            ocupacionSpan.style.color = porcentaje <= 50 ? 'green' : porcentaje <= 80 ? 'orange' : 'red';
+
+            if (porcentaje <= 50) {
+              ocupacionSpan.style.color = 'green';
+            } else if (porcentaje <= 80) {
+              ocupacionSpan.style.color = 'orange';
+            } else {
+              ocupacionSpan.style.color = 'red';
+            }
           } else {
-            console.log("No hay cupos disponibles.");
             ocupacionSpan.textContent = 'Sin cupos disponibles';
-            ocupacionSpan.style.color = 'black';
+            ocupacionSpan.style.color = 'red';
           }
         })
-        .catch(error => {
-          console.error('Error al cargar los turnos:', error);
+        .catch(() => {
           alert('Error al cargar los turnos. Intente nuevamente más tarde.');
-          const ocupacionSpan = document.getElementById('ocupacionTotal');
-          ocupacionSpan.textContent = 'Error cargando datos';
-          ocupacionSpan.style.color = 'red';
         });
     }
 
@@ -210,8 +215,8 @@
       const formData = new FormData(form);
 
       fetch(scriptURL, { method: 'POST', body: formData })
-      .then(response => response.text())
-      .then(respuesta => {
+      .then((response) => response.text())
+      .then((respuesta) => {
         if (respuesta.toLowerCase().includes('duplicado')) {
           document.getElementById('popup-error').style.display = 'block';
           setTimeout(() => {
@@ -230,7 +235,6 @@
           setTimeout(() => {
             document.getElementById('popup').style.display = 'none';
           }, 4000);
-          actualizarTurnos(); // Actualizo para reflejar cambios en inscriptos
         }
       })
       .catch(() => {
