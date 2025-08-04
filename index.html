@@ -119,11 +119,11 @@
 <label for="email">Email personal:</label>
 <input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
 <label for="turno">
-  Seleccione fecha disponible:
+  Seleccioná fecha disponible:
   <span id="ocupacionTotal" style="font-weight:bold;"></span>
 </label>
 <select id="turno" name="turno" required="">
-<option disabled="" selected="" value="">Seleccione una opción...</option>
+<option disabled="" selected="" value="">Seleccioná una opción...</option>
 </select>
 <button type="submit">Inscribirme</button>
 </form>
@@ -138,84 +138,84 @@
 <strong>toxicoalumnos@gmail.com</strong>
 </div>
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 
-    function formatearFechaArgentina(fechaISO) {
-      const [anio, mes, dia] = fechaISO.split('-');
-      return `${dia}/${mes}/${anio}`;
-    }
+  function formatearFechaArgentina(fechaISO) {
+    const [anio, mes, dia] = fechaISO.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
 
-    function esFechaValida(fechaISO) {
-      const fechaTurno = new Date(fechaISO);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      const manana = new Date(hoy);
-      manana.setDate(manana.getDate() + 1);
-      return fechaTurno > manana;
-    }
+  function esFechaValida(fechaISO) {
+    const fechaTurno = new Date(fechaISO);
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const manana = new Date(hoy);
+    manana.setDate(manana.getDate() + 1);
+    return fechaTurno > manana;
+  }
 
-    function actualizarTurnos() {
-      fetch(scriptURL + '?action=turnos')
-        .then((res) => res.json())
-        .then((data) => {
-          const turnoSelect = document.getElementById('turno');
-          turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
+  function actualizarTurnos() {
+    fetch(scriptURL + '?action=turnos')
+      .then(res => res.json())
+      .then(data => {
+        const turnoSelect = document.getElementById('turno');
+        turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
 
-          let totalCupos = 0;
-          let totalInscriptos = 0;
+        let totalCupos = 0;
+        let totalOcupados = 0;
 
-          data.forEach((turno) => {
-            const cupoMax = Number(turno.cupoMax) || 0;
-            const cuposDisponibles = Number(turno.cupos) || 0;
+        data.forEach(turno => {
+          const cupoMax = Number(turno.cupoMax) || 0;
+          const ocupados = Number(turno.ocupados) || 0;
 
-            totalCupos += cupoMax;
-            totalInscriptos += (cupoMax - cuposDisponibles);
+          totalCupos += cupoMax;
+          totalOcupados += ocupados;
 
-            const partes = turno.id.split('-');
-            const fechaISO = partes.slice(0, 3).join('-');
-            const hora = partes[3];
+          const partes = turno.id.split('-');
+          const fechaISO = partes.slice(0, 3).join('-');
+          const hora = partes[3];
 
-            if (esFechaValida(fechaISO) && turno.disponible) {
-              const option = document.createElement('option');
-              option.value = turno.id;
-              const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Restantes: ${cuposDisponibles})`;
-              turnoSelect.appendChild(option);
-            }
-          });
-
-          const ocupacionSpan = document.getElementById('ocupacionTotal');
-
-          if (totalCupos > 0) {
-            const porcentaje = Math.round((totalInscriptos / totalCupos) * 100);
-            ocupacionSpan.textContent = `${porcentaje}% ocupado`;
-
-            if (porcentaje <= 50) {
-              ocupacionSpan.style.color = 'green';
-            } else if (porcentaje <= 80) {
-              ocupacionSpan.style.color = 'orange';
-            } else {
-              ocupacionSpan.style.color = 'red';
-            }
-          } else {
-            ocupacionSpan.textContent = '';
+          if (esFechaValida(fechaISO) && turno.disponible) {
+            const option = document.createElement('option');
+            option.value = turno.id;
+            const fechaFormateada = formatearFechaArgentina(fechaISO);
+            option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Restantes: ${cupoMax - ocupados})`;
+            turnoSelect.appendChild(option);
           }
-        })
-        .catch(() => {
-          alert('Error al cargar los turnos. Intente nuevamente más tarde.');
         });
-    }
 
-    actualizarTurnos();
+        const ocupacionSpan = document.getElementById('ocupacionTotal');
 
-    document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const form = document.getElementById('inscripcionForm');
-      const formData = new FormData(form);
+        if (totalCupos > 0) {
+          const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
+          ocupacionSpan.textContent = `${porcentaje}% ocupado`;
 
-      fetch(scriptURL, { method: 'POST', body: formData })
-      .then((response) => response.text())
-      .then((respuesta) => {
+          if (porcentaje <= 50) {
+            ocupacionSpan.style.color = 'green';
+          } else if (porcentaje <= 80) {
+            ocupacionSpan.style.color = 'orange';
+          } else {
+            ocupacionSpan.style.color = 'red';
+          }
+        } else {
+          ocupacionSpan.textContent = '';
+        }
+      })
+      .catch(() => {
+        alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+      });
+  }
+
+  actualizarTurnos();
+
+  document.getElementById('inscripcionForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const form = document.getElementById('inscripcionForm');
+    const formData = new FormData(form);
+
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(response => response.text())
+      .then(respuesta => {
         if (respuesta.toLowerCase().includes('duplicado')) {
           document.getElementById('popup-error').style.display = 'block';
           setTimeout(() => {
@@ -241,89 +241,89 @@
         document.getElementById('guardarBtn').style.display = 'none';
         document.getElementById('aviso-descarga').style.display = 'none';
       });
-    });
+  });
 
-    document.getElementById('guardarBtn').addEventListener('click', function () {
-      const canvas = document.getElementById('descargaCanvas');
-      const enlace = document.createElement('a');
-      enlace.download = 'confirmacion_turno.png';
-      enlace.href = canvas.toDataURL('image/png');
-      enlace.click();
-    });
+  document.getElementById('guardarBtn').addEventListener('click', () => {
+    const canvas = document.getElementById('descargaCanvas');
+    const enlace = document.createElement('a');
+    enlace.download = 'confirmacion_turno.png';
+    enlace.href = canvas.toDataURL('image/png');
+    enlace.click();
+  });
 
-    function generarImagenConfirmacion() {
-      const nombre = document.getElementById('nombre').value;
-      const legajo = document.getElementById('legajo').value;
-      const turno = document.getElementById('turno').selectedOptions[0].textContent;
+  function generarImagenConfirmacion() {
+    const nombre = document.getElementById('nombre').value;
+    const legajo = document.getElementById('legajo').value;
+    const turno = document.getElementById('turno').selectedOptions[0].textContent;
 
-      const canvas = document.getElementById('descargaCanvas');
-      const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('descargaCanvas');
+    const ctx = canvas.getContext('2d');
 
-      const width = 600;
-      const height = 300;
-      const scale = window.devicePixelRatio || 1;
+    const width = 600;
+    const height = 300;
+    const scale = window.devicePixelRatio || 1;
 
-      canvas.width = width * scale;
-      canvas.height = height * scale;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
 
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
 
-      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
 
-      const logo = new Image();
-      logo.src = 'logo.png';
+    const logo = new Image();
+    logo.src = 'logo.png';
 
-      logo.onload = () => {
-        const maxLogoWidth = 150;
-        const maxLogoHeight = 150;
-        let logoWidth = logo.width;
-        let logoHeight = logo.height;
+    logo.onload = () => {
+      const maxLogoWidth = 150;
+      const maxLogoHeight = 150;
+      let logoWidth = logo.width;
+      let logoHeight = logo.height;
 
-        const ratio = Math.min(maxLogoWidth / logoWidth, maxLogoHeight / logoHeight);
-        logoWidth = logoWidth * ratio;
-        logoHeight = logoHeight * ratio;
+      const ratio = Math.min(maxLogoWidth / logoWidth, maxLogoHeight / logoHeight);
+      logoWidth = logoWidth * ratio;
+      logoHeight = logoHeight * ratio;
 
-        const logoX = (width - logoWidth) / 2;
-        const logoY = 20;
+      const logoX = (width - logoWidth) / 2;
+      const logoY = 20;
 
-        ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+      ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
 
-        ctx.fillStyle = '#38828f';
-        ctx.font = 'bold 24px "Open Sans", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
+      ctx.fillStyle = '#38828f';
+      ctx.font = 'bold 24px "Open Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
 
-        ctx.fillStyle = '#000000';
-        ctx.font = '18px "Open Sans", sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
-        ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
-        ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
+      ctx.fillStyle = '#000000';
+      ctx.font = '18px "Open Sans", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
+      ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
+      ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
 
-        document.getElementById('guardarBtn').style.display = 'inline-block';
-      };
+      document.getElementById('guardarBtn').style.display = 'inline-block';
+    };
 
-      logo.onerror = () => {
-        alert('Error al cargar el logo, la constancia se generará sin logo.');
-        ctx.fillStyle = '#38828f';
-        ctx.font = 'bold 24px "Open Sans", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Confirmación de inscripción', width / 2, 100);
+    logo.onerror = () => {
+      alert('Error al cargar el logo, la constancia se generará sin logo.');
+      ctx.fillStyle = '#38828f';
+      ctx.font = 'bold 24px "Open Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Confirmación de inscripción', width / 2, 100);
 
-        ctx.fillStyle = '#000000';
-        ctx.font = '18px "Open Sans", sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Nombre: ${nombre}`, 40, 140);
-        ctx.fillText(`Legajo: ${legajo}`, 40, 170);
-        ctx.fillText(`Turno: ${turno}`, 40, 200);
+      ctx.fillStyle = '#000000';
+      ctx.font = '18px "Open Sans", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Nombre: ${nombre}`, 40, 140);
+      ctx.fillText(`Legajo: ${legajo}`, 40, 170);
+      ctx.fillText(`Turno: ${turno}`, 40, 200);
 
-        document.getElementById('guardarBtn').style.display = 'inline-block';
-      };
-    }
+      document.getElementById('guardarBtn').style.display = 'inline-block';
+    };
+  }
 </script>
 </body>
 </html>
