@@ -165,8 +165,8 @@
           let totalInscriptos = 0;
 
           data.forEach((turno) => {
-            const cupoMax = parseInt(turno.cupoMax) || 0;
-            const cuposDisponibles = parseInt(turno.cupos) || 0;
+            const cupoMax = Number(turno.cupoMax) || 0;
+            const cuposDisponibles = Number(turno.cupos) || 0;
 
             totalCupos += cupoMax;
             totalInscriptos += (cupoMax - cuposDisponibles);
@@ -184,9 +184,10 @@
             }
           });
 
+          const ocupacionSpan = document.getElementById('ocupacionTotal');
+
           if (totalCupos > 0) {
             const porcentaje = Math.round((totalInscriptos / totalCupos) * 100);
-            const ocupacionSpan = document.getElementById('ocupacionTotal');
             ocupacionSpan.textContent = `${porcentaje}% ocupado`;
 
             if (porcentaje <= 50) {
@@ -197,7 +198,7 @@
               ocupacionSpan.style.color = 'red';
             }
           } else {
-            document.getElementById('ocupacionTotal').textContent = '';
+            ocupacionSpan.textContent = '';
           }
         })
         .catch(() => {
