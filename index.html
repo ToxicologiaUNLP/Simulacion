@@ -156,8 +156,13 @@
 
     function actualizarTurnos() {
       fetch(scriptURL + '?action=turnos')
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error('Respuesta no OK: ' + res.status);
+          return res.json();
+        })
         .then((data) => {
+          console.log('Datos recibidos:', data);
+
           const turnoSelect = document.getElementById('turno');
           turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
 
@@ -193,9 +198,12 @@
             } else {
               ocupacionSpan.style.color = 'red';
             }
+          } else {
+            console.warn('No hay cupos totales > 0.');
           }
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('Error al cargar los turnos:', error);
           alert('Error al cargar los turnos. Intente nuevamente más tarde.');
         });
     }
