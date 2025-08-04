@@ -162,12 +162,13 @@
           turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
 
           let totalCupos = 0;
-          let totalDisponibles = 0;
+          let totalInscriptos = 0;
 
           data.forEach((turno) => {
-            const cupoMax = turno.cupoMax ? turno.cupoMax : 10; // Valor por defecto 10 si no viene
+            // Asumo cupoMax si existe, sino uso cupos como total inicial para ese turno
+            const cupoMax = turno.cupoMax ? turno.cupoMax : turno.cupos;
             totalCupos += cupoMax;
-            totalDisponibles += turno.cupos;
+            totalInscriptos += (cupoMax - turno.cupos);
 
             const partes = turno.id.split('-');
             const fechaISO = partes.slice(0, 3).join('-');
@@ -183,8 +184,7 @@
           });
 
           if (totalCupos > 0) {
-            const totalOcupados = totalCupos - totalDisponibles;
-            const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
+            const porcentaje = Math.round((totalInscriptos / totalCupos) * 100);
             const ocupacionSpan = document.getElementById('ocupacionTotal');
             ocupacionSpan.textContent = `${porcentaje}% ocupado`;
 
