@@ -5,7 +5,6 @@
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <link href="logo2.png" rel="icon" type="image/png"/>
   <title>Taller de simulación - Toxicología-FCM,UNLP</title>
-  <!-- Fuente Open Sans -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
     body {
@@ -120,7 +119,7 @@
 <label for="email">Email personal:</label>
 <input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
 <label for="turno">
-  Seleccione fecha disponible:
+  Seleccioná fecha disponible:
   <span id="ocupacionTotal" style="font-weight:bold;"></span>
 </label>
 <select id="turno" name="turno" required="">
@@ -163,11 +162,12 @@
           turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
 
           let totalCupos = 0;
-          let totalOcupados = 0;
+          let totalDisponibles = 0;
 
           data.forEach((turno) => {
-            totalCupos += turno.cupoMax;
-            totalOcupados += turno.ocupados;
+            const cupoMax = turno.cupoMax ? turno.cupoMax : 10; // Valor por defecto 10 si no viene
+            totalCupos += cupoMax;
+            totalDisponibles += turno.cupos;
 
             const partes = turno.id.split('-');
             const fechaISO = partes.slice(0, 3).join('-');
@@ -183,6 +183,7 @@
           });
 
           if (totalCupos > 0) {
+            const totalOcupados = totalCupos - totalDisponibles;
             const porcentaje = Math.round((totalOcupados / totalCupos) * 100);
             const ocupacionSpan = document.getElementById('ocupacionTotal');
             ocupacionSpan.textContent = `${porcentaje}% ocupado`;
@@ -208,10 +209,7 @@
       const form = document.getElementById('inscripcionForm');
       const formData = new FormData(form);
 
-      fetch(scriptURL, {
-        method: 'POST',
-        body: formData
-      })
+      fetch(scriptURL, { method: 'POST', body: formData })
       .then((response) => response.text())
       .then((respuesta) => {
         if (respuesta.toLowerCase().includes('duplicado')) {
@@ -325,4 +323,3 @@
 </script>
 </body>
 </html>
-
