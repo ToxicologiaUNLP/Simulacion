@@ -120,7 +120,7 @@
 <input id="email" name="email" placeholder="alumno@gmail.com" required="" type="email"/>
 <label for="turno">
   Seleccioná fecha disponible:
-  <span id="ocupacionTotal" style="font-weight:bold; margin-left: 10px;"></span>
+  <span id="ocupacionTotal" style="font-weight:bold;"></span>
 </label>
 <select id="turno" name="turno" required="">
 <option disabled="" selected="" value="">Seleccioná una opción...</option>
@@ -168,10 +168,13 @@
           let totalOcupados = 0;
 
           data.forEach((turno) => {
-            if (!turno.cupoMax || !turno.ocupados) return; // si faltan datos, salteo
+            if (turno.cupoMax == null || turno.ocupados == null) return;
 
-            totalCupos += parseInt(turno.cupoMax);
-            totalOcupados += parseInt(turno.ocupados);
+            const cupoMax = Number(turno.cupoMax);
+            const ocupados = Number(turno.ocupados);
+
+            totalCupos += cupoMax;
+            totalOcupados += ocupados;
 
             const partes = turno.id.split('-');
             const fechaISO = partes.slice(0, 3).join('-');
@@ -181,7 +184,7 @@
               const option = document.createElement('option');
               option.value = turno.id;
               const fechaFormateada = formatearFechaArgentina(fechaISO);
-              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos disponibles: ${turno.cupoMax - turno.ocupados})`;
+              option.textContent = `Martes ${fechaFormateada} - ${hora}hs (Cupos disponibles: ${cupoMax - ocupados})`;
               turnoSelect.appendChild(option);
             }
           });
