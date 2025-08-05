@@ -106,17 +106,14 @@
       border: 2px solid #c62828;
       color: #b71c1c;
     }
-    /* Loader */
+    /* Loader puntos suspensivos */
     #loader {
       display: none;
-      margin: 20px auto;
-      width: 80px;
-      height: 80px;
-      animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #38828f;
     }
   </style>
 </head>
@@ -140,8 +137,8 @@
 <button type="submit">Inscribirme</button>
 </form>
 
-<!-- Loader -->
-<img id="loader" src="logo.png" alt="Cargando...">
+<!-- Loader de puntos -->
+<div id="loader">Inscribiendo<span id="dots"></span></div>
 
 <div id="aviso-descarga">Descargue la constancia de su inscripción y agende la fecha seleccionada.</div>
 <button id="guardarBtn">Descargar constancia</button>
@@ -156,6 +153,7 @@
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
     const CUPO_MAXIMO = 14; // Cupo máximo por turno
+    let dotsInterval;
 
     function actualizarTurnos() {
       fetch(scriptURL + '?action=turnos')
@@ -201,7 +199,18 @@
 
     document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      document.getElementById('loader').style.display = 'block'; // Mostrar loader
+
+      // Mostrar loader de puntos
+      const loader = document.getElementById('loader');
+      const dotsEl = document.getElementById('dots');
+      loader.style.display = 'block';
+      dotsEl.textContent = '';
+      
+      let count = 0;
+      dotsInterval = setInterval(() => {
+        count = (count + 1) % 4;
+        dotsEl.textContent = '.'.repeat(count);
+      }, 400);
 
       const form = document.getElementById('inscripcionForm');
       const formData = new FormData(form);
@@ -209,7 +218,8 @@
       fetch(scriptURL, { method: 'POST', body: formData })
       .then(response => response.text())
       .then(respuesta => {
-        document.getElementById('loader').style.display = 'none'; // Ocultar loader
+        clearInterval(dotsInterval);
+        loader.style.display = 'none';
 
         if (respuesta.toLowerCase().includes('duplicado')) {
           document.getElementById('popup-error').style.display = 'block';
@@ -228,7 +238,8 @@
         }
       })
       .catch(() => {
-        document.getElementById('loader').style.display = 'none'; // Ocultar loader
+        clearInterval(dotsInterval);
+        loader.style.display = 'none';
         alert('Error en la inscripción. Por favor, intente nuevamente.');
         document.getElementById('guardarBtn').style.display = 'none';
         document.getElementById('aviso-descarga').style.display = 'none';
@@ -302,3 +313,4 @@
 </script>
 </body>
 </html>
+
