@@ -206,6 +206,28 @@
         .then(res => res.json())
         .then(data => {
           const turnoSelect = document.getElementById('turno');
+
+          // Nuevo control de estado habilitado/deshabilitado
+          if (data.estado === "cerrado") {
+            turnoSelect.style.display = "none";
+
+            let aviso = document.getElementById("avisoCierre");
+            if (!aviso) {
+              aviso = document.createElement("p");
+              aviso.id = "avisoCierre";
+              aviso.style.color = "red";
+              aviso.style.fontWeight = "bold";
+              aviso.style.fontSize = "1.2em";
+              turnoSelect.parentNode.appendChild(aviso);
+            }
+            aviso.textContent = data.mensaje;
+            return; // No seguimos cargando opciones
+          } else {
+            turnoSelect.style.display = "block";
+            const aviso = document.getElementById("avisoCierre");
+            if (aviso) aviso.remove();
+          }
+
           turnoSelect.innerHTML = '<option value="" disabled selected>Seleccioná una opción...</option>';
           let totalCuposMax = data.length * CUPO_MAXIMO;
           let totalOcupados = 0;
@@ -337,4 +359,3 @@
 </script>
 </body>
 </html>
-
