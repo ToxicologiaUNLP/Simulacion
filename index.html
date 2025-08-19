@@ -47,6 +47,13 @@
     button:hover {
       background-color: #2a6a73;
     }
+    /* ✅ Botón "Inscribirme" centrado y con ancho del texto */
+    #inscripcionForm button[type="submit"] {
+      width: auto;
+      display: block;
+      padding: 10px 20px;
+      margin: 20px auto 0;
+    }
     #logo {
       display: block;
       margin: 0 auto 20px;
@@ -66,11 +73,11 @@
       font-size: 14px;
     }
     #guardarBtn {
-      display: none;
+      display: none;            /* Se muestra por JS como block para centrar */
       background-color: #4caf50;
       width: auto;
       padding: 10px 20px;
-      margin: 15px auto 0;
+      margin: 15px auto 0;      /* Centrado horizontal */
       cursor: pointer;
       border-radius: 5px;
       font-weight: bold;
@@ -353,7 +360,8 @@
         ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
         ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
         ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
-        document.getElementById('guardarBtn').style.display = 'inline-block';
+        // 🔽 Mostrar centrado el botón verde
+        document.getElementById('guardarBtn').style.display = 'block';
       };
     }
 </script>
