@@ -61,7 +61,9 @@
       height: auto;
     }
     @media (max-width: 600px) {
-      #logo { max-width: 90%; }
+      #logo {
+        max-width: 90%;
+      }
     }
     .contacto {
       text-align: center;
@@ -145,7 +147,9 @@
       text-align: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .modal h2 { margin-top: 0; }
+    .modal h2 {
+      margin-top: 0;
+    }
     .modal button {
       margin-top: 15px;
       padding: 10px 20px;
@@ -155,7 +159,9 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    .modal button:hover { background: #2a6a73; }
+    .modal button:hover {
+      background: #2a6a73;
+    }
   </style>
 </head>
 <body>
@@ -190,6 +196,7 @@
 </form>
 
 <div id="loader">Inscribiendo<span id="dots"></span></div>
+
 <div id="aviso-descarga">Descargue el comprobante de inscripción. Por favor, agende la fecha seleccionada.</div>
 <button id="guardarBtn">Descargar Comprobante</button>
 <canvas id="descargaCanvas" style="display:none;"></canvas>
@@ -202,7 +209,8 @@
 </div>
 
 <script>
-    const scriptURL = 'TU_SCRIPT_URL_AQUI';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+    const CUPO_MAXIMO = 14; 
     let dotsInterval;
 
     function actualizarTurnos() {
@@ -224,30 +232,33 @@
           }
 
           turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
-          let totalCuposMax = 0;
+          let totalCuposMax = data.length * CUPO_MAXIMO;
           let totalOcupados = 0;
-
           data.forEach(turno => {
-            const cupoMax = Number(turno.cupoMax);
-            totalCuposMax += cupoMax;
-            totalOcupados += (cupoMax - Number(turno.cupos));
-
-            if (turno.disponible) {
+            totalOcupados += (CUPO_MAXIMO - turno.cupos); // suma para todos los turnos
+            if (turno.cupos > 0) { // solo mostrar si hay cupos
               const option = document.createElement('option');
               option.value = turno.id;
               option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
               turnoSelect.appendChild(option);
             }
           });
-
           if (totalCuposMax > 0) {
             const porcentaje = Math.round((totalOcupados / totalCuposMax) * 100);
             const ocupacionSpan = document.getElementById('ocupacionTotal');
             ocupacionSpan.textContent = `${porcentaje}% ocupado`;
-            ocupacionSpan.style.color = porcentaje <= 50 ? 'green' : porcentaje <= 80 ? 'orange' : 'red';
+            if (porcentaje <= 50) {
+              ocupacionSpan.style.color = 'green';
+            } else if (porcentaje <= 80) {
+              ocupacionSpan.style.color = 'orange';
+            } else {
+              ocupacionSpan.style.color = 'red';
+            }
           }
         })
-        .catch(() => { alert('Error al cargar los turnos. Intente nuevamente más tarde.'); });
+        .catch(() => {
+          alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+        });
     }
 
     function cerrarModal() {
@@ -262,7 +273,10 @@
       loader.style.display = 'block';
       dotsEl.textContent = '';
       let count = 0;
-      dotsInterval = setInterval(() => { count = (count+1)%4; dotsEl.textContent='.'.repeat(count); },400);
+      dotsInterval = setInterval(() => {
+        count = (count + 1) % 4;
+        dotsEl.textContent = '.'.repeat(count);
+      }, 400);
       const form = document.getElementById('inscripcionForm');
       const formData = new FormData(form);
       fetch(scriptURL, { method: 'POST', body: formData })
@@ -270,66 +284,79 @@
       .then(respuesta => {
         clearInterval(dotsInterval);
         loader.style.display = 'none';
-        if(respuesta.toLowerCase().includes('duplicado')){
-          document.getElementById('popup-error').style.display='block';
-          setTimeout(()=>document.getElementById('popup-error').style.display='none',5000);
-          document.getElementById('guardarBtn').style.display='none';
-          document.getElementById('aviso-descarga').style.display='none';
-        } else if(respuesta.toLowerCase().includes('error')){
+        if (respuesta.toLowerCase().includes('duplicado')) {
+          document.getElementById('popup-error').style.display = 'block';
+          setTimeout(() => document.getElementById('popup-error').style.display = 'none', 5000);
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
+        } else if (respuesta.toLowerCase().includes('error')) {
           alert('Error en la inscripción. Por favor, intente nuevamente.');
-          document.getElementById('guardarBtn').style.display='none';
-          document.getElementById('aviso-descarga').style.display='none';
+          document.getElementById('guardarBtn').style.display = 'none';
+          document.getElementById('aviso-descarga').style.display = 'none';
         } else {
           generarImagenConfirmacion();
-          document.getElementById('aviso-descarga').style.display='block';
-          document.getElementById('popup').style.display='block';
-          setTimeout(()=>document.getElementById('popup').style.display='none',6000);
+          document.getElementById('aviso-descarga').style.display = 'block';
+          document.getElementById('popup').style.display = 'block';
+          setTimeout(() => document.getElementById('popup').style.display = 'none', 6000);
         }
-      }).catch(()=>{clearInterval(dotsInterval); loader.style.display='none'; alert('Error en la inscripción. Por favor, intente nuevamente.'); document.getElementById('guardarBtn').style.display='none'; document.getElementById('aviso-descarga').style.display='none'; });
+      })
+      .catch(() => {
+        clearInterval(dotsInterval);
+        loader.style.display = 'none';
+        alert('Error en la inscripción. Por favor, intente nuevamente.');
+        document.getElementById('guardarBtn').style.display = 'none';
+        document.getElementById('aviso-descarga').style.display = 'none';
+      });
     });
 
-    document.getElementById('guardarBtn').addEventListener('click',function(){
-      const canvas=document.getElementById('descargaCanvas');
-      const enlace=document.createElement('a');
-      enlace.download='confirmacion_turno.png';
-      enlace.href=canvas.toDataURL('image/png');
+    document.getElementById('guardarBtn').addEventListener('click', function () {
+      const canvas = document.getElementById('descargaCanvas');
+      const enlace = document.createElement('a');
+      enlace.download = 'confirmacion_turno.png';
+      enlace.href = canvas.toDataURL('image/png');
       enlace.click();
     });
 
-    function generarImagenConfirmacion(){
-      const nombre=document.getElementById('nombre').value;
-      const legajo=document.getElementById('legajo').value;
-      const turno=document.getElementById('turno').selectedOptions[0].textContent;
-      const canvas=document.getElementById('descargaCanvas');
-      const ctx=canvas.getContext('2d');
-      const width=600,height=300,scale=window.devicePixelRatio||1;
-      canvas.width=width*scale;
-      canvas.height=height*scale;
-      canvas.style.width=width+'px';
-      canvas.style.height=height+'px';
-      ctx.setTransform(scale,0,0,scale,0,0);
-      ctx.fillStyle='#ffffff';
-      ctx.fillRect(0,0,width,height);
-      const logo=new Image();
-      logo.src='logo.png';
-      logo.onload=()=>{
-        const maxLogoWidth=150,maxLogoHeight=150;
-        let logoWidth=logo.width,logoHeight=logo.height;
-        const ratio=Math.min(maxLogoWidth/logoWidth,maxLogoHeight/logoHeight);
-        logoWidth*=ratio; logoHeight*=ratio;
-        const logoX=(width-logoWidth)/2,logoY=20;
-        ctx.drawImage(logo,logoX,logoY,logoWidth,logoHeight);
-        ctx.fillStyle='#38828f';
-        ctx.font='bold 24px "Open Sans", sans-serif';
-        ctx.textAlign='center';
-        ctx.fillText('Confirmación de inscripción',width/2,logoY+logoHeight+30);
-        ctx.fillStyle='#000000';
-        ctx.font='18px "Open Sans", sans-serif';
-        ctx.textAlign='left';
-        ctx.fillText(`Nombre: ${nombre}`,40,logoY+logoHeight+70);
-        ctx.fillText(`Legajo: ${legajo}`,40,logoY+logoHeight+100);
-        ctx.fillText(`Turno: ${turno}`,40,logoY+logoHeight+130);
-        document.getElementById('guardarBtn').style.display='block';
+    function generarImagenConfirmacion() {
+      const nombre = document.getElementById('nombre').value;
+      const legajo = document.getElementById('legajo').value;
+      const turno = document.getElementById('turno').selectedOptions[0].textContent;
+      const canvas = document.getElementById('descargaCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = 600;
+      const height = 300;
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      const logo = new Image();
+      logo.src = 'logo.png';
+      logo.onload = () => {
+        const maxLogoWidth = 150;
+        const maxLogoHeight = 150;
+        let logoWidth = logo.width;
+        let logoHeight = logo.height;
+        const ratio = Math.min(maxLogoWidth / logoWidth, maxLogoHeight / logoHeight);
+        logoWidth *= ratio;
+        logoHeight *= ratio;
+        const logoX = (width - logoWidth) / 2;
+        const logoY = 20;
+        ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+        ctx.fillStyle = '#38828f';
+        ctx.font = 'bold 24px "Open Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
+        ctx.fillStyle = '#000000';
+        ctx.font = '18px "Open Sans", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
+        ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
+        ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
+        document.getElementById('guardarBtn').style.display = 'block';
       };
     }
 </script>
