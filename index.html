@@ -238,16 +238,17 @@ function actualizarTurnos() {
       }
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
+
       let totalCuposMax = data.length * CUPO_MAXIMO;
       let totalOcupados = 0;
 
       data.forEach(turno => {
-        totalOcupados += turno.cupos; // sumamos ocupados
-        const cuposLibres = CUPO_MAXIMO - turno.cupos;
-        if (cuposLibres > 0) { // desaparece si lleno
+        totalOcupados += turno.cupos;
+        const disponibles = CUPO_MAXIMO - turno.cupos;
+        if (disponibles > 0) {
           const option = document.createElement('option');
           option.value = turno.id;
-          option.textContent = `${turno.texto} (Cupos: ${cuposLibres})`;
+          option.textContent = `${turno.texto} (Cupos: ${disponibles})`;
           turnoSelect.appendChild(option);
         }
       });
@@ -275,6 +276,7 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
+// resto del código para submit, descarga y confirmación queda igual
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
