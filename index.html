@@ -240,12 +240,14 @@ function actualizarTurnos() {
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
       let totalCuposMax = data.length * CUPO_MAXIMO;
       let totalOcupados = 0;
+
       data.forEach(turno => {
-        totalOcupados += turno.cupos; // sumamos los ocupados directamente
-        if (turno.cupos < CUPO_MAXIMO) { // desaparece si está lleno
+        totalOcupados += turno.cupos; // sumamos ocupados
+        const cuposLibres = CUPO_MAXIMO - turno.cupos;
+        if (cuposLibres > 0) { // desaparece si lleno
           const option = document.createElement('option');
           option.value = turno.id;
-          option.textContent = `${turno.texto} (Cupos: ${CUPO_MAXIMO - turno.cupos})`;
+          option.textContent = `${turno.texto} (Cupos: ${cuposLibres})`;
           turnoSelect.appendChild(option);
         }
       });
@@ -369,6 +371,7 @@ function generarImagenConfirmacion() {
 </script>
 </body>
 </html>
+
 
 
 
