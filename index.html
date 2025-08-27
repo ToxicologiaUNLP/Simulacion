@@ -174,7 +174,7 @@
     <h2>⚠ Aviso importante</h2>
     <p>Recuerde que solo podrá inscribirse y seleccionar una fecha por única vez.<br>
        Revise su disponibilidad horaria antes de confirmar la inscripción.</p>
-    <p class="mensaje-rojo">Respete orden: APELLIDO y NOMBRE</p>
+    <p style="color:red;">Respete orden: Apellido y Nombre/s</p>
     <button onclick="cerrarModal()">Aceptar</button>
   </div>
 </div>
@@ -240,7 +240,7 @@
           let totalCuposMax = data.length * CUPO_MAXIMO;
           let totalOcupados = 0;
           data.forEach(turno => {
-            totalOcupados += (CUPO_MAXIMO - turno.cupos);
+            totalOcupados += turno.ocupados;
             if (turno.disponible) {
               const option = document.createElement('option');
               option.value = turno.id;
