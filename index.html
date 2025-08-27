@@ -127,6 +127,8 @@
       font-weight: bold;
       color: #38828f;
     }
+
+    /* Modal numerado */
     .overlay {
       position: fixed;
       top: 0;
@@ -141,37 +143,55 @@
     }
     .modal {
       background: white;
-      padding: 20px;
+      padding: 25px 30px;
       border-radius: 10px;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      max-width: 500px;
+      text-align: left;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      font-family: Arial, sans-serif;
     }
     .modal h2 {
-      margin-top: 0;
+      color: #e07b00;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .modal ol {
+      padding-left: 20px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .modal li.important {
+      color: red;
+      font-weight: bold;
     }
     .modal button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border: none;
-      background: #38828f;
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      padding: 10px 0;
+      background-color: #e07b00;
       color: white;
+      border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
     }
     .modal button:hover {
-      background: #2a6a73;
+      background-color: #c06500;
     }
   </style>
 </head>
 <body>
 
+<!-- Modal numerado -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h2>⚠ IMPORTANTE</h2>
-    <p>Solo podrá inscribirse y seleccionar su fecha por única vez.<br>
-       Por lo tanto, revise su disponibilidad horaria antes de inscribirse.</p>
-    <p style="color:red;">Respete el orden solicitado: Apellido y Nombre/s</p>
+    <h2>⚠ ATENCIÓN – Información Importante</h2>
+    <ol>
+      <li>Solo podrá inscribirse y seleccionar una <strong>fecha una única vez</strong>.</li>
+      <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
+      <li class="important">Respete el orden solicitado al ingresar su nombre: Apellido y Nombre/s.</li>
+    </ol>
     <button onclick="cerrarModal()">Aceptar</button>
   </div>
 </div>
@@ -179,21 +199,21 @@
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
 <form id="inscripcionForm">
-<label for="nombre">Alumno:</label>
-<input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
-<label for="legajo">Legajo:</label>
-<input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
-<label for="email">Correo electrónico:</label>
-<input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-<label for="turno">
-  Seleccione:
-  <span id="ocupacionTotal" style="font-weight:bold;"></span>
-</label>
-<select id="turno" name="turno" required>
-<option disabled selected value="">Fechas disponibles...</option>
-</select>
-<div id="avisoCierre" style="display:none;"></div>
-<button type="submit">Inscribirme</button>
+  <label for="nombre">Alumno:</label>
+  <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
+  <label for="legajo">Legajo:</label>
+  <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
+  <label for="email">Correo electrónico:</label>
+  <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
+  <label for="turno">
+    Seleccione:
+    <span id="ocupacionTotal" style="font-weight:bold;"></span>
+  </label>
+  <select id="turno" name="turno" required>
+    <option disabled selected value="">Fechas disponibles...</option>
+  </select>
+  <div id="avisoCierre" style="display:none;"></div>
+  <button type="submit">Inscribirme</button>
 </form>
 
 <div id="loader">Inscribiendo<span id="dots"></span></div>
@@ -233,7 +253,6 @@ function actualizarTurnos() {
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
-      // 🔹 Cálculo corregido de ocupación
       let totalCuposMax = 0;
       let totalOcupados = 0;
       data.forEach(turno => {
@@ -367,6 +386,7 @@ function generarImagenConfirmacion() {
 </script>
 </body>
 </html>
+
 
 
 
