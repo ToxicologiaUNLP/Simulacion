@@ -240,15 +240,16 @@
 
           // 🔹 Cálculo corregido de ocupación
           let totalCuposMax = 0;
-          let totalOcupados = 0;
-          data.forEach(turno => {
-            totalCuposMax += Number(turno.cupoMax);
-            totalOcupados += Number(turno.ocupados);
-            if (turno.disponible) {
-              const option = document.createElement('option');
-              option.value = turno.id;
-              option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
-              turnoSelect.appendChild(option);
+let totalOcupados = 0;
+data.forEach(turno => {
+  totalCuposMax += Number(turno.cupoMax);
+  totalOcupados += (Number(turno.cupoMax) - Number(turno.cupos));
+  if (turno.disponible) {
+    const option = document.createElement('option');
+    option.value = turno.id;
+    option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
+    turnoSelect.appendChild(option);
+    
             }
           });
 
