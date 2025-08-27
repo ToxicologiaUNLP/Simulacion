@@ -237,10 +237,13 @@
           }
 
           turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
-          let totalCuposMax = data.length * CUPO_MAXIMO;
+
+          // 🔹 Cálculo corregido de ocupación
+          let totalCuposMax = 0;
           let totalOcupados = 0;
           data.forEach(turno => {
-            totalOcupados += turno.ocupados;
+            totalCuposMax += Number(turno.cupoMax);
+            totalOcupados += Number(turno.ocupados);
             if (turno.disponible) {
               const option = document.createElement('option');
               option.value = turno.id;
@@ -248,6 +251,7 @@
               turnoSelect.appendChild(option);
             }
           });
+
           if (totalCuposMax > 0) {
             const porcentaje = Math.round((totalOcupados / totalCuposMax) * 100);
             const ocupacionSpan = document.getElementById('ocupacionTotal');
