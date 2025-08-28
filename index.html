@@ -253,7 +253,6 @@ function actualizarTurnos() {
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
-      // Agregamos opciones y sumamos cupos disponibles visibles
       let sumCuposDisponibles = 0;
       data.forEach(turno => {
         if (turno.disponible) {
@@ -265,7 +264,6 @@ function actualizarTurnos() {
         }
       });
 
-      // Cálculo del porcentaje real según tu lógica
       const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
       const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
       const ocupacionSpan = document.getElementById('ocupacionTotal');
@@ -321,6 +319,7 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
       generarImagenConfirmacion();
       document.getElementById('aviso-descarga').style.display = 'block';
       document.getElementById('popup').style.display = 'block';
+      actualizarTurnos(); // ✅ actualiza porcentaje y turnos disponibles
       setTimeout(() => document.getElementById('popup').style.display = 'none', 6000);
     }
   })
@@ -339,6 +338,8 @@ document.getElementById('guardarBtn').addEventListener('click', function () {
   enlace.download = 'confirmacion_turno.png';
   enlace.href = canvas.toDataURL('image/png');
   enlace.click();
+  // ✅ recarga la página después de descargar
+  setTimeout(() => location.reload(), 1000);
 });
 
 function generarImagenConfirmacion() {
@@ -386,6 +387,7 @@ function generarImagenConfirmacion() {
 </script>
 </body>
 </html>
+
 
 
 
