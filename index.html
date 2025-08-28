@@ -230,7 +230,7 @@
 
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
-const CUPO_MAXIMO = 14; 
+const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
 function actualizarTurnos() {
@@ -253,12 +253,11 @@ function actualizarTurnos() {
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
-      let totalCuposMax = 0;
-      let totalOcupados = 0;
+      // Agregamos opciones y sumamos cupos disponibles visibles
+      let sumCuposDisponibles = 0;
       data.forEach(turno => {
-        totalCuposMax += Number(turno.cupoMax);
-        totalOcupados += (Number(turno.cupoMax) - Number(turno.cupos));
         if (turno.disponible) {
+          sumCuposDisponibles += Number(turno.cupos);
           const option = document.createElement('option');
           option.value = turno.id;
           option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
@@ -266,17 +265,18 @@ function actualizarTurnos() {
         }
       });
 
-      if (totalCuposMax > 0) {
-        const porcentaje = Math.round((totalOcupados / totalCuposMax) * 100);
-        const ocupacionSpan = document.getElementById('ocupacionTotal');
-        ocupacionSpan.textContent = `${porcentaje}% ocupado`;
-        if (porcentaje <= 50) {
-          ocupacionSpan.style.color = 'green';
-        } else if (porcentaje <= 80) {
-          ocupacionSpan.style.color = 'orange';
-        } else {
-          ocupacionSpan.style.color = 'red';
-        }
+      // Cálculo del porcentaje real según tu lógica
+      const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
+      const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
+      const ocupacionSpan = document.getElementById('ocupacionTotal');
+      ocupacionSpan.textContent = `${porcentaje}% ocupado`;
+
+      if (porcentaje <= 50) {
+        ocupacionSpan.style.color = 'green';
+      } else if (porcentaje <= 80) {
+        ocupacionSpan.style.color = 'orange';
+      } else {
+        ocupacionSpan.style.color = 'red';
       }
     })
     .catch(() => {
@@ -386,6 +386,7 @@ function generarImagenConfirmacion() {
 </script>
 </body>
 </html>
+
 
 
 
