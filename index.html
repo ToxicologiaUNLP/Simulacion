@@ -267,7 +267,7 @@ function actualizarTurnos() {
       const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
       const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
       const ocupacionSpan = document.getElementById('ocupacionTotal');
-      ocupacionSpan.textContent = `${porcentaje}% ocupado`;
+      ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
 
       if (porcentaje <= 50) {
         ocupacionSpan.style.color = 'green';
