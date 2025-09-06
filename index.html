@@ -225,24 +225,28 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// 🔹 Nueva función switch de F2
+// 🔹 Función para chequear estadoTurnos desde F2
 function checkEstadoTurnos() {
   fetch(scriptURL + '?action=estado&_ts=' + Date.now())
     .then(res => res.json())
     .then(data => {
-      const estado = data[0]?.estadoTurnos?.toLowerCase() || 'habilitado';
-      if (estado === 'deshabilitado') {
+      // Se asume que la hoja devuelve { estadoTurnos: "habilitado" o "deshabilitado" }
+      const estadoTurnos = (data.estadoTurnos || 'habilitado').toLowerCase();
+      if (estadoTurnos === 'deshabilitado') {
         document.getElementById('inscripcionForm').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('modal-cierre').style.display = 'flex';
       } else {
         document.getElementById('modal-cierre').style.display = 'none';
         document.getElementById('inscripcionForm').style.display = 'block';
-        document.getElementById('overlay').style.display = 'flex';
       }
+    })
+    .catch(() => {
+      console.log('Error al chequear estadoTurnos.');
     });
 }
 
+// 🔹 Función que ya tenías para actualizar turnos (no modificada)
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
     .then(res => res.json())
@@ -294,20 +298,21 @@ function actualizarTurnos() {
 
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
+  actualizarTurnos();
 }
+
+// 🔹 Actualización automática
+setInterval(() => {
+  checkEstadoTurnos();
+  actualizarTurnos();
+}, 2000);
 
 window.onload = () => {
   checkEstadoTurnos();
   actualizarTurnos();
 };
 
-// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
-setInterval(() => {
-  checkEstadoTurnos();
-  actualizarTurnos();
-}, 2000);
-
-// ...resto del código de envío y descarga sin cambios
+// 🔹 Resto de tu código para envío de formulario, descarga y canvas (sin cambios)
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
