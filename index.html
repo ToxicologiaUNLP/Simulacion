@@ -179,6 +179,14 @@
     .modal button:hover {
       background-color: #c06500;
     }
+    /* Botón nuevo ver inscripción */
+    #verInscripcionBtn {
+      background-color: #00bfa5; /* turquesa */
+      margin-top: 10px;
+    }
+    #verInscripcionBtn:hover {
+      background-color: #009e8f;
+    }
   </style>
 </head>
 <body>
@@ -192,7 +200,8 @@
       <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
       <li class="important">Respete el orden al ingresar su nombre: Apellido y Nombre/s.</li>
     </ol>
-    <button onclick="cerrarModal()">Aceptar</button>
+    <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
+    <button id="verInscripcionBtn" onclick="verMiInscripcion()">Ya estoy inscripto, ver mi fecha</button>
   </div>
 </div>
 
@@ -338,7 +347,6 @@ document.getElementById('guardarBtn').addEventListener('click', function () {
   enlace.download = 'confirmacion_turno.png';
   enlace.href = canvas.toDataURL('image/png');
   enlace.click();
-  // ✅ recarga la página después de descargar
   setTimeout(() => location.reload(), 1000);
 });
 
@@ -385,17 +393,41 @@ function generarImagenConfirmacion() {
   };
 }
 
-/* ✅ Validación/autocompletado de legajo con barra */
-document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, ''); // solo números
-  if (valor.length > 5) {
-    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6); // formato 12345/6
+/* ✅ Formatea automáticamente legajo con barra */
+document.getElementById('legajo').addEventListener('input', function() {
+  let value = this.value.replace(/\D/g,''); // solo números
+  if (value.length > 1) {
+    this.value = value.slice(0, -1) + '/' + value.slice(-1);
   }
-  e.target.value = valor;
 });
+
+/* ✅ Función para ver inscripción */
+function verMiInscripcion() {
+  const legajo = document.getElementById('legajo').value.trim();
+  if (!legajo) {
+    alert('Ingrese su legajo para ver la inscripción.');
+    return;
+  }
+  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
+    .then(res => res.text())
+    .then(text => {
+      const filas = text.split('\n').slice(1); // ignorar encabezado
+      const encontrado = filas.find(f => f.split(',')[1].trim() === legajo);
+      if (encontrado) {
+        const datos = encontrado.split(',');
+        alert(`Alumno: ${datos[0]}\nFecha del turno: ${datos[4]}`);
+      } else {
+        alert('No se encontró inscripción para el legajo ingresado.');
+      }
+    })
+    .catch(() => {
+      alert('Error al consultar inscripciones.');
+    });
+}
 </script>
 </body>
 </html>
+
 
 
 
