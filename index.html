@@ -228,6 +228,18 @@
     <strong style="font-weight: 700;">toxicoalumnos@gmail.com</strong>
 </div>
 
+<!-- Modal de inscripciones deshabilitadas -->
+<div id="modal-cierre" class="overlay" style="display:none;">
+  <div class="modal">
+    <p style="text-align:center; font-size:1.1em;">
+      La etapa de inscripciones ha finalizado, la función se encuentra deshabilitada en este momento
+    </p>
+    <p style="text-align:center;">
+      Ante dudas, escriba a <strong>toxicoalumnos@gmail.com</strong>
+    </p>
+  </div>
+</div>
+
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
@@ -237,6 +249,16 @@ function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos')
     .then(res => res.json())
     .then(data => {
+      // 🔹 NUEVO: Revisar estado desde F2
+      const estado = data.estadoTurnos || 'habilitado';
+      if (estado.toLowerCase() === 'deshabilitado') {
+        document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal-cierre').style.display = 'flex';
+        return;
+      }
+
+      // ✅ Código original de actualización de turnos
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -287,6 +309,9 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
+window.onload = actualizarTurnos;
+
+// ✅ Resto de tu código de inscripción permanece exactamente igual
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -319,7 +344,7 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
       generarImagenConfirmacion();
       document.getElementById('aviso-descarga').style.display = 'block';
       document.getElementById('popup').style.display = 'block';
-      actualizarTurnos(); // ✅ actualiza porcentaje y turnos disponibles
+      actualizarTurnos(); 
       setTimeout(() => document.getElementById('popup').style.display = 'none', 6000);
     }
   })
@@ -338,7 +363,6 @@ document.getElementById('guardarBtn').addEventListener('click', function () {
   enlace.download = 'confirmacion_turno.png';
   enlace.href = canvas.toDataURL('image/png');
   enlace.click();
-  // ✅ recarga la página después de descargar
   setTimeout(() => location.reload(), 1000);
 });
 
@@ -385,17 +409,17 @@ function generarImagenConfirmacion() {
   };
 }
 
-/* ✅ Validación/autocompletado de legajo con barra */
 document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, ''); // solo números
+  let valor = e.target.value.replace(/[^0-9]/g, '');
   if (valor.length > 5) {
-    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6); // formato 12345/6
+    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
   }
   e.target.value = valor;
 });
 </script>
 </body>
 </html>
+
 
 
 
