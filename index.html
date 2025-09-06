@@ -221,32 +221,35 @@
 </div>
 
 <script>
-const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+const scriptURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTu8Ia.../pub?output=tsv'; // tu hoja publicada en web
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// 🔹 Función para chequear estadoTurnos desde F2
-function checkEstadoTurnos() {
-  fetch(scriptURL + '?action=estado&_ts=' + Date.now())
-    .then(res => res.json())
-    .then(data => {
-      // Se asume que la hoja devuelve { estadoTurnos: "habilitado" o "deshabilitado" }
-      const estadoTurnos = (data.estadoTurnos || 'habilitado').toLowerCase();
-      if (estadoTurnos === 'deshabilitado') {
+// 🔹 NUEVO: función para leer F2 de la hoja publicada y mostrar modal si está deshabilitado
+function verificarEstado() {
+  fetch(scriptURL + '?_ts=' + Date.now())
+    .then(res => res.text())
+    .then(text => {
+      const filas = text.trim().split('\n');
+      const encabezado = filas[0].split('\t');
+      const estadoIndex = encabezado.indexOf('estadoTurnos');
+      const estado = filas[1].split('\t')[estadoIndex].toLowerCase();
+      if (estado === 'deshabilitado') {
         document.getElementById('inscripcionForm').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('modal-cierre').style.display = 'flex';
       } else {
         document.getElementById('modal-cierre').style.display = 'none';
-        document.getElementById('inscripcionForm').style.display = 'block';
+        document.getElementById('overlay').style.display = 'flex';
       }
     })
-    .catch(() => {
-      console.log('Error al chequear estadoTurnos.');
-    });
+    .catch(console.error);
 }
 
-// 🔹 Función que ya tenías para actualizar turnos (no modificada)
+// 🔹 Auto-update cada 2 segundos sin cache
+setInterval(verificarEstado, 2000);
+
+// 🔹 Mantener tu función original de actualización de turnos intacta
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
     .then(res => res.json())
@@ -296,23 +299,19 @@ function actualizarTurnos() {
     });
 }
 
+// 🔹 Mantener tu modal numerado funcional
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
   actualizarTurnos();
 }
 
-// 🔹 Actualización automática
-setInterval(() => {
-  checkEstadoTurnos();
-  actualizarTurnos();
-}, 2000);
-
-window.onload = () => {
-  checkEstadoTurnos();
+// 🔹 Ejecutar actualización original al cargar
+window.onload = function() {
+  verificarEstado();
   actualizarTurnos();
 };
 
-// 🔹 Resto de tu código para envío de formulario, descarga y canvas (sin cambios)
+// 🔹 Resto de tu código original (envío formulario, generación de comprobante, validación legajo)
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
