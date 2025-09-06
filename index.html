@@ -226,7 +226,7 @@ const TOTAL_CUPOS = 140;
 let dotsInterval;
 
 function actualizarTurnos() {
-  fetch(scriptURL + '?action=turnos')
+  fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
     .then(res => res.json())
     .then(data => {
       const estadoTurnos = data.estadoTurnos || 'habilitado';
@@ -287,8 +287,8 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
-// 🔹 Auto-update cada 10 segundos
-setInterval(actualizarTurnos, 10000);
+// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
+setInterval(actualizarTurnos, 2000);
 
 window.onload = actualizarTurnos;
 
@@ -400,6 +400,7 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
