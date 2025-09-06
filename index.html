@@ -159,9 +159,6 @@
     #modal-cierre .modal {
       border: 5px solid #38828f;
     }
-    #overlay .modal {
-      border: 5px solid #38828f;
-    }
   </style>
 </head>
 <body>
@@ -224,49 +221,78 @@
 </div>
 
 <script>
-const sheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
-const TOTAL_CUPOS = 140;
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
+const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// Función para cerrar modal
-function cerrarModal() {
-  document.getElementById('overlay').style.display = 'none';
-}
-
-// Función que actualiza turnos desde CSV
 function actualizarTurnos() {
-  fetch(sheetCSV + '&cachebust=' + new Date().getTime())
-    .then(res => res.text())
-    .then(csv => {
-      const filas = csv.split('\n');
-      const encabezados = filas[0].split(',');
-      const estadoIndex = encabezados.indexOf('estadoTurnos');
-      const estadoTurnos = filas[1].split(',')[estadoIndex].trim().toLowerCase();
-
-      // Mostrar/ocultar modal de cierre según F2
-      if (estadoTurnos === 'deshabilitado') {
+  fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
+    .then(res => res.json())
+    .then(data => {
+      const estadoTurnos = data.estadoTurnos || 'habilitado';
+      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
         document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
         document.getElementById('modal-cierre').style.display = 'flex';
+        return;
+      }
+
+      const turnoSelect = document.getElementById('turno');
+      const avisoCierre = document.getElementById('avisoCierre');
+
+      if (data.estado === "cerrado") {
+        turnoSelect.style.display = "none";
+        avisoCierre.style.display = "block";
+        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
+        return;
       } else {
-        document.getElementById('inscripcionForm').style.display = 'block';
-        document.getElementById('modal-cierre').style.display = 'none';
-        // Solo mostrar modal de ⚠ ATENCIÓN la primera vez
-        if (!window.modalMostrado) {
-          document.getElementById('overlay').style.display = 'flex';
-          window.modalMostrado = true;
+        turnoSelect.style.display = "block";
+        avisoCierre.style.display = "none";
+        avisoCierre.textContent = "";
+      }
+
+      turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
+
+      let sumCuposDisponibles = 0;
+      data.forEach(turno => {
+        if (turno.disponible) {
+          sumCuposDisponibles += Number(turno.cupos);
+          const option = document.createElement('option');
+          option.value = turno.id;
+          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
+          turnoSelect.appendChild(option);
         }
+      });
+
+      const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
+      const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
+      const ocupacionSpan = document.getElementById('ocupacionTotal');
+      ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
+
+      if (porcentaje <= 50) {
+        ocupacionSpan.style.color = 'green';
+      } else if (porcentaje <= 80) {
+        ocupacionSpan.style.color = 'orange';
+      } else {
+        ocupacionSpan.style.color = 'red';
       }
     })
     .catch(() => {
-      console.error('Error al leer los turnos desde CSV');
+      alert('Error al cargar los turnos. Intente nuevamente más tarde.');
     });
 }
 
-// Ejecutar actualización cada 10 segundos
-setInterval(actualizarTurnos, 10000);
+function cerrarModal() {
+  document.getElementById('overlay').style.display = 'none';
+  actualizarTurnos();
+}
+
+// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
+setInterval(actualizarTurnos, 2000);
+
 window.onload = actualizarTurnos;
 
-// --- El resto del código de tu HTML para envío y descarga permanece intacto ---
+// ...resto del código de envío y descarga sin cambios
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -374,6 +400,30 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
