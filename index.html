@@ -221,39 +221,22 @@
 </div>
 
 <script>
-const scriptURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTu8Ia.../pub?output=tsv'; // tu hoja publicada en web
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// 🔹 NUEVO: función para leer F2 de la hoja publicada y mostrar modal si está deshabilitado
-function verificarEstado() {
-  fetch(scriptURL + '?_ts=' + Date.now())
-    .then(res => res.text())
-    .then(text => {
-      const filas = text.trim().split('\n');
-      const encabezado = filas[0].split('\t');
-      const estadoIndex = encabezado.indexOf('estadoTurnos');
-      const estado = filas[1].split('\t')[estadoIndex].toLowerCase();
-      if (estado === 'deshabilitado') {
-        document.getElementById('inscripcionForm').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('modal-cierre').style.display = 'flex';
-      } else {
-        document.getElementById('modal-cierre').style.display = 'none';
-        document.getElementById('overlay').style.display = 'flex';
-      }
-    })
-    .catch(console.error);
-}
-
-// 🔹 Auto-update cada 2 segundos sin cache
-setInterval(verificarEstado, 2000);
-
-// 🔹 Mantener tu función original de actualización de turnos intacta
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
     .then(res => res.json())
     .then(data => {
+      const estadoTurnos = data.estadoTurnos || 'habilitado';
+      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
+        document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal-cierre').style.display = 'flex';
+        return;
+      }
+
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -299,19 +282,55 @@ function actualizarTurnos() {
     });
 }
 
-// 🔹 Mantener tu modal numerado funcional
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
   actualizarTurnos();
 }
 
-// 🔹 Ejecutar actualización original al cargar
-window.onload = function() {
-  verificarEstado();
-  actualizarTurnos();
-};
+// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
+setInterval(actualizarTurnos, 2000);
 
-// 🔹 Resto de tu código original (envío formulario, generación de comprobante, validación legajo)
+window.onload = actualizarTurnos;
+
+// --- SWITCH DE ESTADO DE TURNOS ---
+const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+
+async function verificarEstado() {
+  try {
+    const res = await fetch(urlCSV + '?_ts=' + Date.now());
+    if (!res.ok) throw new Error('No se pudo cargar la hoja');
+    const csvText = await res.text();
+    const filas = csvText.trim().split('\n');
+    if (filas.length < 2) return;
+
+    const encabezado = filas[0].split(',');
+    const estadoIdx = encabezado.findIndex(h => h.trim().toLowerCase() === 'estadoturnos');
+    if (estadoIdx === -1) return;
+
+    const f2 = filas[1].split(',');
+    const estadoTurnos = f2[estadoIdx].trim().toLowerCase();
+
+    if (estadoTurnos === 'deshabilitado') {
+      document.getElementById('inscripcionForm').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('modal-cierre').style.display = 'flex';
+    } else {
+      document.getElementById('inscripcionForm').style.display = 'block';
+      document.getElementById('modal-cierre').style.display = 'none';
+      document.getElementById('overlay').style.display = 'flex';
+    }
+  } catch (err) {
+    console.error('Error verificando estado:', err);
+  }
+}
+
+// revisa cada 2 segundos
+setInterval(verificarEstado, 2000);
+
+// verificación inicial al cargar la página
+window.addEventListener('load', verificarEstado);
+
+// ...resto del código de envío y descarga sin cambios
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -408,19 +427,9 @@ function generarImagenConfirmacion() {
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
-
-document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, '');
-  if (valor.length > 5) {
-    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
-  }
-  e.target.value = valor;
-});
 </script>
 </body>
 </html>
-
-
 
 
 
