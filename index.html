@@ -15,13 +15,11 @@
       margin: auto;
     }
     h1 { text-align: center; color: #38828f; }
-   form {
-  background: #f9f8f5;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  border: 3px solid #38828f;
-  box-sizing: border-box;
+    form {
+      background: #f9f8f5;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     label { display: block; margin-top: 15px; }
     input, select, button {
@@ -158,6 +156,9 @@
       font-size: 16px;
     }
     .modal button:hover { background-color: #c06500; }
+    #modal-cierre .modal {
+      border: 5px solid #38828f;
+    }
   </style>
 </head>
 <body>
@@ -211,10 +212,10 @@
 <div id="modal-cierre" class="overlay" style="display:none;">
   <div class="modal">
     <p style="text-align:center; font-size:1.1em;">
-      La etapa de inscripciones ha finalizado, la función se encuentra deshabilitada en este momento
+      La etapa de inscripciones ha finalizado, la función se encuentra deshabilitada en este momento.
     </p>
     <p style="text-align:center;">
-      Ante dudas, escriba a <strong>toxicoalumnos@gmail.com</strong>
+      Contacto:<strong>toxicoalumnos@gmail.com</strong>
     </p>
   </div>
 </div>
@@ -224,34 +225,18 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// 🔹 NUEVO: URL CSV para leer F2
-const urlEstado = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
-
-async function leerEstado() {
-  try {
-    const res = await fetch(urlEstado + '&_ts=' + Date.now());
-    const text = await res.text();
-    const fila = text.split('\n')[1]?.split(',')[5]; // F2
-    if(fila && fila.trim().toLowerCase() === 'deshabilitado'){
-      document.getElementById('inscripcionForm').style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('modal-cierre').style.display = 'flex';
-      return false;
-    }
-    return true;
-  } catch(e) {
-    console.error('No se pudo leer el estado', e);
-    return true; // si falla, habilitar
-  }
-}
-
-async function actualizarTurnos() {
-  const habilitado = await leerEstado();
-  if(!habilitado) return;
-
+function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos')
     .then(res => res.json())
     .then(data => {
+      const estadoTurnos = data.estadoTurnos || 'habilitado';
+      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
+        document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal-cierre').style.display = 'flex';
+        return;
+      }
+
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -302,10 +287,12 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
+// 🔹 Auto-update cada 10 segundos
+setInterval(actualizarTurnos, 10000);
+
 window.onload = actualizarTurnos;
 
-// --- resto del código de envío, generación de imagen y formateo de legajo queda igual ---
-
+// ...resto del código de envío y descarga sin cambios
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
