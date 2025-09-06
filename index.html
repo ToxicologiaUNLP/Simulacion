@@ -207,7 +207,7 @@
       <li class="important">Respete el orden al ingresar su nombre: Apellido y Nombre/s.</li>
     </ol>
     <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-    <button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto, ver mi fecha</button>
+    <button id="verInscripBtn" onclick="cerrarModal(); abrirVerInscripcion()">Ya estoy inscripto, ver mi fecha</button>
   </div>
 </div>
 
@@ -469,6 +469,7 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
 
 
 
