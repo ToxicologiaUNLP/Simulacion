@@ -159,6 +159,9 @@
     #modal-cierre .modal {
       border: 5px solid #38828f;
     }
+    #overlay .modal {
+      border: 5px solid #38828f;
+    }
   </style>
 </head>
 <body>
@@ -221,45 +224,49 @@
 </div>
 
 <script>
-const csvURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
-const TOTAL_CUPOS = 140; 
+const sheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+const TOTAL_CUPOS = 140;
 let dotsInterval;
 
-// 🔹 Función principal de actualización
-function actualizarTurnos() {
+// Función para cerrar modal
+function cerrarModal() {
+  document.getElementById('overlay').style.display = 'none';
+}
 
-  // 🔹 Primer bloque: revisar estadoTurnos desde F2 sin tocar el resto de la lógica
-  fetch(csvURL + '?t=' + new Date().getTime())
+// Función que actualiza turnos desde CSV
+function actualizarTurnos() {
+  fetch(sheetCSV + '&cachebust=' + new Date().getTime())
     .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.split('\n');
-      const encabezado = filas[0].split(',');
-      const indiceEstado = encabezado.indexOf('estadoTurnos');
-      if (indiceEstado !== -1 && filas[1]) {
-        const estadoTurnos = filas[1].split(',')[indiceEstado].trim().toLowerCase();
-        if (estadoTurnos === 'deshabilitado') {
-          document.getElementById('inscripcionForm').style.display = 'none';
-          document.getElementById('overlay').style.display = 'none';
-          document.getElementById('modal-cierre').style.display = 'flex';
-        } else {
-          document.getElementById('inscripcionForm').style.display = 'block';
-          document.getElementById('modal-cierre').style.display = 'none';
+    .then(csv => {
+      const filas = csv.split('\n');
+      const encabezados = filas[0].split(',');
+      const estadoIndex = encabezados.indexOf('estadoTurnos');
+      const estadoTurnos = filas[1].split(',')[estadoIndex].trim().toLowerCase();
+
+      // Mostrar/ocultar modal de cierre según F2
+      if (estadoTurnos === 'deshabilitado') {
+        document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('modal-cierre').style.display = 'flex';
+      } else {
+        document.getElementById('inscripcionForm').style.display = 'block';
+        document.getElementById('modal-cierre').style.display = 'none';
+        // Solo mostrar modal de ⚠ ATENCIÓN la primera vez
+        if (!window.modalMostrado) {
+          document.getElementById('overlay').style.display = 'flex';
+          window.modalMostrado = true;
         }
       }
     })
-    .catch(err => console.error('Error leyendo estadoTurnos:', err));
-
-  // 🔹 Resto de tu código original para turnos, cupos, porcentajes, etc.
-  // ... sin cambios
-  // Esto asegura que todo lo demás siga funcionando igual que antes
+    .catch(() => {
+      console.error('Error al leer los turnos desde CSV');
+    });
 }
 
-// 🔹 Auto-update cada 10 segundos
+// Ejecutar actualización cada 10 segundos
 setInterval(actualizarTurnos, 10000);
-
 window.onload = actualizarTurnos;
 
-// ...el resto de tu código de envío de formulario y generación de imagen se mantiene igual
+// --- El resto del código de tu HTML para envío y descarga permanece intacto ---
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -367,6 +374,7 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
