@@ -222,19 +222,34 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-function actualizarTurnos() {
+// 🔹 NUEVO: URL CSV para leer F2
+const urlEstado = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
+
+async function leerEstado() {
+  try {
+    const res = await fetch(urlEstado + '&_ts=' + Date.now());
+    const text = await res.text();
+    const fila = text.split('\n')[1]?.split(',')[5]; // F2
+    if(fila && fila.trim().toLowerCase() === 'deshabilitado'){
+      document.getElementById('inscripcionForm').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('modal-cierre').style.display = 'flex';
+      return false;
+    }
+    return true;
+  } catch(e) {
+    console.error('No se pudo leer el estado', e);
+    return true; // si falla, habilitar
+  }
+}
+
+async function actualizarTurnos() {
+  const habilitado = await leerEstado();
+  if(!habilitado) return;
+
   fetch(scriptURL + '?action=turnos')
     .then(res => res.json())
     .then(data => {
-      // 🔹 Revisar estado desde F2
-      const estadoTurnos = data.estadoTurnos || 'habilitado';
-      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
-        document.getElementById('inscripcionForm').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('modal-cierre').style.display = 'flex';
-        return;
-      }
-
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -286,6 +301,8 @@ function cerrarModal() {
 }
 
 window.onload = actualizarTurnos;
+
+// --- resto del código de envío, generación de imagen y formateo de legajo queda igual ---
 
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -394,6 +411,7 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
+
 
 
 
