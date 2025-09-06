@@ -14,14 +14,20 @@
       max-width: 600px;
       margin: auto;
     }
-    h1 { text-align: center; color: #38828f; }
+    h1 {
+      text-align: center;
+      color: #38828f;
+    }
     form {
       background: #f9f8f5;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    label { display: block; margin-top: 15px; }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
     input, select, button {
       width: 100%;
       padding: 10px;
@@ -38,7 +44,9 @@
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover { background-color: #2a6a73; }
+    button:hover {
+      background-color: #2a6a73;
+    }
     #inscripcionForm button[type="submit"] {
       width: auto;
       display: block;
@@ -52,7 +60,11 @@
       width: 100%;
       height: auto;
     }
-    @media (max-width: 600px) { #logo { max-width: 90%; } }
+    @media (max-width: 600px) {
+      #logo {
+        max-width: 90%;
+      }
+    }
     .contacto {
       text-align: center;
       margin-top: 30px;
@@ -115,6 +127,8 @@
       font-weight: bold;
       color: #38828f;
     }
+
+    /* Modal numerado */
     .overlay {
       position: fixed;
       top: 0;
@@ -141,8 +155,15 @@
       margin-bottom: 15px;
       text-align: center;
     }
-    .modal ol { padding-left: 20px; font-size: 16px; line-height: 1.5; }
-    .modal li.important { color: red; font-weight: bold; }
+    .modal ol {
+      padding-left: 20px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .modal li.important {
+      color: red;
+      font-weight: bold;
+    }
     .modal button {
       margin-top: 20px;
       display: block;
@@ -155,9 +176,8 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .modal button:hover { background-color: #c06500; }
-    #modal-cierre .modal {
-      border: 5px solid #38828f;
+    .modal button:hover {
+      background-color: #c06500;
     }
   </style>
 </head>
@@ -208,35 +228,15 @@
     <strong style="font-weight: 700;">toxicoalumnos@gmail.com</strong>
 </div>
 
-<!-- Modal de inscripciones deshabilitadas -->
-<div id="modal-cierre" class="overlay" style="display:none;">
-  <div class="modal">
-    <p style="text-align:center; font-size:1.1em;">
-      La etapa de inscripciones ha finalizado, la función se encuentra deshabilitada en este momento.
-    </p>
-    <p style="text-align:center;">
-      Contacto:<strong>toxicoalumnos@gmail.com</strong>
-    </p>
-  </div>
-</div>
-
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
 function actualizarTurnos() {
-  fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
+  fetch(scriptURL + '?action=turnos')
     .then(res => res.json())
     .then(data => {
-      const estadoTurnos = data.estadoTurnos || 'habilitado';
-      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
-        document.getElementById('inscripcionForm').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('modal-cierre').style.display = 'flex';
-        return;
-      }
-
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -287,50 +287,6 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
-// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
-setInterval(actualizarTurnos, 2000);
-
-window.onload = actualizarTurnos;
-
-// --- SWITCH DE ESTADO DE TURNOS ---
-const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
-
-async function verificarEstado() {
-  try {
-    const res = await fetch(urlCSV + '?_ts=' + Date.now());
-    if (!res.ok) throw new Error('No se pudo cargar la hoja');
-    const csvText = await res.text();
-    const filas = csvText.trim().split('\n');
-    if (filas.length < 2) return;
-
-    const encabezado = filas[0].split(',');
-    const estadoIdx = encabezado.findIndex(h => h.trim().toLowerCase() === 'estadoturnos');
-    if (estadoIdx === -1) return;
-
-    const f2 = filas[1].split(',');
-    const estadoTurnos = f2[estadoIdx].trim().toLowerCase();
-
-    if (estadoTurnos === 'deshabilitado') {
-      document.getElementById('inscripcionForm').style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('modal-cierre').style.display = 'flex';
-    } else {
-      document.getElementById('inscripcionForm').style.display = 'block';
-      document.getElementById('modal-cierre').style.display = 'none';
-      document.getElementById('overlay').style.display = 'flex';
-    }
-  } catch (err) {
-    console.error('Error verificando estado:', err);
-  }
-}
-
-// revisa cada 2 segundos
-setInterval(verificarEstado, 2000);
-
-// verificación inicial al cargar la página
-window.addEventListener('load', verificarEstado);
-
-// ...resto del código de envío y descarga sin cambios
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -363,7 +319,7 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
       generarImagenConfirmacion();
       document.getElementById('aviso-descarga').style.display = 'block';
       document.getElementById('popup').style.display = 'block';
-      actualizarTurnos(); 
+      actualizarTurnos(); // ✅ actualiza porcentaje y turnos disponibles
       setTimeout(() => document.getElementById('popup').style.display = 'none', 6000);
     }
   })
@@ -382,6 +338,7 @@ document.getElementById('guardarBtn').addEventListener('click', function () {
   enlace.download = 'confirmacion_turno.png';
   enlace.href = canvas.toDataURL('image/png');
   enlace.click();
+  // ✅ recarga la página después de descargar
   setTimeout(() => location.reload(), 1000);
 });
 
@@ -427,9 +384,27 @@ function generarImagenConfirmacion() {
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
+
+/* ✅ Validación/autocompletado de legajo con barra */
+document.getElementById('legajo').addEventListener('input', function (e) {
+  let valor = e.target.value.replace(/[^0-9]/g, ''); // solo números
+  if (valor.length > 5) {
+    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6); // formato 12345/6
+  }
+  e.target.value = valor;
+});
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 
