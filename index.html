@@ -225,18 +225,11 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
+// Función principal de turnos (igual que antes, sin cambios)
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos&_ts=' + Date.now())
     .then(res => res.json())
     .then(data => {
-      const estadoTurnos = data.estadoTurnos || 'habilitado';
-      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
-        document.getElementById('inscripcionForm').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('modal-cierre').style.display = 'flex';
-        return;
-      }
-
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -252,7 +245,6 @@ function actualizarTurnos() {
       }
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
-
       let sumCuposDisponibles = 0;
       data.forEach(turno => {
         if (turno.disponible) {
@@ -268,7 +260,6 @@ function actualizarTurnos() {
       const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
       const ocupacionSpan = document.getElementById('ocupacionTotal');
       ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
-
       if (porcentaje <= 50) {
         ocupacionSpan.style.color = 'green';
       } else if (porcentaje <= 80) {
@@ -276,6 +267,19 @@ function actualizarTurnos() {
       } else {
         ocupacionSpan.style.color = 'red';
       }
+
+      // 🔹 NUEVO SWITCH: bloquea o habilita la página según F2
+      const estadoTurnos = data.estadoTurnos || 'habilitado';
+      const form = document.getElementById('inscripcionForm');
+      const modalCierre = document.getElementById('modal-cierre');
+      if (estadoTurnos.toLowerCase() === 'deshabilitado') {
+        form.style.display = 'none';
+        modalCierre.style.display = 'flex';
+      } else {
+        form.style.display = 'block';
+        modalCierre.style.display = 'none';
+      }
+
     })
     .catch(() => {
       alert('Error al cargar los turnos. Intente nuevamente más tarde.');
@@ -287,12 +291,12 @@ function cerrarModal() {
   actualizarTurnos();
 }
 
-// 🔹 Auto-update cada 2 segundos para reflejar cambios rápido
+// 🔹 Auto-update cada 2 segundos, sin cache
 setInterval(actualizarTurnos, 2000);
 
 window.onload = actualizarTurnos;
 
-// ...resto del código de envío y descarga sin cambios
+// ...resto del código de envío, descarga y canvas sin cambios
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -400,31 +404,6 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
