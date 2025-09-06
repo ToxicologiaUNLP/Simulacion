@@ -14,20 +14,14 @@
       max-width: 600px;
       margin: auto;
     }
-    h1 {
-      text-align: center;
-      color: #38828f;
-    }
+    h1 { text-align: center; color: #38828f; }
     form {
       background: #f9f8f5;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    label {
-      display: block;
-      margin-top: 15px;
-    }
+    label { display: block; margin-top: 15px; }
     input, select, button {
       width: 100%;
       padding: 10px;
@@ -44,9 +38,7 @@
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #2a6a73;
-    }
+    button:hover { background-color: #2a6a73; }
     #inscripcionForm button[type="submit"] {
       width: auto;
       display: block;
@@ -60,11 +52,7 @@
       width: 100%;
       height: auto;
     }
-    @media (max-width: 600px) {
-      #logo {
-        max-width: 90%;
-      }
-    }
+    @media (max-width: 600px) { #logo { max-width: 90%; } }
     .contacto {
       text-align: center;
       margin-top: 30px;
@@ -127,8 +115,6 @@
       font-weight: bold;
       color: #38828f;
     }
-
-    /* Modal numerado */
     .overlay {
       position: fixed;
       top: 0;
@@ -155,15 +141,8 @@
       margin-bottom: 15px;
       text-align: center;
     }
-    .modal ol {
-      padding-left: 20px;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    .modal li.important {
-      color: red;
-      font-weight: bold;
-    }
+    .modal ol { padding-left: 20px; font-size: 16px; line-height: 1.5; }
+    .modal li.important { color: red; font-weight: bold; }
     .modal button {
       margin-top: 20px;
       display: block;
@@ -176,9 +155,7 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .modal button:hover {
-      background-color: #c06500;
-    }
+    .modal button:hover { background-color: #c06500; }
   </style>
 </head>
 <body>
@@ -258,7 +235,6 @@ function actualizarTurnos() {
         return;
       }
 
-      // ✅ Código original de actualización de turnos
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -311,7 +287,6 @@ function cerrarModal() {
 
 window.onload = actualizarTurnos;
 
-// ✅ Resto de tu código de inscripción permanece exactamente igual
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const loader = document.getElementById('loader');
@@ -419,7 +394,6 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 </script>
 </body>
 </html>
-
 
 
 
