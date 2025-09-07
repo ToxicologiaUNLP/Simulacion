@@ -111,16 +111,6 @@
       color: black;
       font-family: 'Open Sans', sans-serif;
     }
-    #verInscripcionModal {
-      max-width: 450px;
-      width: 90%;
-      background: #f0f8f8;
-      border: 2px solid #38828f;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      text-align: center;
-      padding: 25px;
-    }
     #popup {
       border: 2px solid #38828f;
     }
@@ -137,6 +127,7 @@
       font-weight: bold;
       color: #38828f;
     }
+
     /* Modal numerado */
     .overlay {
       position: fixed;
@@ -188,6 +179,7 @@
     .modal button:hover {
       background-color: #c06500;
     }
+
     /* Botón "Ver mi inscripción" */
     #verInscripBtn {
       background-color: #38828f;
@@ -201,7 +193,18 @@
     #verInscripBtn:hover {
       background-color: #2a6a73;
     }
+
     /* Estilos internos del modal de ver inscripción */
+    #verInscripcionModal {
+      max-width: 450px;
+      width: 90%;
+      border: 2px solid #38828f;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      text-align: center;
+      padding: 25px;
+      background-color: #ffffff;
+    }
     #verInscripcionModal h2 {
       text-transform: uppercase;
       font-weight: normal;
@@ -240,9 +243,9 @@
       margin-top: 10px;
       padding: 10px;
       border-radius: 8px;
-      background-color: #e0f7f7;
       font-size: 16px;
       text-align: left;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -258,7 +261,7 @@
       <li class="important">Respete el orden al ingresar su nombre: Apellido y Nombre/s.</li>
     </ol>
     <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-    <button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto, ver mi fecha</button>
+    <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto, ver mi fecha</button>
   </div>
 </div>
 
@@ -291,11 +294,7 @@
 <div id="popup-error">Usted ya posee una fecha reservada, no es posible realizar una nueva.</div>
 
 <!-- Modal para ver inscripción -->
-<div id="verInscripcionModal">
-  <h2>MI INSCRIPCIÓN</h2>
-  <div id="verInscripcionContenido"></div>
-  <button onclick="cerrarVerInscripcion()">Cerrar</button>
-</div>
+<div id="verInscripcionModal"></div>
 
 <div class="contacto">
     © Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
@@ -463,7 +462,7 @@ function generarImagenConfirmacion() {
 
 // ---------- Formato automático legajo ----------
 document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, ''); // solo números
+  let valor = e.target.value.replace(/[^0-9]/g, '');
   if (valor.length > 5) {
     valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
   }
@@ -473,11 +472,13 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 // ---------- Modal "Ver inscripción" ----------
 function abrirVerInscripcion() {
   document.getElementById('verInscripcionModal').style.display = 'block';
-  document.getElementById('verInscripcionContenido').innerHTML = `
+  document.getElementById('verInscripcionModal').innerHTML = `
+    <h2>MI INSCRIPCIÓN</h2>
     <label for="buscarLegajo">Legajo:</label>
     <input type="text" id="buscarLegajo" placeholder="12345/6"/>
     <button onclick="buscarInscripcion()">Buscar</button>
-    <div id="resultadoBusqueda" style="margin-top:15px;"></div>
+    <div id="resultadoBusqueda"></div>
+    <button style="margin-top:15px;" onclick="cerrarVerInscripcion()">Cerrar</button>
   `;
 }
 
@@ -506,8 +507,10 @@ function buscarInscripcion() {
         const fechaTurno = columnas[4];
         if (leg.trim() === legajo) {
           document.getElementById('resultadoBusqueda').innerHTML = `
-            <div><strong>Nombre:</strong> ${nombre}</div>
-            <div><strong>Turno:</strong> ${fechaTurno}</div>
+            <div>
+              <p><strong>Nombre:</strong> ${nombre}</p>
+              <p><strong>Turno:</strong> ${fechaTurno}</p>
+            </div>
           `;
           encontrado = true;
         }
@@ -523,6 +526,7 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
 
 
 
