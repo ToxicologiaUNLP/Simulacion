@@ -303,34 +303,8 @@
 
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
-const SHEET_ESTADO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
-
-// ---------- Función para deshabilitar si fecha pasada ----------
-function revisarFechaEstado() {
-  fetch(SHEET_ESTADO_CSV)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split('\n');
-      if (filas.length < 2) return; // No hay datos
-      const columnas = filas[1].split(',');
-      const fechaStr = columnas[5]; // columna F = índice 5
-      if (!fechaStr) return;
-      const [dd, mm, yyyy] = fechaStr.split('/');
-      const fechaSheet = new Date(yyyy, mm-1, dd, 0, 0, 0);
-      const ahora = new Date();
-      if (ahora >= fechaSheet) {
-        document.getElementById('inscripcionForm').style.display = 'none';
-        const avisoCierre = document.getElementById('avisoCierre');
-        avisoCierre.style.display = 'block';
-        avisoCierre.style.color = 'black';
-        avisoCierre.style.fontWeight = 'normal';
-        avisoCierre.textContent = 'La fecha de inscripciones ha finalizado. Comuníquese directamente con la cátedra. Muchas gracias';
-      }
-    })
-    .catch(() => console.log('No se pudo leer la fecha de estado.'));
-}
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
@@ -384,7 +358,6 @@ function actualizarTurnos() {
 
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
-  revisarFechaEstado();
   actualizarTurnos();
 }
 
@@ -550,15 +523,44 @@ function buscarInscripcion() {
       document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
     });
 }
-
-// ---------- Revisar fecha estado al cargar ----------
-document.addEventListener('DOMContentLoaded', () => {
-  revisarFechaEstado();
-  actualizarTurnos();
-});
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
