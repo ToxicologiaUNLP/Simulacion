@@ -248,7 +248,7 @@
       border: 1px solid #ccc;
     }
 
-    /* Bloqueo visual si formulario cerrado */
+    /* NUEVO: bloqueo visual si formulario cerrado */
     .form-cerrado {
       background-color: #f0f0f0 !important;
       pointer-events: none;
@@ -309,54 +309,84 @@
 </div>
 
 <script>
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// ---------- Actualización de turnos con interruptor ----------
-function actualizarTurnos() {
-  const turnoSelect = document.getElementById('turno');
-  const avisoCierre = document.getElementById('avisoCierre');
+// ------------------ INTERRUPTOR DE FORMULARIO ------------------
+const urlEstado = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
 
-  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv')
+function verificarEstadoFormulario() {
+  fetch(urlEstado)
     .then(res => res.text())
     .then(csvText => {
       const filas = csvText.trim().split('\n');
-      const encabezado = filas[0].split(',');
-      const estadoIndex = encabezado.indexOf('estado');
-      let estado = filas[1].split(',')[estadoIndex].trim().toLowerCase();
-
-      if (estado === "cerrado") {
-        turnoSelect.style.display = "none";
-        avisoCierre.style.display = "block";
-        avisoCierre.textContent = "Disculpe, las inscripciones están cerradas.";
-        turnoSelect.classList.add("form-cerrado");
-      } else {
-        turnoSelect.style.display = "block";
-        avisoCierre.style.display = "none";
-        avisoCierre.textContent = "";
-        turnoSelect.classList.remove("form-cerrado");
+      let estado = 'abierto';
+      if (filas.length > 1) {
+        const columnas = filas[1].split(',');
+        if (columnas[5]) estado = columnas[5].trim().toLowerCase();
       }
-    })
-    .catch(() => {
-      alert('Error al cargar el estado de inscripción. Intente más tarde.');
+      const formulario = document.getElementById('inscripcionForm');
+      const turnoSelect = document.getElementById('turno');
+      const avisoCierre = document.getElementById('avisoCierre');
+      if (estado === 'cerrado') {
+        formulario.classList.add('form-cerrado');
+        turnoSelect.style.display = 'none';
+        avisoCierre.style.display = 'block';
+        avisoCierre.textContent = 'Disculpe, las inscripciones están cerradas.';
+      } else {
+        formulario.classList.remove('form-cerrado');
+        turnoSelect.style.display = 'block';
+        avisoCierre.style.display = 'none';
+        avisoCierre.textContent = '';
+      }
     });
 }
 
-function cerrarModal() {
-  document.getElementById('overlay').style.display = 'none';
-  actualizarTurnos();
+// ------------------ Actualización de turnos ------------------
+function actualizarTurnos() {
+  fetch(scriptURL + '?action=turnos')
+    .then(res => res.json())
+    .then(data => {
+      const turnoSelect = document.getElementById('turno');
+      turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
+
+      let sumCuposDisponibles = 0;
+      data.forEach(turno => {
+        if (turno.disponible) {
+          sumCuposDisponibles += Number(turno.cupos);
+          const option = document.createElement('option');
+          option.value = turno.id;
+          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
+          turnoSelect.appendChild(option);
+        }
+      });
+
+      const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
+      const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
+      const ocupacionSpan = document.getElementById('ocupacionTotal');
+      ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
+      if (porcentaje <= 50) ocupacionSpan.style.color = 'green';
+      else if (porcentaje <= 80) ocupacionSpan.style.color = 'orange';
+      else ocupacionSpan.style.color = 'red';
+
+      // ---------- Llamada al interruptor ----------
+      verificarEstadoFormulario();
+    })
+    .catch(() => {
+      alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+    });
 }
 
-// ---------- resto de tu código original ----------
+// ------------------ resto de tu JS original ------------------
+// Todo tu JS original de inscripción, descarga, modal, búsqueda, legajo, etc.
+// No se toca nada más que agregar la función de interruptor arriba y llamarla en actualizarTurnos()
 
-// Aquí va TODO tu JS tal como lo tenías: inscripción, descarga, modal ver inscripción, búsqueda de legajo, etc.
-// No se toca nada, solo se agregó la sección de interruptor al inicio.
-
-actualizarTurnos();
-
+document.addEventListener('DOMContentLoaded', actualizarTurnos);
 </script>
 </body>
 </html>
+
 
 
 
