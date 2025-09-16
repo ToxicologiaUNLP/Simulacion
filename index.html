@@ -324,7 +324,7 @@ function actualizarTurnos() {
       // ---------- INTERRUPTOR ABIERTO/CERRADO ----------
       let estado = null;
       if (Array.isArray(data) && data.length > 0) {
-        if (data[0].estado) estado = data[0].estado.toLowerCase();
+        if (data[0].estado) estado = data[0].estado.toString().trim().toLowerCase();
       }
 
       if (estado === "cerrado") {
@@ -551,6 +551,7 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
 
 
 
