@@ -13,7 +13,6 @@
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      transition: background-color 0.3s ease;
     }
     h1 {
       text-align: center;
@@ -303,76 +302,57 @@
 </div>
 
 <script>
-const urlTurnos = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv";
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
-  fetch(urlTurnos)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split("\n");
-      const encabezados = filas[0].split(",");
-      const datos = filas.slice(1).map(f => f.split(","));
-      
-      const estadoIdx = encabezados.indexOf("estado");
-      const estado = datos[0][estadoIdx]?.trim().toLowerCase();
+  fetch(scriptURL + '?action=turnos')
+    .then(res => res.json())
+    .then(data => {
+      const turnoSelect = document.getElementById('turno');
+      const avisoCierre = document.getElementById('avisoCierre');
 
-      const turnoSelect = document.getElementById("turno");
-      const avisoCierre = document.getElementById("avisoCierre");
-      const boton = document.querySelector("#inscripcionForm button[type='submit']");
-
-      if (estado === "cerrado") {
+      if (data.estado === "cerrado") {
         turnoSelect.style.display = "none";
         avisoCierre.style.display = "block";
-        avisoCierre.textContent = "Disculpe, las inscripciones están cerradas.";
-        boton.disabled = true;
-        document.body.style.backgroundColor = "#c47070";
+        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
         return;
       } else {
         turnoSelect.style.display = "block";
         avisoCierre.style.display = "none";
         avisoCierre.textContent = "";
-        boton.disabled = false;
-        document.body.style.backgroundColor = "#f9f9f9";
       }
 
-      // Acá seguís con tu lógica de turnos, cupos y porcentajes
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
       let sumCuposDisponibles = 0;
-      datos.forEach(col => {
-        const id = col[0];
-        const fecha = col[1];
-        const hora = col[2];
-        const cupoMax = parseInt(col[3], 10);
-        const ocupados = parseInt(col[4], 10);
-        const disponibles = cupoMax - ocupados;
-        if (disponibles > 0) {
-          sumCuposDisponibles += disponibles;
-          const option = document.createElement("option");
-          option.value = id;
-          option.textContent = `${fecha} ${hora} (Cupos: ${disponibles})`;
+      data.forEach(turno => {
+        if (turno.disponible) {
+          sumCuposDisponibles += Number(turno.cupos);
+          const option = document.createElement('option');
+          option.value = turno.id;
+          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
           turnoSelect.appendChild(option);
         }
       });
 
       const ocupados = TOTAL_CUPOS - sumCuposDisponibles;
       const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
-      const ocupacionSpan = document.getElementById("ocupacionTotal");
+      const ocupacionSpan = document.getElementById('ocupacionTotal');
       ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
 
       if (porcentaje <= 50) {
-        ocupacionSpan.style.color = "green";
+        ocupacionSpan.style.color = 'green';
       } else if (porcentaje <= 80) {
-        ocupacionSpan.style.color = "orange";
+        ocupacionSpan.style.color = 'orange';
       } else {
-        ocupacionSpan.style.color = "red";
+        ocupacionSpan.style.color = 'red';
       }
     })
     .catch(() => {
-      alert("Error al cargar los turnos. Intente nuevamente más tarde.");
+      alert('Error al cargar los turnos. Intente nuevamente más tarde.');
     });
 }
 
@@ -546,6 +526,76 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
