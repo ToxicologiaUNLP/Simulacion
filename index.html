@@ -364,6 +364,16 @@ function cerrarModal() {
 // ---------- Inscripción ----------
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
+
+  const turnoSelect = document.getElementById('turno');
+  const avisoCierre = document.getElementById('avisoCierre');
+
+  // Verificar si la inscripción está cerrada
+  if (turnoSelect.style.display === "none") {
+    alert("Las inscripciones están cerradas. No es posible enviar el formulario.");
+    return;
+  }
+
   const loader = document.getElementById('loader');
   const dotsEl = document.getElementById('dots');
   loader.style.display = 'block';
