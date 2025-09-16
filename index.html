@@ -247,20 +247,6 @@
       text-align: left;
       border: 1px solid #ccc;
     }
-
-    /* Interruptor agregado */
-    .switch-container {
-      display: flex;
-      align-items: center;
-      margin-top: 15px;
-      font-size: 14px;
-      gap: 10px;
-    }
-    .switch-container input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -281,7 +267,6 @@
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
-
 <form id="inscripcionForm">
   <label for="nombre">Alumno:</label>
   <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
@@ -289,13 +274,6 @@
   <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
   <label for="email">Correo electrónico:</label>
   <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-  
-  <!-- Interruptor agregado -->
-  <div class="switch-container">
-    <input type="checkbox" id="interruptor" checked/>
-    <label for="interruptor">Activar inscripción</label>
-  </div>
-
   <label for="turno">
     Seleccione:
     <span id="ocupacionTotal" style="font-weight:bold;"></span>
@@ -336,14 +314,10 @@ function actualizarTurnos() {
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
-      // Verificar estado del interruptor
-      const interruptor = document.getElementById('interruptor');
-      const estaBloqueado = interruptor && !interruptor.checked;
-
-      if (data.estado === "cerrado" || estaBloqueado) {
+      if (data.estado === "cerrado") {
         turnoSelect.style.display = "none";
         avisoCierre.style.display = "block";
-        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas o el interruptor está desactivado.";
+        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
         return;
       } else {
         turnoSelect.style.display = "block";
@@ -549,6 +523,11 @@ function buscarInscripcion() {
       document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
     });
 }
+
+// ---------- Inicialización ----------
+window.onload = () => {
+  actualizarTurnos();
+};
 </script>
 </body>
 </html>
