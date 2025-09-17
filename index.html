@@ -18,6 +18,13 @@
       text-align: center;
       color: #38828f;
     }
+    #f2Info {
+      color:#d94f4f;
+      font-size:60%;
+      font-family:'Open Sans', sans-serif;
+      text-align:center;
+      margin-bottom:20px;
+    }
     form {
       background: #f9f8f5;
       padding: 20px;
@@ -247,18 +254,6 @@
       text-align: left;
       border: 1px solid #ccc;
     }
-
-    /* Div mensaje F2 */
-    #mensajeF2 {
-      display:none;
-      text-align:center;
-      margin:15px 0;
-      font-weight:bold;
-      font-size:18px;
-      color:#38828f;
-      opacity:0;
-      transition: opacity 1s;
-    }
   </style>
 </head>
 <body>
@@ -279,9 +274,7 @@
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
-
-<!-- Mensaje F2 -->
-<div id="mensajeF2"></div>
+<div id="f2Info"></div>
 
 <form id="inscripcionForm">
   <label for="nombre">Alumno:</label>
@@ -372,9 +365,30 @@ function actualizarTurnos() {
     });
 }
 
+// ---------- Cargar F2 ----------
+function cargarF2() {
+  const urlTurnos = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+  fetch(urlTurnos)
+    .then(res => res.text())
+    .then(csvText => {
+      const filas = csvText.trim().split('\n');
+      if (filas.length > 1) {
+        const columnas = filas[1].split(',');
+        const f2 = columnas[5] || ''; // columna F → índice 5
+        if(f2.trim() !== '') {
+          document.getElementById('f2Info').textContent = f2;
+        }
+      }
+    })
+    .catch(() => {
+      document.getElementById('f2Info').textContent = '';
+    });
+}
+
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
   actualizarTurnos();
+  cargarF2();
 }
 
 // ---------- Inscripción ----------
@@ -509,7 +523,7 @@ function buscarInscripcion() {
   if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
   legajoInput.value = legajo;
 
-  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
   fetch(urlInscripciones)
     .then(res => res.text())
     .then(csvText => {
@@ -540,54 +554,14 @@ function buscarInscripcion() {
     });
 }
 
-// ---------- Mostrar valor F2 con fade-in ----------
-document.addEventListener('DOMContentLoaded', () => {
-  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv')
-
-    .then(res => res.text())
-    .then(csv => {
-      const filas = csv.trim().split('\n');
-      const f2 = filas[1]?.split(',')[5] || ''; // Columna F = índice 5
-      if(f2) {
-        const mensajeEl = document.getElementById('mensajeF2');
-        mensajeEl.textContent = f2.toUpperCase();
-        mensajeEl.style.display = 'block';
-        setTimeout(() => mensajeEl.style.opacity = 1, 100);
-      }
-    })
-    .catch(() => console.log('No se pudo leer F2'));
+// ---------- Inicialización ----------
+window.addEventListener('load', () => {
+  actualizarTurnos();
+  cargarF2();
 });
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
