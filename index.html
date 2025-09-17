@@ -180,6 +180,22 @@
       background-color: #c06500;
     }
 
+    /* Modal cierre institucional */
+    .modal-cierre {
+      text-align: center;
+      border: 3px solid #38828f;
+      background: #f9f8f5;
+    }
+    .modal-cierre h2 {
+      color: #38828f;
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+    .modal-cierre p {
+      font-size: 16px;
+      color: #333;
+    }
+
     /* Botón "Ver mi inscripción" */
     #verInscripBtn {
       background-color: #38828f;
@@ -315,9 +331,16 @@ function actualizarTurnos() {
       const avisoCierre = document.getElementById('avisoCierre');
 
       if (data.estado === "cerrado") {
-        turnoSelect.style.display = "none";
-        avisoCierre.style.display = "block";
-        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
+        // 🔴 Cartel institucional de cierre
+        const overlay = document.getElementById('overlay');
+        overlay.style.display = 'flex';
+        overlay.querySelector('.modal').className = "modal modal-cierre";
+        overlay.querySelector('.modal').innerHTML = `
+          <h2>Inscripciones cerradas</h2>
+          <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
+        `;
+        // Ocultar formulario
+        document.getElementById('inscripcionForm').style.display = "none";
         return;
       } else {
         turnoSelect.style.display = "block";
@@ -449,83 +472,22 @@ function generarImagenConfirmacion() {
     ctx.fillStyle = '#38828f';
     ctx.font = 'bold 24px "Open Sans", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
+    ctx.fillText('Confirmación de inscripción', width / 2, 200);
     ctx.fillStyle = '#000000';
     ctx.font = '18px "Open Sans", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
-    ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
-    ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
+    ctx.fillText('Alumno: ' + nombre, 50, 240);
+    ctx.fillText('Legajo: ' + legajo, 50, 270);
+    ctx.fillText('Turno: ' + turno, 50, 300);
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
 
-// ---------- Formato automático legajo ----------
-document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, '');
-  if (valor.length > 5) {
-    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
-  }
-  e.target.value = valor;
-});
-
-// ---------- Modal "Ver inscripción" ----------
-function abrirVerInscripcion() {
-  document.getElementById('verInscripcionModal').style.display = 'block';
-  document.getElementById('verInscripcionModal').innerHTML = `
-    <h2>MI INSCRIPCIÓN</h2>
-    <label for="buscarLegajo">Legajo:</label>
-    <input type="text" id="buscarLegajo" placeholder="12345/6"/>
-    <button onclick="buscarInscripcion()">Buscar</button>
-    <div id="resultadoBusqueda"></div>
-    <button style="margin-top:15px;" onclick="cerrarVerInscripcion()">Cerrar</button>
-  `;
-}
-
-function cerrarVerInscripcion() {
-  document.getElementById('verInscripcionModal').style.display = 'none';
-}
-
-// ---------- Buscar inscripción ----------
-function buscarInscripcion() {
-  const legajoInput = document.getElementById('buscarLegajo');
-  let legajo = legajoInput.value.replace(/[^0-9]/g,'');
-  if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
-  legajoInput.value = legajo;
-
-  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
-  fetch(urlInscripciones)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split('\n').slice(1);
-      let encontrado = false;
-      filas.forEach(fila => {
-        const columnas = fila.split(',');
-        const nombre = columnas[0];
-        const leg = columnas[1];
-        const email = columnas[2];
-        const fechaTurno = columnas[4];
-        if (leg.trim() === legajo) {
-          document.getElementById('resultadoBusqueda').innerHTML = `
-            <div>
-              <p><strong>Nombre:</strong> ${nombre}</p>
-              <p><strong>Turno:</strong> ${fechaTurno}</p>
-            </div>
-          `;
-          encontrado = true;
-        }
-      });
-      if (!encontrado) {
-        document.getElementById('resultadoBusqueda').textContent = 'No se encontró inscripción con ese legajo.';
-      }
-    })
-    .catch(() => {
-      document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
-    });
-}
+window.onload = actualizarTurnos;
 </script>
 </body>
 </html>
+
 
 
 
