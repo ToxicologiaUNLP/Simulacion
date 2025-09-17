@@ -17,13 +17,14 @@
     h1 {
       text-align: center;
       color: #38828f;
+      font-size: 32px;
     }
     #f2Info {
-      color:#d94f4f;
-      font-size:60%;
-      font-family:'Open Sans', sans-serif;
-      text-align:center;
-      margin-bottom:20px;
+      text-align: center;
+      color: #d9534f;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 60%;
+      margin-bottom: 15px;
     }
     form {
       background: #f9f8f5;
@@ -315,6 +316,24 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
+// ---------- Cargar F2 ----------
+function cargarF2() {
+  const urlF2 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+  fetch(urlF2)
+    .then(res => res.text())
+    .then(csvText => {
+      const filas = csvText.trim().split('\n');
+      if(filas.length > 1) {
+        const columnas = filas[1].split(',');
+        const f2Texto = columnas[1].trim();
+        if(f2Texto) {
+          document.getElementById('f2Info').textContent = f2Texto;
+        }
+      }
+    })
+    .catch(()=>{});
+}
+
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos')
@@ -365,30 +384,9 @@ function actualizarTurnos() {
     });
 }
 
-// ---------- Cargar F2 ----------
-function cargarF2() {
-  const urlTurnos = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
-  fetch(urlTurnos)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split('\n');
-      if (filas.length > 1) {
-        const columnas = filas[1].split(',');
-        const f2 = columnas[5] || ''; // columna F → índice 5
-        if(f2.trim() !== '') {
-          document.getElementById('f2Info').textContent = f2;
-        }
-      }
-    })
-    .catch(() => {
-      document.getElementById('f2Info').textContent = '';
-    });
-}
-
 function cerrarModal() {
   document.getElementById('overlay').style.display = 'none';
   actualizarTurnos();
-  cargarF2();
 }
 
 // ---------- Inscripción ----------
@@ -555,13 +553,13 @@ function buscarInscripcion() {
 }
 
 // ---------- Inicialización ----------
-window.addEventListener('load', () => {
-  actualizarTurnos();
+window.onload = function() {
   cargarF2();
-});
+};
 </script>
 </body>
 </html>
+
 
 
 
