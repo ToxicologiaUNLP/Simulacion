@@ -267,6 +267,8 @@
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
+<div id="f2Text"></div> <!-- Aquí se mostrará el valor de F2 -->
+
 <form id="inscripcionForm">
   <label for="nombre">Alumno:</label>
   <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
@@ -299,6 +301,30 @@
 <div class="contacto">
     © Cátedra de Toxicología, HoSiC, Facultad de Ciencias Médicas - UNLP<br/>
     <strong style="font-weight: 700;">toxicoalumnos@gmail.com</strong>
+</div>
+
+<script>
+// ---------- Mostrar F2 ----------
+const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
+fetch(urlCSV)
+  .then(res => res.text())
+  .then(csvText => {
+    const filas = csvText.trim().split('\n');
+    const headers = filas[0].split(',');
+    const f2Index = headers.indexOf('estado'); 
+    const f2Value = filas[1].split(',')[f2Index].trim();
+    if (f2Value) {
+      const f2TextDiv = document.getElementById('f2Text');
+      f2TextDiv.textContent = f2Value.toUpperCase();
+      f2TextDiv.style.color = '#d9534f';
+      f2TextDiv.style.fontSize = '60%';
+      f2TextDiv.style.textAlign = 'center';
+      f2TextDiv.style.fontFamily = "'Open Sans', sans-serif";
+      f2TextDiv.style.fontWeight = '600';
+      f2TextDiv.style.marginBottom = '15px';
+    }
+  })
+  .catch(err => console.error('Error al leer F2:', err));
 </div>
 
 <script>
