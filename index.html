@@ -17,14 +17,14 @@
     h1 {
       text-align: center;
       color: #38828f;
-      font-size: 32px;
     }
-    #f2Info {
+    #mensajeF2 {
+      display: none;
       text-align: center;
-      color: #d9534f;
+      color: #d25c5c;
       font-family: 'Open Sans', sans-serif;
-      font-size: 60%;
-      margin-bottom: 15px;
+      margin-top: 10px;
+      font-size: 36px;
     }
     form {
       background: #f9f8f5;
@@ -71,6 +71,9 @@
     @media (max-width: 600px) {
       #logo {
         max-width: 90%;
+      }
+      #mensajeF2 {
+        font-size: 24px;
       }
     }
     .contacto {
@@ -275,7 +278,7 @@
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
-<div id="f2Info"></div>
+<div id="mensajeF2"></div>
 
 <form id="inscripcionForm">
   <label for="nombre">Alumno:</label>
@@ -316,22 +319,33 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// ---------- Cargar F2 ----------
-function cargarF2() {
+// ---------- Mostrar mensaje F2 ----------
+function cargarMensajeF2() {
   const urlF2 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv';
+  
   fetch(urlF2)
     .then(res => res.text())
     .then(csvText => {
       const filas = csvText.trim().split('\n');
-      if(filas.length > 1) {
+      if (filas.length > 1) {
         const columnas = filas[1].split(',');
-        const f2Texto = columnas[1].trim();
-        if(f2Texto) {
-          document.getElementById('f2Info').textContent = f2Texto;
+        const mensaje = columnas[5] ? columnas[5].trim() : '';
+        if (mensaje) {
+          const div = document.getElementById('mensajeF2');
+          div.textContent = mensaje;
+          div.style.display = 'block';
         }
       }
     })
-    .catch(()=>{});
+    .catch(err => console.error('Error al cargar F2:', err));
+}
+
+function ajustarTamanoF2() {
+  const div = document.getElementById('mensajeF2');
+  if (!div) return;
+  const h1 = document.querySelector('h1');
+  const h1Size = window.getComputedStyle(h1).fontSize.replace('px','');
+  div.style.fontSize = Math.round(h1Size * 0.6) + 'px';
 }
 
 // ---------- Actualización de turnos ----------
@@ -465,97 +479,60 @@ function generarImagenConfirmacion() {
   logo.src = 'logo.png';
   logo.onload = () => {
     const maxLogoWidth = 150;
-    const maxLogoHeight = 150;
-    let logoWidth = logo.width;
-    let logoHeight = logo.height;
-    const ratio = Math.min(maxLogoWidth / logoWidth, maxLogoHeight / logoHeight);
-    logoWidth *= ratio;
-    logoHeight *= ratio;
-    const logoX = (width - logoWidth) / 2;
-    const logoY = 20;
-    ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+    const scaleLogo = Math.min(maxLogoWidth / logo.width, 1);
+    const logoWidth = logo.width * scaleLogo;
+    const logoHeight = logo.height * scaleLogo;
+    ctx.drawImage(logo, 20, 20, logoWidth, logoHeight);
     ctx.fillStyle = '#38828f';
-    ctx.font = 'bold 24px "Open Sans", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
-    ctx.fillStyle = '#000000';
-    ctx.font = '18px "Open Sans", sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
-    ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
-    ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
+    ctx.font = '20px "Open Sans"';
+    ctx.fillText('Comprobante de inscripción', 200, 50);
+    ctx.fillStyle = 'black';
+    ctx.font = '18px "Open Sans"';
+    ctx.fillText(`Alumno: ${nombre}`, 50, 120);
+    ctx.fillText(`Legajo: ${legajo}`, 50, 160);
+    ctx.fillText(`Turno: ${turno}`, 50, 200);
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
 
-// ---------- Formato automático legajo ----------
-document.getElementById('legajo').addEventListener('input', function (e) {
-  let valor = e.target.value.replace(/[^0-9]/g, '');
-  if (valor.length > 5) {
-    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
-  }
-  e.target.value = valor;
-});
-
-// ---------- Modal "Ver inscripción" ----------
+// ---------- Modal ver inscripción ----------
 function abrirVerInscripcion() {
   document.getElementById('verInscripcionModal').style.display = 'block';
   document.getElementById('verInscripcionModal').innerHTML = `
-    <h2>MI INSCRIPCIÓN</h2>
-    <label for="buscarLegajo">Legajo:</label>
-    <input type="text" id="buscarLegajo" placeholder="12345/6"/>
+    <h2>Ver inscripción</h2>
+    <label>Legajo:</label>
+    <input type="text" id="buscarLegajo" placeholder="Ingrese su legajo"/>
     <button onclick="buscarInscripcion()">Buscar</button>
     <div id="resultadoBusqueda"></div>
-    <button style="margin-top:15px;" onclick="cerrarVerInscripcion()">Cerrar</button>
+    <button onclick="cerrarModalVer()">Cerrar</button>
   `;
 }
-
-function cerrarVerInscripcion() {
+function cerrarModalVer() {
   document.getElementById('verInscripcionModal').style.display = 'none';
 }
-
-// ---------- Buscar inscripción ----------
 function buscarInscripcion() {
-  const legajoInput = document.getElementById('buscarLegajo');
-  let legajo = legajoInput.value.replace(/[^0-9]/g,'');
-  if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
-  legajoInput.value = legajo;
-
-  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
-  fetch(urlInscripciones)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split('\n').slice(1);
-      let encontrado = false;
-      filas.forEach(fila => {
-        const columnas = fila.split(',');
-        const nombre = columnas[0];
-        const leg = columnas[1];
-        const email = columnas[2];
-        const fechaTurno = columnas[4];
-        if (leg.trim() === legajo) {
-          document.getElementById('resultadoBusqueda').innerHTML = `
-            <div>
-              <p><strong>Nombre:</strong> ${nombre}</p>
-              <p><strong>Turno:</strong> ${fechaTurno}</p>
-            </div>
-          `;
-          encontrado = true;
-        }
-      });
-      if (!encontrado) {
-        document.getElementById('resultadoBusqueda').textContent = 'No se encontró inscripción con ese legajo.';
+  const legajo = document.getElementById('buscarLegajo').value;
+  fetch(scriptURL + '?action=buscar&legajo=' + encodeURIComponent(legajo))
+    .then(res => res.json())
+    .then(data => {
+      const div = document.getElementById('resultadoBusqueda');
+      if (data.length > 0) {
+        div.innerHTML = `Turno asignado: ${data[0].turno}`;
+      } else {
+        div.innerHTML = 'No se encontró inscripción para ese legajo.';
       }
     })
     .catch(() => {
-      document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
+      document.getElementById('resultadoBusqueda').innerHTML = 'Error al buscar la inscripción.';
     });
 }
 
-// ---------- Inicialización ----------
-window.onload = function() {
-  cargarF2();
-};
+window.addEventListener('load', () => {
+  cargarMensajeF2();
+  ajustarTamanoF2();
+  actualizarTurnos();
+});
+window.addEventListener('resize', ajustarTamanoF2);
 </script>
 </body>
 </html>
