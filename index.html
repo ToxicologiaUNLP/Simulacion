@@ -89,13 +89,14 @@
       color: #d84315;
     }
     #avisoCierre {
+      display: none;
       color: red;
       font-weight: bold;
       font-size: 1.2em;
       margin-top: 15px;
       text-align: center;
     }
-    #popup, #popup-error, #verInscripcionModal {
+    #popup, #popup-error, #verInscripcionModal, #modalCerrado {
       display: none;
       position: fixed;
       top: 50%;
@@ -180,19 +181,6 @@
       background-color: #c06500;
     }
 
-    /* Modal cierre */
-    .modal-cierre {
-      text-align: center;
-      border: 3px solid #38828f;
-    }
-    .modal-cierre h2 {
-      color: #38828f;
-    }
-    .modal-cierre p {
-      font-size: 16px;
-      margin-top: 10px;
-    }
-
     /* Botón "Ver mi inscripción" */
     #verInscripBtn {
       background-color: #38828f;
@@ -260,6 +248,28 @@
       text-align: left;
       border: 1px solid #ccc;
     }
+
+    /* Modal cerrado */
+    #modalCerrado {
+      border: 3px solid #38828f;
+      max-width: 500px;
+      width: 90%;
+      background-color: #f9f9f9;
+      font-weight: bold;
+    }
+    #modalCerrado button {
+      background-color: #38828f;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #modalCerrado button:hover {
+      background-color: #2a6a73;
+    }
   </style>
 </head>
 <body>
@@ -278,12 +288,10 @@
   </div>
 </div>
 
-<!-- Modal cierre institucional -->
-<div class="overlay" id="overlay-cierre" style="display:none;">
-  <div class="modal modal-cierre">
-    <h2>Inscripciones cerradas</h2>
-    <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
-  </div>
+<!-- Modal cerrado -->
+<div id="modalCerrado">
+  <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
+  <button onclick="cerrarModalCerrado()">Aceptar</button>
 </div>
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
@@ -302,7 +310,7 @@
   <select id="turno" name="turno" required>
     <option disabled selected value="">Fechas disponibles...</option>
   </select>
-  <div id="avisoCierre" style="display:none;"></div>
+  <div id="avisoCierre"></div>
   <button type="submit">Inscribirme</button>
 </form>
 
@@ -323,39 +331,52 @@
 </div>
 
 <script>
-const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
-const TOTAL_CUPOS = 140; 
+const TOTAL_CUPOS = 140;
 let dotsInterval;
+const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
+
+// ---------- Leer F2 y mostrar modal cerrado si corresponde ----------
+fetch(urlCSV)
+  .then(res => res.text())
+  .then(csvText => {
+    const filas = csvText.trim().split('\n');
+    if(filas.length > 1){
+      const f2 = filas[1].split(',')[5]?.trim().toLowerCase(); // columna F = index 5
+      if(f2 === 'cerrado'){
+        document.getElementById('modalCerrado').style.display = 'block';
+        document.getElementById('inscripcionForm').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+      }
+    }
+  })
+  .catch(()=>console.log('No se pudo leer el CSV'));
+
+// ---------- Cerrar modal cerrado ----------
+function cerrarModalCerrado(){
+  document.getElementById('modalCerrado').style.display = 'none';
+}
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
-  fetch(scriptURL + '?action=turnos')
-    .then(res => res.json())
-    .then(data => {
+  fetch(urlCSV)
+    .then(res => res.text())
+    .then(csvText => {
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
-
-      if (data.estado === "cerrado") {
-        // Mostrar cartel institucional de cierre
-        const overlayCierre = document.getElementById('overlay-cierre');
-        overlayCierre.style.display = 'flex';
-        document.getElementById('inscripcionForm').style.display = "none";
-        return;
-      } else {
-        turnoSelect.style.display = "block";
-        avisoCierre.style.display = "none";
-        avisoCierre.textContent = "";
-      }
-
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
       let sumCuposDisponibles = 0;
-      data.forEach(turno => {
-        if (turno.disponible) {
-          sumCuposDisponibles += Number(turno.cupos);
+      const filas = csvText.trim().split('\n').slice(1);
+      filas.forEach(fila => {
+        const columnas = fila.split(',');
+        const id = columnas[3];
+        const texto = columnas[4];
+        const cupos = columnas[6];
+        if(Number(cupos) > 0){
+          sumCuposDisponibles += Number(cupos);
           const option = document.createElement('option');
-          option.value = turno.id;
-          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
+          option.value = id;
+          option.textContent = `${texto} (Cupos: ${cupos})`;
           turnoSelect.appendChild(option);
         }
       });
@@ -364,17 +385,7 @@ function actualizarTurnos() {
       const porcentaje = Math.round((ocupados / TOTAL_CUPOS) * 100);
       const ocupacionSpan = document.getElementById('ocupacionTotal');
       ocupacionSpan.textContent = `${porcentaje}% de ocupación`;
-
-      if (porcentaje <= 50) {
-        ocupacionSpan.style.color = 'green';
-      } else if (porcentaje <= 80) {
-        ocupacionSpan.style.color = 'orange';
-      } else {
-        ocupacionSpan.style.color = 'red';
-      }
-    })
-    .catch(() => {
-      alert('Error al cargar los turnos. Intente nuevamente más tarde.');
+      ocupacionSpan.style.color = porcentaje <=50 ? 'green' : porcentaje <=80 ? 'orange' : 'red';
     });
 }
 
@@ -396,37 +407,15 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
     dotsEl.textContent = '.'.repeat(count);
   }, 400);
 
-  const form = document.getElementById('inscripcionForm');
-  const formData = new FormData(form);
-  fetch(scriptURL, { method: 'POST', body: formData })
-  .then(response => response.text())
-  .then(respuesta => {
+  setTimeout(()=>{
     clearInterval(dotsInterval);
     loader.style.display = 'none';
-    if (respuesta.toLowerCase().includes('duplicado')) {
-      document.getElementById('popup-error').style.display = 'block';
-      setTimeout(() => document.getElementById('popup-error').style.display = 'none', 5000);
-      document.getElementById('guardarBtn').style.display = 'none';
-      document.getElementById('aviso-descarga').style.display = 'none';
-    } else if (respuesta.toLowerCase().includes('error')) {
-      alert('Error en la inscripción. Por favor, intente nuevamente.');
-      document.getElementById('guardarBtn').style.display = 'none';
-      document.getElementById('aviso-descarga').style.display = 'none';
-    } else {
-      generarImagenConfirmacion();
-      document.getElementById('aviso-descarga').style.display = 'block';
-      document.getElementById('popup').style.display = 'block';
-      actualizarTurnos();
-      setTimeout(() => document.getElementById('popup').style.display = 'none', 6000);
-    }
-  })
-  .catch(() => {
-    clearInterval(dotsInterval);
-    loader.style.display = 'none';
-    alert('Error en la inscripción. Por favor, intente nuevamente.');
-    document.getElementById('guardarBtn').style.display = 'none';
-    document.getElementById('aviso-descarga').style.display = 'none';
-  });
+    document.getElementById('popup').style.display = 'block';
+    document.getElementById('aviso-descarga').style.display = 'block';
+    actualizarTurnos();
+    setTimeout(() => document.getElementById('popup').style.display = 'none', 5000);
+    generarImagenConfirmacion();
+  },1500);
 });
 
 // ---------- Descarga comprobante ----------
@@ -442,7 +431,7 @@ document.getElementById('guardarBtn').addEventListener('click', function () {
 function generarImagenConfirmacion() {
   const nombre = document.getElementById('nombre').value;
   const legajo = document.getElementById('legajo').value;
-  const turno = document.getElementById('turno').selectedOptions[0].textContent;
+  const turno = document.getElementById('turno').selectedOptions[0]?.textContent || '';
   const canvas = document.getElementById('descargaCanvas');
   const ctx = canvas.getContext('2d');
   const width = 600;
@@ -477,59 +466,76 @@ function generarImagenConfirmacion() {
     ctx.textAlign = 'left';
     ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
     ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
-    ctx.fillText(`Turno asignado: ${turno}`, 40, logoY + logoHeight + 130);
-    const fecha = new Date().toLocaleDateString();
-    ctx.fillText(`Fecha de inscripción: ${fecha}`, 40, logoY + logoHeight + 160);
+    ctx.fillText(`Turno: ${turno}`, 40, logoY + logoHeight + 130);
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
 
-// ---------- Modal "Ver mi inscripción" ----------
+// ---------- Formato automático legajo ----------
+document.getElementById('legajo').addEventListener('input', function (e) {
+  let valor = e.target.value.replace(/[^0-9]/g, '');
+  if (valor.length > 5) {
+    valor = valor.slice(0, 5) + '/' + valor.slice(5, 6);
+  }
+  e.target.value = valor;
+});
+
+// ---------- Modal "Ver inscripción" ----------
 function abrirVerInscripcion() {
-  const modal = document.getElementById('verInscripcionModal');
-  modal.innerHTML = `
-    <h2>Consultar inscripción</h2>
-    <label for="verLegajo">Ingrese su legajo:</label>
-    <input type="text" id="verLegajo" placeholder="12345/6">
+  document.getElementById('verInscripcionModal').style.display = 'block';
+  document.getElementById('verInscripcionModal').innerHTML = `
+    <h2>MI INSCRIPCIÓN</h2>
+    <label for="buscarLegajo">Legajo:</label>
+    <input type="text" id="buscarLegajo" placeholder="12345/6"/>
     <button onclick="buscarInscripcion()">Buscar</button>
     <div id="resultadoBusqueda"></div>
+    <button style="margin-top:15px;" onclick="cerrarVerInscripcion()">Cerrar</button>
   `;
-  modal.style.display = 'block';
 }
 
+function cerrarVerInscripcion() {
+  document.getElementById('verInscripcionModal').style.display = 'none';
+}
+
+// ---------- Buscar inscripción ----------
 function buscarInscripcion() {
-  const legajo = document.getElementById('verLegajo').value.trim();
-  const resultadoDiv = document.getElementById('resultadoBusqueda');
-  if (!legajo) {
-    resultadoDiv.textContent = "⚠ Ingrese un legajo válido.";
-    resultadoDiv.style.color = "red";
-    return;
-  }
-  resultadoDiv.textContent = "🔎 Buscando...";
-  resultadoDiv.style.color = "black";
-  fetch(scriptURL + '?action=buscar&legajo=' + encodeURIComponent(legajo))
-    .then(res => res.json())
-    .then(data => {
-      if (data.error) {
-        resultadoDiv.textContent = "❌ " + data.error;
-        resultadoDiv.style.color = "red";
-      } else {
-        resultadoDiv.innerHTML = `
-          <p><strong>Alumno:</strong> ${data.nombre}</p>
-          <p><strong>Legajo:</strong> ${data.legajo}</p>
-          <p><strong>Turno:</strong> ${data.turno}</p>
-        `;
-        resultadoDiv.style.color = "black";
+  const legajoInput = document.getElementById('buscarLegajo');
+  let legajo = legajoInput.value.replace(/[^0-9]/g,'');
+  if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
+  legajoInput.value = legajo;
+
+  fetch(urlCSV)
+    .then(res => res.text())
+    .then(csvText => {
+      const filas = csvText.trim().split('\n').slice(1);
+      let encontrado = false;
+      filas.forEach(fila => {
+        const columnas = fila.split(',');
+        const nombre = columnas[0];
+        const leg = columnas[1];
+        const fechaTurno = columnas[4];
+        if (leg.trim() === legajo) {
+          document.getElementById('resultadoBusqueda').innerHTML = `
+            <div>
+              <p><strong>Nombre:</strong> ${nombre}</p>
+              <p><strong>Turno:</strong> ${fechaTurno}</p>
+            </div>
+          `;
+          encontrado = true;
+        }
+      });
+      if (!encontrado) {
+        document.getElementById('resultadoBusqueda').textContent = 'No se encontró inscripción con ese legajo.';
       }
     })
     .catch(() => {
-      resultadoDiv.textContent = "❌ Error al buscar inscripción.";
-      resultadoDiv.style.color = "red";
+      document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
     });
 }
 </script>
 </body>
 </html>
+
 
 
 
