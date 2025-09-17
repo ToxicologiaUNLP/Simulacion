@@ -253,7 +253,7 @@
 
 <!-- Modal numerado -->
 <div class="overlay" id="overlay">
-  <div class="modal" id="modalContent">
+  <div class="modal">
     <h2>⚠ ATENCIÓN</h2>
     <ol>
       <li>Solo podrá inscribirse y seleccionar una <strong>fecha por única vez</strong>.</li>
@@ -302,72 +302,38 @@
 </div>
 
 <script>
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// ---------- URL de tu CSV ----------
-const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6tjk1ZkcU3qxUkM7GFQ/pub?output=csv';
-
-// ---------- Revisar estado de inscripciones ----------
-fetch(urlCSV)
-  .then(res => res.text())
-  .then(csvText => {
-    const filas = csvText.trim().split('\n');
-    const estadoF2 = filas[1].split(',')[5].trim().toLowerCase();
-
-    if (estadoF2 === 'cerrado') {
-      // Ocultar formulario
-      document.getElementById('inscripcionForm').style.display = 'none';
-
-      // Mostrar modal de cierre
-      const overlay = document.getElementById('overlay');
-      overlay.style.display = 'flex';
-      const modal = document.getElementById('modalContent');
-      modal.innerHTML = `
-        <h2 style="color:#38828f;text-transform:uppercase;">INSCRIPCIÓN CERRADA</h2>
-        <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
-      `;
-      return;
-    }
-
-    // Si está abierto, se muestra el modal normal
-    document.getElementById('overlay').style.display = 'flex';
-  });
-
-// ---------- Función para cerrar modal ----------
-function cerrarModal() {
-  document.getElementById('overlay').style.display = 'none';
-  actualizarTurnos();
-}
-
-// ---------- Función actualizar turnos ----------
+// ---------- Actualización de turnos ----------
 function actualizarTurnos() {
-  fetch(urlCSV)
-    .then(res => res.text())
-    .then(csvText => {
-      const filas = csvText.trim().split('\n').slice(1);
+  fetch(scriptURL + '?action=turnos')
+    .then(res => res.json())
+    .then(data => {
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
-      turnoSelect.style.display = "block";
-      avisoCierre.style.display = "none";
-      avisoCierre.textContent = "";
+      if (data.estado === "cerrado") {
+        turnoSelect.style.display = "none";
+        avisoCierre.style.display = "block";
+        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
+        return;
+      } else {
+        turnoSelect.style.display = "block";
+        avisoCierre.style.display = "none";
+        avisoCierre.textContent = "";
+      }
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
       let sumCuposDisponibles = 0;
-      filas.forEach(fila => {
-        const columnas = fila.split(',');
-        const id = columnas[0];
-        const texto = columnas[1];
-        const cupos = columnas[4] ? parseInt(columnas[4]) : 0;
-        const estado = columnas[5] ? columnas[5].trim().toLowerCase() : '';
-
-        if (estado !== 'cerrado') {
-          sumCuposDisponibles += cupos;
+      data.forEach(turno => {
+        if (turno.disponible) {
+          sumCuposDisponibles += Number(turno.cupos);
           const option = document.createElement('option');
-          option.value = id;
-          option.textContent = `${columnas[1]} (Cupos: ${cupos})`;
+          option.value = turno.id;
+          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
           turnoSelect.appendChild(option);
         }
       });
@@ -388,6 +354,11 @@ function actualizarTurnos() {
     .catch(() => {
       alert('Error al cargar los turnos. Intente nuevamente más tarde.');
     });
+}
+
+function cerrarModal() {
+  document.getElementById('overlay').style.display = 'none';
+  actualizarTurnos();
 }
 
 // ---------- Inscripción ----------
@@ -522,6 +493,7 @@ function buscarInscripcion() {
   if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
   legajoInput.value = legajo;
 
+  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
   fetch(urlInscripciones)
     .then(res => res.text())
     .then(csvText => {
@@ -554,6 +526,158 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
