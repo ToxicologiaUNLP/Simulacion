@@ -253,7 +253,7 @@
 
 <!-- Modal numerado -->
 <div class="overlay" id="overlay">
-  <div class="modal">
+  <div class="modal" id="modalContent">
     <h2>⚠ ATENCIÓN</h2>
     <ol>
       <li>Solo podrá inscribirse y seleccionar una <strong>fecha por única vez</strong>.</li>
@@ -302,43 +302,50 @@
 </div>
 
 <script>
-const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// URL CSV de Google Sheets
-const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
+// ---------- URL de tu CSV ----------
+const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6tjk1ZkcU3qxUkM7GFQ/pub?output=csv';
 
-// ---------- Chequeo de F2 ----------
+// ---------- Revisar estado de inscripciones ----------
 fetch(urlCSV)
   .then(res => res.text())
   .then(csvText => {
     const filas = csvText.trim().split('\n');
-    if(filas.length > 1){
-      const f2 = filas[1].split(',')[5]; // columna F, fila 2
-      if(f2 && f2.trim().toLowerCase() === 'cerrado'){
-        const overlay = document.createElement('div');
-        overlay.className = 'overlay';
-        overlay.innerHTML = `
-          <div class="modal" style="border:2px solid #38828f; text-align:center;">
-            <h2>Inscripción cerrada</h2>
-            <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
-          </div>
-        `;
-        document.body.appendChild(overlay);
-        return; // detiene la carga de la página normal
-      }
-    }
-    // Si no está cerrado, se puede continuar con la inicialización normal
-    actualizarTurnos();
-  })
-  .catch(err => console.error('Error al leer CSV:', err));
+    const estadoF2 = filas[1].split(',')[5].trim().toLowerCase();
 
-// ---------- Actualización de turnos ----------
+    if (estadoF2 === 'cerrado') {
+      // Ocultar formulario
+      document.getElementById('inscripcionForm').style.display = 'none';
+
+      // Mostrar modal de cierre
+      const overlay = document.getElementById('overlay');
+      overlay.style.display = 'flex';
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `
+        <h2 style="color:#38828f;text-transform:uppercase;">INSCRIPCIÓN CERRADA</h2>
+        <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
+      `;
+      return;
+    }
+
+    // Si está abierto, se muestra el modal normal
+    document.getElementById('overlay').style.display = 'flex';
+  });
+
+// ---------- Función para cerrar modal ----------
+function cerrarModal() {
+  document.getElementById('overlay').style.display = 'none';
+  actualizarTurnos();
+}
+
+// ---------- Función actualizar turnos ----------
 function actualizarTurnos() {
-  fetch(scriptURL + '?action=turnos')
-    .then(res => res.json())
-    .then(data => {
+  fetch(urlCSV)
+    .then(res => res.text())
+    .then(csvText => {
+      const filas = csvText.trim().split('\n').slice(1);
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
@@ -349,12 +356,18 @@ function actualizarTurnos() {
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
       let sumCuposDisponibles = 0;
-      data.forEach(turno => {
-        if (turno.disponible) {
-          sumCuposDisponibles += Number(turno.cupos);
+      filas.forEach(fila => {
+        const columnas = fila.split(',');
+        const id = columnas[0];
+        const texto = columnas[1];
+        const cupos = columnas[4] ? parseInt(columnas[4]) : 0;
+        const estado = columnas[5] ? columnas[5].trim().toLowerCase() : '';
+
+        if (estado !== 'cerrado') {
+          sumCuposDisponibles += cupos;
           const option = document.createElement('option');
-          option.value = turno.id;
-          option.textContent = `${turno.texto} (Cupos: ${turno.cupos})`;
+          option.value = id;
+          option.textContent = `${columnas[1]} (Cupos: ${cupos})`;
           turnoSelect.appendChild(option);
         }
       });
