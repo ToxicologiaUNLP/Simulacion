@@ -180,20 +180,17 @@
       background-color: #c06500;
     }
 
-    /* Modal cierre institucional */
+    /* Modal cierre */
     .modal-cierre {
       text-align: center;
       border: 3px solid #38828f;
-      background: #f9f8f5;
     }
     .modal-cierre h2 {
       color: #38828f;
-      font-size: 22px;
-      margin-bottom: 15px;
     }
     .modal-cierre p {
       font-size: 16px;
-      color: #333;
+      margin-top: 10px;
     }
 
     /* Botón "Ver mi inscripción" */
@@ -281,6 +278,14 @@
   </div>
 </div>
 
+<!-- Modal cierre institucional -->
+<div class="overlay" id="overlay-cierre" style="display:none;">
+  <div class="modal modal-cierre">
+    <h2>Inscripciones cerradas</h2>
+    <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
+  </div>
+</div>
+
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
 <h1>PLATAFORMA DE INSCRIPCIONES</h1>
 <form id="inscripcionForm">
@@ -331,15 +336,9 @@ function actualizarTurnos() {
       const avisoCierre = document.getElementById('avisoCierre');
 
       if (data.estado === "cerrado") {
-        // 🔴 Cartel institucional de cierre
-        const overlay = document.getElementById('overlay');
-        overlay.style.display = 'flex';
-        overlay.querySelector('.modal').className = "modal modal-cierre";
-        overlay.querySelector('.modal').innerHTML = `
-          <h2>Inscripciones cerradas</h2>
-          <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
-        `;
-        // Ocultar formulario
+        // Mostrar cartel institucional de cierre
+        const overlayCierre = document.getElementById('overlay-cierre');
+        overlayCierre.style.display = 'flex';
         document.getElementById('inscripcionForm').style.display = "none";
         return;
       } else {
@@ -472,18 +471,62 @@ function generarImagenConfirmacion() {
     ctx.fillStyle = '#38828f';
     ctx.font = 'bold 24px "Open Sans", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Confirmación de inscripción', width / 2, 200);
+    ctx.fillText('Confirmación de inscripción', width / 2, logoY + logoHeight + 30);
     ctx.fillStyle = '#000000';
     ctx.font = '18px "Open Sans", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('Alumno: ' + nombre, 50, 240);
-    ctx.fillText('Legajo: ' + legajo, 50, 270);
-    ctx.fillText('Turno: ' + turno, 50, 300);
+    ctx.fillText(`Nombre: ${nombre}`, 40, logoY + logoHeight + 70);
+    ctx.fillText(`Legajo: ${legajo}`, 40, logoY + logoHeight + 100);
+    ctx.fillText(`Turno asignado: ${turno}`, 40, logoY + logoHeight + 130);
+    const fecha = new Date().toLocaleDateString();
+    ctx.fillText(`Fecha de inscripción: ${fecha}`, 40, logoY + logoHeight + 160);
     document.getElementById('guardarBtn').style.display = 'block';
   };
 }
 
-window.onload = actualizarTurnos;
+// ---------- Modal "Ver mi inscripción" ----------
+function abrirVerInscripcion() {
+  const modal = document.getElementById('verInscripcionModal');
+  modal.innerHTML = `
+    <h2>Consultar inscripción</h2>
+    <label for="verLegajo">Ingrese su legajo:</label>
+    <input type="text" id="verLegajo" placeholder="12345/6">
+    <button onclick="buscarInscripcion()">Buscar</button>
+    <div id="resultadoBusqueda"></div>
+  `;
+  modal.style.display = 'block';
+}
+
+function buscarInscripcion() {
+  const legajo = document.getElementById('verLegajo').value.trim();
+  const resultadoDiv = document.getElementById('resultadoBusqueda');
+  if (!legajo) {
+    resultadoDiv.textContent = "⚠ Ingrese un legajo válido.";
+    resultadoDiv.style.color = "red";
+    return;
+  }
+  resultadoDiv.textContent = "🔎 Buscando...";
+  resultadoDiv.style.color = "black";
+  fetch(scriptURL + '?action=buscar&legajo=' + encodeURIComponent(legajo))
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        resultadoDiv.textContent = "❌ " + data.error;
+        resultadoDiv.style.color = "red";
+      } else {
+        resultadoDiv.innerHTML = `
+          <p><strong>Alumno:</strong> ${data.nombre}</p>
+          <p><strong>Legajo:</strong> ${data.legajo}</p>
+          <p><strong>Turno:</strong> ${data.turno}</p>
+        `;
+        resultadoDiv.style.color = "black";
+      }
+    })
+    .catch(() => {
+      resultadoDiv.textContent = "❌ Error al buscar inscripción.";
+      resultadoDiv.style.color = "red";
+    });
+}
 </script>
 </body>
 </html>
