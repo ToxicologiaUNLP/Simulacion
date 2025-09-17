@@ -542,7 +542,8 @@ function buscarInscripcion() {
 
 // ---------- Mostrar valor F2 con fade-in ----------
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('https://docs.google.com/spreadsheets/d/e/YOUR_SPREADSHEET_ID/pub?output=csv')
+  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv')
+
     .then(res => res.text())
     .then(csv => {
       const filas = csv.trim().split('\n');
