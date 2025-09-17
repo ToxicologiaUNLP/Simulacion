@@ -247,45 +247,6 @@
       text-align: left;
       border: 1px solid #ccc;
     }
-
-    /* Nuevo modal de cierre institucional */
-    #modalCerrado {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      border: 3px solid #38828f;
-      font-family: 'Open Sans', sans-serif;
-      font-size: 18px;
-      text-align: center;
-      z-index: 100000;
-      max-width: 500px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-    }
-    #modalCerrado h2 {
-      color: #38828f;
-      margin-bottom: 20px;
-    }
-    #modalCerrado p {
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    #modalCerrado button {
-      background-color: #38828f;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    #modalCerrado button:hover {
-      background-color: #2a6a73;
-    }
   </style>
 </head>
 <body>
@@ -302,13 +263,6 @@
     <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
     <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto, ver mi fecha</button>
   </div>
-</div>
-
-<!-- Modal de cierre institucional -->
-<div id="modalCerrado">
-  <h2>Inscripciones Finalizadas</h2>
-  <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
-  <button onclick="cerrarModalCerrado()">Cerrar</button>
 </div>
 
 <img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
@@ -352,34 +306,33 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
-// Link CSV
-const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv'; // reemplazar por tu link real
+// URL CSV de Google Sheets
+const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?output=csv';
 
-// ---------- Chequear estado F2 ----------
-fetch(urlInscripciones)
+// ---------- Chequeo de F2 ----------
+fetch(urlCSV)
   .then(res => res.text())
   .then(csvText => {
     const filas = csvText.trim().split('\n');
-    const f2 = filas[1].split(',')[1].trim().toLowerCase();
-    if(f2 === 'cerrado') {
-      document.getElementById('inscripcionForm').style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('modalCerrado').style.display = 'block';
-    } else {
-      document.getElementById('overlay').style.display = 'flex';
-      actualizarTurnos();
+    if(filas.length > 1){
+      const f2 = filas[1].split(',')[5]; // columna F, fila 2
+      if(f2 && f2.trim().toLowerCase() === 'cerrado'){
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        overlay.innerHTML = `
+          <div class="modal" style="border:2px solid #38828f; text-align:center;">
+            <h2>Inscripción cerrada</h2>
+            <p>Disculpe, la fecha de inscripciones ha finalizado.</p>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        return; // detiene la carga de la página normal
+      }
     }
+    // Si no está cerrado, se puede continuar con la inicialización normal
+    actualizarTurnos();
   })
-  .catch(err => console.error('Error leyendo CSV:', err));
-
-function cerrarModal() {
-  document.getElementById('overlay').style.display = 'none';
-  actualizarTurnos();
-}
-
-function cerrarModalCerrado() {
-  document.getElementById('modalCerrado').style.display = 'none';
-}
+  .catch(err => console.error('Error al leer CSV:', err));
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
@@ -389,16 +342,9 @@ function actualizarTurnos() {
       const turnoSelect = document.getElementById('turno');
       const avisoCierre = document.getElementById('avisoCierre');
 
-      if (data.estado === "cerrado") {
-        turnoSelect.style.display = "none";
-        avisoCierre.style.display = "block";
-        avisoCierre.textContent = data.mensaje || "Las inscripciones están cerradas.";
-        return;
-      } else {
-        turnoSelect.style.display = "block";
-        avisoCierre.style.display = "none";
-        avisoCierre.textContent = "";
-      }
+      turnoSelect.style.display = "block";
+      avisoCierre.style.display = "none";
+      avisoCierre.textContent = "";
 
       turnoSelect.innerHTML = '<option value="" disabled selected>Fechas disponibles...</option>';
 
