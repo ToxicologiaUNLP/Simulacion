@@ -306,6 +306,21 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otc
 const TOTAL_CUPOS = 140; 
 let dotsInterval;
 
+const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
+
+fetch(urlCSV)
+  .then(res => res.text())
+  .then(csv => {
+    const filas = csv.trim().split("\n").map(f => f.split(","));
+    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : ""; // Celda F2
+    if (mensaje) {
+      const div = document.getElementById("mensajeF2");
+      div.textContent = mensaje;
+      div.style.display = "block";
+    }
+  })
+  .catch(err => console.error("Error al leer F2:", err));
+
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos')
