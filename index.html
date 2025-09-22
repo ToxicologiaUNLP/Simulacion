@@ -355,7 +355,8 @@ function actualizarTurnos() {
           sumCuposDisponibles += Number(turno.cupos);
           const option = document.createElement('option');
           option.value = turno.id;
-          option.textContent = `${turno.texto.replace(/\bhs\b/i, "h")} (Cupos: ${turno.cupos})`;
+          option.textContent = `${turno.texto.replace(/hs\b/i, " h")} (Cupos: ${turno.cupos})`;
+
           turnoSelect.appendChild(option);
         }
       });
