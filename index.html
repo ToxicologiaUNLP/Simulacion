@@ -2,99 +2,145 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <link href="logo2.png" rel="icon" type="image/png"/>
-  <title>Taller de simulación - Toxicología-FCM,UNLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="logo2.png" type="image/png"/>
+  <title>Taller de simulación - Toxicología-FCM, UNLP</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    /* ===== BASE ===== */
+    body, html {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
       font-family: 'Open Sans', sans-serif;
-      background: #f9f9f9;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      background: linear-gradient(135deg,
+        #087882 0%,
+        #0c8c9c 40%,
+        #045c63 70%,
+        #04545d 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    /* ===== CONTENEDOR INSTITUCIONAL ===== */
+    .main-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 40px 15px;
+      box-sizing: border-box;
+    }
+
+    .main-box {
+      background: rgba(198, 213, 218, 0.96);
+      width: 100%;
+      max-width: 600px;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      box-sizing: border-box;
+    }
+
+    /* ===== LOGO ===== */
+    #logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 20px;
+      border-radius: 12px;
+    }
+
     h1 {
       text-align: center;
-      color: #38828f;
+      color: #04545d;
+      margin-bottom: 20px;
     }
+
+    /* ===== FORM ===== */
     form {
       background: #f9f8f5;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     label {
       display: block;
       margin-top: 15px;
+      font-weight: 600;
+      color: #04545d;
     }
+
     input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      border: 1px solid #608b92;
+      border-radius: 6px;
       box-sizing: border-box;
+      font-family: inherit;
     }
+
     button {
-      background-color: #38828f;
+      background-color: #0c8c9c;
       color: white;
       border: none;
       margin-top: 20px;
       font-size: 16px;
       cursor: pointer;
+      transition: background 0.3s;
     }
+
     button:hover {
-      background-color: #2a6a73;
+      background-color: #04545d;
     }
+
     #inscripcionForm button[type="submit"] {
       width: auto;
+      padding: 10px 25px;
+      margin: 25px auto 0;
       display: block;
-      padding: 10px 20px;
-      margin: 20px auto 0;
     }
-    #logo {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 600px;
-      width: 100%;
-      height: auto;
-    }
-    @media (max-width: 600px) {
-      #logo {
-        max-width: 90%;
-      }
-    }
-    .contacto {
-      text-align: center;
-      margin-top: 30px;
-      color: #333;
-      font-size: 14px;
-    }
-    #guardarBtn {
-      display: none;
-      background-color: #4caf50;
-      width: auto;
-      padding: 10px 20px;
-      margin: 15px auto 0;
-      cursor: pointer;
-      border-radius: 5px;
+
+    /* ===== AVISOS ===== */
+    #avisoCierre {
+      color: #b22222;
       font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
     }
+
+    #loader {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #045c63;
+      display: none;
+    }
+
     #aviso-descarga {
       display: none;
       margin-top: 15px;
-      font-size: 14px;
       text-align: center;
-      color: #d84315;
+      color: #b22222;
+      font-weight: 600;
     }
-    #avisoCierre {
-      color: red;
+
+    #guardarBtn {
+      display: none;
+      background-color: #608b92;
+      width: auto;
+      padding: 10px 25px;
+      margin: 15px auto 0;
+      border-radius: 6px;
       font-weight: bold;
-      font-size: 1.2em;
-      margin-top: 15px;
-      text-align: center;
+      cursor: pointer;
     }
+
+    /* ===== POPUPS ===== */
     #popup, #popup-error, #verInscripcionModal {
       display: none;
       position: fixed;
@@ -102,150 +148,70 @@
       left: 50%;
       transform: translate(-50%, -50%);
       padding: 30px;
-      border-radius: 12px;
-      font-size: 18px;
-      text-align: center;
+      border-radius: 14px;
       z-index: 1000;
       box-shadow: 0px 5px 25px rgba(0,0,0,0.3);
       background-color: #ffffff;
-      color: black;
-      font-family: 'Open Sans', sans-serif;
+      text-align: center;
     }
+
     #popup {
-      border: 2px solid #38828f;
+      border: 2px solid #0c8c9c;
     }
+
     #popup-error {
       border: 2px solid #c62828;
       color: #b71c1c;
       background-color: #ffebee;
     }
-    #loader {
-      display: none;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #38828f;
-    }
 
-    /* Modal numerado */
+    /* ===== OVERLAY ===== */
     .overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(0,0,0,0.6);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 99999;
     }
+
     .modal {
       background: white;
       padding: 25px 30px;
-      border-radius: 10px;
+      border-radius: 14px;
       max-width: 500px;
-      text-align: left;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      font-family: Arial, sans-serif;
     }
+
     .modal h2 {
-      color: #e07b00;
-      margin-bottom: 15px;
+      color: #045c63;
       text-align: center;
     }
-    .modal ol {
-      padding-left: 20px;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    .modal li.important {
-      color: red;
-      font-weight: bold;
-    }
+
     .modal button {
-      margin-top: 20px;
-      display: block;
-      width: 100%;
-      padding: 10px 0;
-      background-color: #e07b00;
+      background-color: #0c8c9c;
       color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
+      border-radius: 6px;
     }
+
     .modal button:hover {
-      background-color: #c06500;
+      background-color: #04545d;
     }
 
-    /* Botón "Ver mi inscripción" */
-    #verInscripBtn {
-      background-color: #38828f;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin-top: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #verInscripBtn:hover {
-      background-color: #2a6a73;
-    }
-
-    /* Estilos internos del modal de ver inscripción */
-    #verInscripcionModal {
-      max-width: 450px;
-      width: 90%;
-      border: 2px solid #38828f;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    /* ===== FOOTER ===== */
+    .contacto {
+      margin-top: 30px;
       text-align: center;
-      padding: 25px;
-      background-color: #ffffff;
-    }
-    #verInscripcionModal h2 {
-      text-transform: uppercase;
-      font-weight: normal;
-      font-family: 'Open Sans', sans-serif;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    #verInscripcionModal label {
+      color: #04545d;
       font-size: 14px;
-      font-weight: normal;
-      display: block;
-      margin-bottom: 5px;
-      text-align: left;
     }
-    #verInscripcionModal input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-    #verInscripcionModal button {
-      background-color: #38828f;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-    }
-    #verInscripcionModal button:hover {
-      background-color: #2a6a73;
-    }
-    #resultadoBusqueda {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 16px;
-      text-align: left;
-      border: 1px solid #ccc;
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .main-box {
+        padding: 20px;
+      }
     }
   </style>
 </head>
