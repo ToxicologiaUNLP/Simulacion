@@ -1,126 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="icon" href="logo2.png" type="image/png"/>
-  <title>Taller de simulación - Toxicología-FCM, UNLP</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" href="logo2.png" type="image/png"/>
+<title>Taller de simulación - Toxicología FCM UNLP</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      font-family: 'Open Sans', sans-serif;
-      background: linear-gradient(135deg,
-        #087882 0%,
-        #0c8c9c 40%,
-        #045c63 70%,
-        #04545d 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+  background: linear-gradient(135deg,#087882 0%,#0c8c9c 40%,#045c63 70%,#04545d 100%);
+}
 
-    main {
-      background: rgba(198, 213, 218, 0.96);
-      width: 95%;
-      max-width: 520px;
-      border-radius: 20px;
-      padding: 30px;
-      margin: auto 0;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      box-sizing: border-box;
-      text-align: center;
-    }
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .logo {
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      display: block;
-    }
+.main-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 15px;
+}
 
-    h1 {
-      color: #04545d;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
+.main-box {
+  background: rgba(198,213,218,0.96);
+  width: 100%;
+  max-width: 600px;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(0,0,0,.25);
+}
 
-    form {
-      background: #f9f8f5;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: left;
-    }
+#logo {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-      color: #04545d;
-    }
+h1 {
+  text-align: center;
+  color: #04545d;
+  margin-bottom: 15px;
+}
 
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #608b92;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
+form {
+  background: #f9f8f5;
+  padding: 20px;
+  border-radius: 12px;
+}
 
-    button {
-      background-color: #0c8c9c;
-      color: white;
-      border: none;
-      margin-top: 20px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #04545d;
+}
 
-    button:hover {
-      background-color: #04545d;
-    }
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #608b92;
+}
 
-    #inscripcionForm button[type="submit"] {
-      width: auto;
-      padding: 10px 25px;
-      margin: 25px auto 0;
-      display: block;
-    }
+button {
+  background: #0c8c9c;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    #avisoCierre,
-    #loader,
-    #aviso-descarga {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: 600;
-    }
+button:hover { background:#04545d; }
 
-    footer {
-      width: 100%;
-      text-align: center;
-      color: #c6d5da;
-      font-size: 14px;
-      padding: 12px 0;
-    }
+#loader,
+#aviso-descarga,
+#guardarBtn,
+#popup,
+#popup-error {
+  display: none;
+}
 
-    @media (max-width: 480px) {
-      main {
-        padding: 20px;
-      }
-    }
-  </style>
+.contacto {
+  margin: 25px 0;
+  text-align: center;
+  color: #e8f3f4;
+  font-size: 14px;
+}
+
+/* MODAL */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  max-width: 500px;
+  text-align: center;
+}
+</style>
 </head>
 
 <body>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>⚠ ATENCIÓN</h2>
+    <ol style="text-align:left">
+      <li>Inscripción por única vez.</li>
+      <li>Verifique disponibilidad horaria.</li>
+      <li>Ingrese Apellido y Nombre.</li>
+    </ol>
+    <button onclick="cerrarModal()">Aceptar</button>
+  </div>
+</div>
+
+<div class="main-wrapper">
+<div class="main-box">
+
+<img id="logo" src="logo.png" alt="Logo Toxicología"/>
+
+<h1>TALLERES DE SIMULACIÓN</h1>
+
+<div id="mensajeF2" style="display:none;text-align:center;color:#b22222;font-weight:600"></div>
+
+<form id="inscripcionForm">
+  <label>Alumno</label>
+  <input id="nombre" name="nombre" required>
+
+  <label>Legajo</label>
+  <input id="legajo" name="legajo" required>
+
+  <label>Email</label>
+  <input id="email" name="email" type="email" required>
+
+  <label>Turno <span id="ocupacionTotal"></span></label>
+  <select id="turno" name="turno" required>
+    <option disabled selected>Fechas disponibles...</option>
+  </select>
+
+  <div id="avisoCierre"></div>
+  <button type="submit">Inscribirme</button>
+</form>
+
+<div id="loader">Inscribiendo<span id="dots"></span></div>
+<div id="aviso-descarga">Descargue el comprobante</div>
+<button id="guardarBtn">Descargar comprobante</button>
+
+<div id="popup">Inscripción exitosa</div>
+<div id="popup-error">Ya posee una inscripción</div>
+
+</div>
+</div>
+
+<div class="contacto">
+© Cátedra de Toxicología – FCM UNLP<br>
+<strong>toxicoalumnos@gmail.com</strong>
+</div>
+
+</body>
 
 <!-- MODAL ATENCIÓN -->
 <div class="overlay" id="overlay">
