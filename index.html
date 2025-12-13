@@ -1,274 +1,245 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link rel="icon" href="logo2.png" type="image/png"/>
-<title>Taller de simulación - Toxicología FCM UNLP</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="logo2.png" type="image/png"/>
+  <title>Taller de simulación - Toxicología-FCM, UNLP</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  font-family: 'Open Sans', sans-serif;
-  background: linear-gradient(135deg,#087882 0%,#0c8c9c 40%,#045c63 70%,#04545d 100%);
-}
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(
+        135deg,
+        #087882 0%,
+        #0c8c9c 40%,
+        #045c63 70%,
+        #04545d 100%
+      );
+      display: flex;
+      flex-direction: column;
+    }
 
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    main {
+      background: rgba(249, 248, 245, 0.96);
+      border-radius: 20px;
+      width: 95%;
+      max-width: 520px;
+      padding: 30px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+      margin: auto;
+    }
 
-.main-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 40px 15px;
-}
+    #logo {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
 
-.main-box {
-  background: rgba(198,213,218,0.96);
-  width: 100%;
-  max-width: 600px;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 8px 25px rgba(0,0,0,.25);
-}
+    h1 {
+      text-align: center;
+      color: #04545d;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
 
-#logo {
-  width: 100%;
-  display: block;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
 
-h1 {
-  text-align: center;
-  color: #04545d;
-  margin-bottom: 15px;
-}
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #04545d;
+    }
 
-form {
-  background: #f9f8f5;
-  padding: 20px;
-  border-radius: 12px;
-}
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
 
-label {
-  display: block;
-  margin-top: 15px;
-  font-weight: 600;
-  color: #04545d;
-}
+    button {
+      background-color: #0c8c9c;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
 
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #608b92;
-}
+    button:hover {
+      background-color: #04545d;
+      transform: translateY(-2px);
+    }
 
-button {
-  background: #0c8c9c;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
+    #inscripcionForm button[type="submit"] {
+      width: auto;
+      display: block;
+      padding: 12px 26px;
+      margin: 20px auto 0;
+    }
 
-button:hover { background:#04545d; }
+    #guardarBtn {
+      display: none;
+      background-color: #4caf50;
+      width: auto;
+      padding: 10px 20px;
+      margin: 15px auto 0;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+    }
 
-#loader,
-#aviso-descarga,
-#guardarBtn,
-#popup,
-#popup-error {
-  display: none;
-}
+    #aviso-descarga {
+      display: none;
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+      color: #d84315;
+    }
 
-.contacto {
-  margin: 25px 0;
-  text-align: center;
-  color: #e8f3f4;
-  font-size: 14px;
-}
+    #avisoCierre {
+      color: red;
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 15px;
+      text-align: center;
+    }
 
-/* MODAL */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+    #loader {
+      display: none;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #04545d;
+    }
 
-.modal {
-  background: white;
-  padding: 25px;
-  border-radius: 14px;
-  max-width: 500px;
-  text-align: center;
-}
-</style>
+    #popup, #popup-error, #verInscripcionModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 30px;
+      border-radius: 14px;
+      font-size: 18px;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+      background-color: #ffffff;
+    }
+
+    #popup {
+      border: 2px solid #0c8c9c;
+    }
+
+    #popup-error {
+      border: 2px solid #c62828;
+      background-color: #ffebee;
+      color: #b71c1c;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+
+    .modal {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 14px;
+      max-width: 500px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .modal h2 {
+      text-align: center;
+      color: #e07b00;
+      margin-bottom: 15px;
+    }
+
+    .modal button {
+      margin-top: 15px;
+      width: 100%;
+      background-color: #e07b00;
+      border-radius: 8px;
+    }
+
+    .modal button:hover {
+      background-color: #c06500;
+    }
+
+    .contacto {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 14px;
+      color: #04545d;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px 0;
+      font-size: 13px;
+      color: #c6d5da;
+    }
+
+    @media (max-width: 480px) {
+      main {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>⚠ ATENCIÓN</h2>
-    <ol style="text-align:left">
-      <li>Inscripción por única vez.</li>
-      <li>Verifique disponibilidad horaria.</li>
-      <li>Ingrese Apellido y Nombre.</li>
-    </ol>
-    <button onclick="cerrarModal()">Aceptar</button>
+  <!-- Modal numerado -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2>⚠ ATENCIÓN</h2>
+      <ol>
+        <li>Solo podrá inscribirse y seleccionar una <strong>fecha por única vez</strong>.</li>
+        <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
+        <li class="important">Respete el orden Apellido y Nombre/s.</li>
+      </ol>
+      <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
+      <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto</button>
+    </div>
   </div>
-</div>
 
-<div class="main-wrapper">
-<div class="main-box">
+  <main>
+    <img src="logo.png" alt="Logo Cátedra Toxicología" id="logo">
 
-<img id="logo" src="logo.png" alt="Logo Toxicología"/>
+    <h1>TALLERES DE SIMULACIÓN</h1>
 
-<h1>TALLERES DE SIMULACIÓN</h1>
+    <div id="mensajeF2" style="display:none; text-align:center; margin-top:8px; color:#b22222; font-weight:600;"></div>
 
-<div id="mensajeF2" style="display:none;text-align:center;color:#b22222;font-weight:600"></div>
+    <form id="inscripcionForm">
 
-<form id="inscripcionForm">
-  <label>Alumno</label>
-  <input id="nombre" name="nombre" required>
-
-  <label>Legajo</label>
-  <input id="legajo" name="legajo" required>
-
-  <label>Email</label>
-  <input id="email" name="email" type="email" required>
-
-  <label>Turno <span id="ocupacionTotal"></span></label>
-  <select id="turno" name="turno" required>
-    <option disabled selected>Fechas disponibles...</option>
-  </select>
-
-  <div id="avisoCierre"></div>
-  <button type="submit">Inscribirme</button>
-</form>
-
-<div id="loader">Inscribiendo<span id="dots"></span></div>
-<div id="aviso-descarga">Descargue el comprobante</div>
-<button id="guardarBtn">Descargar comprobante</button>
-
-<div id="popup">Inscripción exitosa</div>
-<div id="popup-error">Ya posee una inscripción</div>
-
-</div>
-</div>
-
-<div class="contacto">
-© Cátedra de Toxicología – FCM UNLP<br>
-<strong>toxicoalumnos@gmail.com</strong>
-</div>
-
-</body>
-
-<!-- MODAL ATENCIÓN -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>⚠ ATENCIÓN</h2>
-    <ol>
-      <li>Solo podrá inscribirse y seleccionar una <strong>fecha por única vez</strong>.</li>
-      <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
-      <li>Respete el orden: Apellido y Nombre/s.</li>
-    </ol>
-    <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-    <button onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto, ver mi fecha</button>
-  </div>
-</div>
-
-<main>
-
-  <img src="logo.png" alt="Logo Cátedra Toxicología" class="logo">
-
-  <h1>TALLERES DE SIMULACIÓN</h1>
-
-  <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:10px; color:#b22222; font-weight:600;"></div>
-
-  <form id="inscripcionForm">
-    <label for="nombre">Alumno:</label>
-    <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required>
-
-    <label for="legajo">Legajo:</label>
-    <input id="legajo" name="legajo" placeholder="12345/6" required>
-
-    <label for="email">Correo electrónico:</label>
-    <input id="email" name="email" placeholder="alumno@gmail.com" required>
-
-    <label for="turno">Seleccione turno:</label>
-    <select id="turno" name="turno" required>
-      <option disabled selected>Fechas disponibles...</option>
-    </select>
-
-    <div id="avisoCierre" style="display:none;"></div>
-
-    <button type="submit">Inscribirme</button>
-  </form>
-
-  <div id="loader">Inscribiendo<span id="dots"></span></div>
-  <div id="aviso-descarga">Descargue el comprobante y agende la fecha.</div>
-  <button id="guardarBtn">Descargar comprobante</button>
-  <canvas id="descargaCanvas" style="display:none;"></canvas>
-
-  <div id="popup">Inscripción exitosa.</div>
-  <div id="popup-error">Ya posee una inscripción.</div>
-
-  <div id="verInscripcionModal"></div>
-
-</main>
-
-<footer>
-  © Cátedra de Toxicología, HoSiC – Facultad de Ciencias Médicas – UNLP<br>
-  <strong>toxicoalumnos@gmail.com</strong>
-</footer>
-
-<!-- ⚠ SCRIPT ORIGINAL COMPLETO (SIN CAMBIOS) -->
-<script>
-/* TODO tu JavaScript original va acá, exactamente igual */
-</script>
-
-</body>
-</html>
-
-
-<!-- Modal numerado -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>⚠ ATENCIÓN</h2>
-    <ol>
-      <li>Solo podrá inscribirse y seleccionar una <strong>fecha por única vez</strong>.</li>
-      <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
-      <li class="important">Respete el orden al ingresar su nombre: Apellido y Nombre/s.</li>
-    </ol>
-    <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-    <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto, ver mi fecha</button>
-  </div>
-</div>
-
-<img alt="Logo Cátedra Toxicología" id="logo" src="logo.png"/>
-<h1>TALLERES DE SIMULACIÓN</h1>
-  <div id="mensajeF2" style="display:none;
-                          text-align:center;
-                          margin-top:8px;
-                          color:#b22222;
-                          font-size:1.2em;
-                          font-weight:600;">
-</div>
-<form id="inscripcionForm">
   <label for="nombre">Alumno:</label>
   <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
   <label for="legajo">Legajo:</label>
@@ -543,6 +514,442 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
