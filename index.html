@@ -159,15 +159,16 @@
       color: #b71c1c;
     }
 
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 99999;
-    }
+.overlay {
+  display: none; /* que no aparezca al cargar */
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
 
     .modal {
       background: white;
@@ -228,7 +229,7 @@
         <li class="important">Respete el orden Apellido y Nombre/s.</li>
       </ol>
       <button id="botonAceptar" onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-      <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto</button>
+      <button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>
     </div>
 <div id="mensajeF2" style="display:none;"></div>
 
@@ -279,18 +280,18 @@ let dotsInterval;
 
 const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
 
-fetch(urlCSV)
+fetch(urlCSV + '?t=' + new Date().getTime())
   .then(res => res.text())
   .then(csv => {
     const filas = csv.trim().split("\n").map(f => f.split(","));
-    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : ""; // Celda F2
-if (mensaje) {
-  document.getElementById("mensajeF2").textContent = mensaje; // solo guardamos el texto
-  controlarFechas(); // 🔹 Llamada importante
-}
-
+    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : "";
+    if (mensaje) {
+      document.getElementById("mensajeF2").textContent = mensaje;
+      controlarFechas(); // ✅ recalcular fechas siempre
+    }
   })
   .catch(err => console.error("Error al leer F2:", err));
+
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
@@ -344,9 +345,10 @@ function actualizarTurnos() {
 }
 
 function cerrarModal() {
-  document.getElementById('overlay').style.display = 'none';
-  actualizarTurnos();
+  const overlay = document.getElementById('overlay');
+  if (overlay) overlay.style.display = 'none';
 }
+
 
 // ---------- Inscripción ----------
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
@@ -458,8 +460,10 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 
 // ---------- Modal "Ver inscripción" ----------
 function abrirVerInscripcion() {
-  document.getElementById('verInscripcionModal').style.display = 'block';
-  document.getElementById('verInscripcionModal').innerHTML = `
+  const modal = document.getElementById('verInscripcionModal');
+  modal.style.display = 'block';
+  document.getElementById('overlay').style.display = 'flex';
+  modal.innerHTML = `
     <h2>MI INSCRIPCIÓN</h2>
     <label for="buscarLegajo">Legajo:</label>
     <input type="text" id="buscarLegajo" placeholder="12345/6"/>
