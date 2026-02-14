@@ -116,14 +116,13 @@
       color: #d84315;
     }
 
-#avisoCierre {
-  color: red;
-  font-weight: bold;
-  font-size: 1.1em;
-  margin-top: 15px;
-  text-align: center;
-  min-height: 2.2em; /* altura aproximada de dos líneas */
-}
+    #avisoCierre {
+      color: red;
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 15px;
+      text-align: center;
+    }
 
     #loader {
       display: none;
@@ -159,16 +158,15 @@
       color: #b71c1c;
     }
 
-.overlay {
-  display: none; /* al cargar */
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-}
-
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
 
     .modal {
       background: white;
@@ -228,16 +226,17 @@
         <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
         <li class="important">Respete el orden Apellido y Nombre/s.</li>
       </ol>
-      <button id="botonAceptar" onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
-      <button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>
+      <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
+      <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto</button>
     </div>
-</div>
-<div id="mensajeF2" style="display:none;"></div>
+  </div>
 
   <main>
     <img src="logo.png" alt="Logo Cátedra Toxicología" id="logo">
 
     <h1>TALLERES DE SIMULACIÓN</h1>
+
+    <div id="mensajeF2" style="display:none; text-align:center; margin-top:8px; color:#b22222; font-weight:600;"></div>
 
     <form id="inscripcionForm">
 
@@ -281,18 +280,18 @@ let dotsInterval;
 
 const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
 
-fetch(urlCSV + '?t=' + new Date().getTime())
+fetch(urlCSV)
   .then(res => res.text())
   .then(csv => {
     const filas = csv.trim().split("\n").map(f => f.split(","));
-    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : "";
+    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : ""; // Celda F2
     if (mensaje) {
-      document.getElementById("mensajeF2").textContent = mensaje;
-      controlarFechas(); // ✅ recalcular fechas siempre
+      const div = document.getElementById("mensajeF2");
+      div.textContent = mensaje;
+      div.style.display = "block";
     }
   })
   .catch(err => console.error("Error al leer F2:", err));
-
 
 // ---------- Actualización de turnos ----------
 function actualizarTurnos() {
@@ -346,10 +345,9 @@ function actualizarTurnos() {
 }
 
 function cerrarModal() {
-  const overlay = document.getElementById('overlay');
-  if (overlay) overlay.style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+  actualizarTurnos();
 }
-
 
 // ---------- Inscripción ----------
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
@@ -366,21 +364,17 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
 
   const form = document.getElementById('inscripcionForm');
   const formData = new FormData(form);
- fetch(scriptURL, { method: 'POST', body: formData })
+  fetch(scriptURL, { method: 'POST', body: formData })
   .then(response => response.text())
   .then(respuesta => {
     clearInterval(dotsInterval);
     loader.style.display = 'none';
-    
-    // filtrar HTML si hay tags
-    respuesta = respuesta.replace(/<[^>]*>/g, '').trim().toLowerCase();
-
-    if (respuesta.includes('duplicado')) {
+    if (respuesta.toLowerCase().includes('duplicado')) {
       document.getElementById('popup-error').style.display = 'block';
       setTimeout(() => document.getElementById('popup-error').style.display = 'none', 5000);
       document.getElementById('guardarBtn').style.display = 'none';
       document.getElementById('aviso-descarga').style.display = 'none';
-    } else if (respuesta.includes('error')) {
+    } else if (respuesta.toLowerCase().includes('error')) {
       alert('Error en la inscripción. Por favor, intente nuevamente.');
       document.getElementById('guardarBtn').style.display = 'none';
       document.getElementById('aviso-descarga').style.display = 'none';
@@ -465,10 +459,8 @@ document.getElementById('legajo').addEventListener('input', function (e) {
 
 // ---------- Modal "Ver inscripción" ----------
 function abrirVerInscripcion() {
-  const modal = document.getElementById('verInscripcionModal');
-  modal.style.display = 'block';
-  document.getElementById('overlay').style.display = 'flex';
-  modal.innerHTML = `
+  document.getElementById('verInscripcionModal').style.display = 'block';
+  document.getElementById('verInscripcionModal').innerHTML = `
     <h2>MI INSCRIPCIÓN</h2>
     <label for="buscarLegajo">Legajo:</label>
     <input type="text" id="buscarLegajo" placeholder="12345/6"/>
@@ -489,7 +481,7 @@ function buscarInscripcion() {
   if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
   legajoInput.value = legajo;
 
-  const urlInscripciones = 'https://docs.google.com/spreadsheets/.../pub?gid=1122482966&single=true&output=csv';
+  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
   fetch(urlInscripciones)
     .then(res => res.text())
     .then(csvText => {
@@ -499,6 +491,7 @@ function buscarInscripcion() {
         const columnas = fila.split(',');
         const nombre = columnas[0];
         const leg = columnas[1];
+        const email = columnas[2];
         const fechaTurno = columnas[4];
         if (leg.trim() === legajo) {
           document.getElementById('resultadoBusqueda').innerHTML = `
@@ -518,64 +511,882 @@ function buscarInscripcion() {
       document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
     });
 }
-
-// ---------- Control de fechas de inscripción ----------
-function controlarFechas() {
-  const mensajeF2 = document.getElementById('mensajeF2').textContent.trim();
-  if (!mensajeF2) return;
-
-  function parseFechaDDMMYYYY(str) {
-    const [d, m, y] = str.split('/');
-    return new Date(y, m - 1, d);
-  }
-
-  const [inicioStr, finStr] = mensajeF2.split('-').map(s => s.trim());
-  const fechaInicio = parseFechaDDMMYYYY(inicioStr);
-  const fechaFin = parseFechaDDMMYYYY(finStr);
-
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-
-  const botonInscripcion = document.querySelector('#inscripcionForm button[type="submit"]');
-  const avisoCierre = document.getElementById('avisoCierre');
-  const botonAceptar = document.getElementById('botonAceptar');
-  const botonVer = document.getElementById('verInscripBtn');
-
-  if (hoy < fechaInicio) {
-    botonInscripcion.disabled = true;
-    if (botonAceptar) botonAceptar.disabled = true;
-    if (botonVer) botonVer.disabled = false;
-    avisoCierre.style.display = 'block';
-    avisoCierre.innerHTML = `La inscripción aún no ha comenzado.<br/>Se abrirá el ${inicioStr} a las 00:00`;
-  } else if (hoy > fechaFin) {
-    botonInscripcion.disabled = true;
-    if (botonAceptar) botonAceptar.disabled = true;
-    if (botonVer) botonVer.disabled = false;
-    avisoCierre.style.display = 'block';
-    avisoCierre.textContent = 'No es posible, fecha de inscripciones finalizada.';
-  } else {
-    botonInscripcion.disabled = false;
-    if (botonAceptar) botonAceptar.disabled = false;
-    if (botonVer) botonVer.disabled = false;
-    avisoCierre.style.display = 'none';
-  }
-}
-  fetch(urlCSV + '?t=' + new Date().getTime())
-  .then(res => res.text())
-  .then(csv => {
-    const filas = csv.trim().split("\n").map(f => f.split(","));
-    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : "";
-    if (mensaje) {
-      const mensajeEl = document.getElementById("mensajeF2");
-      mensajeEl.textContent = mensaje;
-      controlarFechas(); // ✅ solo después de cargar mensajeF2
-    }
-  })
-  .catch(err => console.error("Error al leer F2:", err));
-
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
