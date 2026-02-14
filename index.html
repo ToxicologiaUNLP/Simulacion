@@ -160,15 +160,15 @@
     }
 
 .overlay {
-  display: none; /* que no aparezca al cargar */
+  display: none; /* al cargar */
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
-  display: flex;
   justify-content: center;
   align-items: center;
   z-index: 99999;
 }
+
 
     .modal {
       background: white;
@@ -365,17 +365,21 @@ document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
 
   const form = document.getElementById('inscripcionForm');
   const formData = new FormData(form);
-  fetch(scriptURL, { method: 'POST', body: formData })
+ fetch(scriptURL, { method: 'POST', body: formData })
   .then(response => response.text())
   .then(respuesta => {
     clearInterval(dotsInterval);
     loader.style.display = 'none';
-    if (respuesta.toLowerCase().includes('duplicado')) {
+    
+    // filtrar HTML si hay tags
+    respuesta = respuesta.replace(/<[^>]*>/g, '').trim().toLowerCase();
+
+    if (respuesta.includes('duplicado')) {
       document.getElementById('popup-error').style.display = 'block';
       setTimeout(() => document.getElementById('popup-error').style.display = 'none', 5000);
       document.getElementById('guardarBtn').style.display = 'none';
       document.getElementById('aviso-descarga').style.display = 'none';
-    } else if (respuesta.toLowerCase().includes('error')) {
+    } else if (respuesta.includes('error')) {
       alert('Error en la inscripción. Por favor, intente nuevamente.');
       document.getElementById('guardarBtn').style.display = 'none';
       document.getElementById('aviso-descarga').style.display = 'none';
@@ -556,8 +560,13 @@ function controlarFechas() {
     avisoCierre.style.display = 'none';
     if (botonAceptar) botonAceptar.disabled = false;
     if (botonVer) botonVer.disabled = false;
+    else botonAceptar.disabled = false;
   }
 }
+  document.addEventListener('DOMContentLoaded', () => {
+  controlarFechas(); // recalcula fechas al cargar
+});
+
 
 </script>
 </body>
