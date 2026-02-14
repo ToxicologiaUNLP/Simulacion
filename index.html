@@ -481,7 +481,7 @@ function buscarInscripcion() {
   if (legajo.length > 5) legajo = legajo.slice(0,5) + '/' + legajo.slice(5,6);
   legajoInput.value = legajo;
 
-  const urlInscripciones = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv';
+  const urlInscripciones = 'https://docs.google.com/spreadsheets/.../pub?gid=1122482966&single=true&output=csv';
   fetch(urlInscripciones)
     .then(res => res.text())
     .then(csvText => {
@@ -491,7 +491,6 @@ function buscarInscripcion() {
         const columnas = fila.split(',');
         const nombre = columnas[0];
         const leg = columnas[1];
-        const email = columnas[2];
         const fechaTurno = columnas[4];
         if (leg.trim() === legajo) {
           document.getElementById('resultadoBusqueda').innerHTML = `
@@ -511,6 +510,39 @@ function buscarInscripcion() {
       document.getElementById('resultadoBusqueda').textContent = 'Error al cargar los datos.';
     });
 }
+
+// ---------- Control de fechas de inscripción ----------
+function controlarFechas() {
+  const mensajeF2 = document.getElementById('mensajeF2').textContent.trim();
+  if (!mensajeF2) return;
+
+  const [inicioStr, finStr] = mensajeF2.split('-');
+  const fechaInicio = new Date(inicioStr.split('/').reverse().join('/'));
+  const fechaFin = new Date(finStr.split('/').reverse().join('/'));
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const botonInscripcion = document.querySelector('#inscripcionForm button[type="submit"]');
+  const avisoCierre = document.getElementById('avisoCierre');
+
+  if (hoy < fechaInicio) {
+    botonInscripcion.disabled = true;
+    avisoCierre.style.display = 'block';
+    avisoCierre.textContent = `La inscripción aún no ha comenzado. Se abrirá el ${inicioStr}`;
+  } else if (hoy > fechaFin) {
+    botonInscripcion.disabled = true;
+    avisoCierre.style.display = 'block';
+    avisoCierre.textContent = "No es posible, fecha de inscripciones finalizada.";
+  } else {
+    botonInscripcion.disabled = false;
+    avisoCierre.style.display = 'none';
+  }
+}
+
+// Ejecutar al cargar la página
+window.onload = function() {
+  controlarFechas();
+};
 </script>
 </body>
 </html>
