@@ -236,8 +236,6 @@
 
     <h1>TALLERES DE SIMULACIÓN</h1>
 
-    <div id="mensajeF2" style="display:none; text-align:center; margin-top:8px; color:#b22222; font-weight:600;"></div>
-
     <form id="inscripcionForm">
 
   <label for="nombre">Alumno:</label>
@@ -516,11 +514,18 @@ function controlarFechas() {
   const mensajeF2 = document.getElementById('mensajeF2').textContent.trim();
   if (!mensajeF2) return;
 
+  // Función para parsear dd/mm/yyyy a Date local
+  function parseFechaDDMMYYYY(str) {
+    const [d, m, y] = str.split('/');
+    return new Date(y, m - 1, d); // mes 0-indexado
+  }
+
   const [inicioStr, finStr] = mensajeF2.split('-');
-  const fechaInicio = new Date(inicioStr.split('/').reverse().join('/'));
-  const fechaFin = new Date(finStr.split('/').reverse().join('/'));
+  const fechaInicio = parseFechaDDMMYYYY(inicioStr);
+  const fechaFin = parseFechaDDMMYYYY(finStr);
+
   const hoy = new Date();
-  hoy.setHours(0,0,0,0);
+  hoy.setHours(0, 0, 0, 0); // ignorar hora
 
   const botonInscripcion = document.querySelector('#inscripcionForm button[type="submit"]');
   const avisoCierre = document.getElementById('avisoCierre');
@@ -539,10 +544,6 @@ function controlarFechas() {
   }
 }
 
-// Ejecutar al cargar la página
-window.onload = function() {
-  controlarFechas();
-};
 </script>
 </body>
 </html>
