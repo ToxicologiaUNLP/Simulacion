@@ -523,21 +523,18 @@ function controlarFechas() {
   const mensajeF2 = document.getElementById('mensajeF2').textContent.trim();
   if (!mensajeF2) return;
 
-  // parsea dd/mm/yyyy a Date
   function parseFechaDDMMYYYY(str) {
     const [d, m, y] = str.split('/');
-    return new Date(y, m - 1, d); // mes 0-indexado
+    return new Date(y, m - 1, d);
   }
 
-  // separar fechas y limpiar espacios
   const [inicioStr, finStr] = mensajeF2.split('-').map(s => s.trim());
   const fechaInicio = parseFechaDDMMYYYY(inicioStr);
   const fechaFin = parseFechaDDMMYYYY(finStr);
 
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0); // ignorar hora
+  hoy.setHours(0,0,0,0);
 
-  // referencias a elementos
   const botonInscripcion = document.querySelector('#inscripcionForm button[type="submit"]');
   const avisoCierre = document.getElementById('avisoCierre');
   const botonAceptar = document.getElementById('botonAceptar');
@@ -545,28 +542,35 @@ function controlarFechas() {
 
   if (hoy < fechaInicio) {
     botonInscripcion.disabled = true;
+    if (botonAceptar) botonAceptar.disabled = true;
+    if (botonVer) botonVer.disabled = false;
     avisoCierre.style.display = 'block';
     avisoCierre.innerHTML = `La inscripción aún no ha comenzado.<br/>Se abrirá el ${inicioStr} a las 00:00`;
-    if (botonAceptar) botonAceptar.disabled = true;
-    if (botonVer) botonVer.disabled = false;
   } else if (hoy > fechaFin) {
     botonInscripcion.disabled = true;
-    avisoCierre.style.display = 'block';
-    avisoCierre.textContent = "No es posible, fecha de inscripciones finalizada.";
     if (botonAceptar) botonAceptar.disabled = true;
     if (botonVer) botonVer.disabled = false;
+    avisoCierre.style.display = 'block';
+    avisoCierre.textContent = 'No es posible, fecha de inscripciones finalizada.';
   } else {
     botonInscripcion.disabled = false;
-    avisoCierre.style.display = 'none';
     if (botonAceptar) botonAceptar.disabled = false;
     if (botonVer) botonVer.disabled = false;
-    else botonAceptar.disabled = false;
+    avisoCierre.style.display = 'none';
   }
 }
-  document.addEventListener('DOMContentLoaded', () => {
-  controlarFechas(); // recalcula fechas al cargar
-});
-
+  fetch(urlCSV + '?t=' + new Date().getTime())
+  .then(res => res.text())
+  .then(csv => {
+    const filas = csv.trim().split("\n").map(f => f.split(","));
+    const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : "";
+    if (mensaje) {
+      const mensajeEl = document.getElementById("mensajeF2");
+      mensajeEl.textContent = mensaje;
+      controlarFechas(); // ✅ solo después de cargar mensajeF2
+    }
+  })
+  .catch(err => console.error("Error al leer F2:", err));
 
 </script>
 </body>
