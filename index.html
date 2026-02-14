@@ -229,7 +229,6 @@
       <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
       <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto</button>
     </div>
-  </div>
 <div id="mensajeF2" style="display:none;"></div>
 
   <main>
@@ -284,11 +283,11 @@ fetch(urlCSV)
   .then(csv => {
     const filas = csv.trim().split("\n").map(f => f.split(","));
     const mensaje = filas[1] && filas[1][5] ? filas[1][5].trim() : ""; // Celda F2
-    if (mensaje) {
-      const div = document.getElementById("mensajeF2");
-      div.textContent = mensaje;
-      div.style.display = "block";
-    }
+if (mensaje) {
+  document.getElementById("mensajeF2").textContent = mensaje; // solo guardamos el texto
+  controlarFechas(); // 🔹 Llamada importante
+}
+
   })
   .catch(err => console.error("Error al leer F2:", err));
 
