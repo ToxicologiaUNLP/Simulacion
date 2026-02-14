@@ -116,13 +116,14 @@
       color: #d84315;
     }
 
-    #avisoCierre {
-      color: red;
-      font-weight: bold;
-      font-size: 1.1em;
-      margin-top: 15px;
-      text-align: center;
-    }
+#avisoCierre {
+  color: red;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-top: 15px;
+  text-align: center;
+  min-height: 2.2em; /* altura aproximada de dos líneas */
+}
 
     #loader {
       display: none;
@@ -226,7 +227,7 @@
         <li>Antes de inscribirse, verifique su <strong>disponibilidad horaria</strong>.</li>
         <li class="important">Respete el orden Apellido y Nombre/s.</li>
       </ol>
-      <button onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
+      <button id="botonAceptar" onclick="cerrarModal()">Aceptar, quiero inscribirme</button>
       <button id="verInscripBtn" onclick="abrirVerInscripcion(); cerrarModal()">Ya estoy inscripto</button>
     </div>
 <div id="mensajeF2" style="display:none;"></div>
@@ -514,33 +515,43 @@ function controlarFechas() {
   const mensajeF2 = document.getElementById('mensajeF2').textContent.trim();
   if (!mensajeF2) return;
 
-  // Función para parsear dd/mm/yyyy a Date local
+  // parsea dd/mm/yyyy a Date
   function parseFechaDDMMYYYY(str) {
     const [d, m, y] = str.split('/');
     return new Date(y, m - 1, d); // mes 0-indexado
   }
 
-  const [inicioStr, finStr] = mensajeF2.split('-');
+  // separar fechas y limpiar espacios
+  const [inicioStr, finStr] = mensajeF2.split('-').map(s => s.trim());
   const fechaInicio = parseFechaDDMMYYYY(inicioStr);
   const fechaFin = parseFechaDDMMYYYY(finStr);
 
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0); // ignorar hora
 
+  // referencias a elementos
   const botonInscripcion = document.querySelector('#inscripcionForm button[type="submit"]');
   const avisoCierre = document.getElementById('avisoCierre');
+  const botonAceptar = document.getElementById('botonAceptar');
+  const botonVer = document.getElementById('verInscripBtn');
 
   if (hoy < fechaInicio) {
     botonInscripcion.disabled = true;
     avisoCierre.style.display = 'block';
-    avisoCierre.textContent = `La inscripción aún no ha comenzado. Se abrirá el ${inicioStr}`;
+    avisoCierre.innerHTML = `La inscripción aún no ha comenzado.<br/>Se abrirá el ${inicioStr} a las 00:00`;
+    if (botonAceptar) botonAceptar.disabled = true;
+    if (botonVer) botonVer.disabled = false;
   } else if (hoy > fechaFin) {
     botonInscripcion.disabled = true;
     avisoCierre.style.display = 'block';
     avisoCierre.textContent = "No es posible, fecha de inscripciones finalizada.";
+    if (botonAceptar) botonAceptar.disabled = true;
+    if (botonVer) botonVer.disabled = false;
   } else {
     botonInscripcion.disabled = false;
     avisoCierre.style.display = 'none';
+    if (botonAceptar) botonAceptar.disabled = false;
+    if (botonVer) botonVer.disabled = false;
   }
 }
 
