@@ -6,6 +6,9 @@
   <link rel="icon" href="logo2.png" type="image/png"/>
   <title>Taller de simulación - Toxicología-FCM, UNLP</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     :root {
@@ -14,7 +17,6 @@
       --accent: #c96d00;
       --bg-light: #f9f8f5;
       --white: #ffffff;
-      --error: #b71c1c;
     }
 
     html, body {
@@ -22,242 +24,212 @@
       font-family: 'Open Sans', sans-serif;
       background: linear-gradient(135deg, #087882 0%, #0c8c9c 40%, #045c63 70%, #04545d 100%);
       background-attachment: fixed;
-      display: flex; flex-direction: column; justify-content: center;
     }
 
     main {
       background: rgba(249, 248, 245, 0.98); border-radius: 24px;
-      width: 95%; max-width: 520px; padding: 30px;
+      width: 95%; max-width: 500px; padding: 30px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin: 20px auto;
       box-sizing: border-box;
     }
 
     #logo { display: block; width: 100%; height: auto; margin-bottom: 20px; border-radius: 14px; }
-    h1 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    h1 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; font-size: 18px; font-weight: 700; text-transform: uppercase; }
 
-    form { background: var(--white); padding: 20px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; margin-bottom: 5px; }
+    form { background: var(--white); padding: 20px; border-radius: 18px; border: 1px solid #eee; }
+    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; }
 
     input {
       width: 100%; padding: 12px; margin-top: 6px;
       border-radius: 12px; border: 2px solid #e8e8e8;
-      box-sizing: border-box; font-size: 15px; transition: all 0.3s ease;
-      background-color: #fafafa;
+      box-sizing: border-box; font-size: 15px;
     }
-    input:focus { border-color: var(--primary); outline: none; background-color: #fff; }
 
     #contenedorTurnos {
       display: grid; grid-template-columns: 1fr; gap: 8px;
-      margin-top: 10px; max-height: 220px; overflow-y: auto;
+      margin-top: 10px; max-height: 200px; overflow-y: auto;
       padding: 5px; border: 1px inset #eee; border-radius: 12px;
-      background: #fdfdfd;
     }
 
     .turno-card {
       background: white; border: 2px solid #e8e8e8; padding: 12px;
       border-radius: 12px; cursor: pointer; transition: 0.2s;
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 14px; font-weight: 600; color: #444;
+      display: flex; justify-content: space-between; align-items: center; font-size: 14px;
     }
-    .turno-card:hover { border-color: var(--primary); background: #f0fbfc; }
-    .turno-card.selected { border-color: var(--primary); background: var(--primary); color: white; transform: scale(0.98); }
-    .turno-card .cupos { font-size: 11px; opacity: 0.8; font-weight: 400; }
+    .turno-card.selected { border-color: var(--primary); background: var(--primary); color: white; }
 
-    button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; }
     #btnSubmit { background-color: var(--primary); color: white; }
-    #btnSubmit:disabled { background-color: #ccc; cursor: not-allowed; }
 
-    .overlay {
-      position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98);
-      backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center;
-      z-index: 99999; padding: 20px;
-    }
-    .modal {
-      background: white; padding: 35px; border-radius: 28px;
-      max-width: 450px; width: 100%; text-align: center;
-    }
-    .modal-emoji { font-size: 60px; display: block; margin-bottom: 15px; }
-    .modal-instrucciones { background: #f0f7f8; padding: 20px; border-radius: 18px; text-align: left; margin-bottom: 20px; border: 1px solid #d0e6e9; }
-    .modal ol { margin: 0; padding-left: 20px; color: #333; font-size: 14px; line-height: 1.7; }
-    .btn-modal-main { background-color: var(--primary); color: white; }
-    .btn-modal-sec { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 12px; }
-
-    #verInscripcionModal {
-      display: none; position: fixed; inset: 0;
-      background: rgba(4, 84, 93, 0.99); backdrop-filter: blur(12px);
-      justify-content: center; align-items: center; z-index: 100000; padding: 20px;
+    /* MODAL DE COMPROBANTE */
+    #comprobanteModal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+      z-index: 200000; padding: 10px; overflow-y: auto;
+      flex-direction: column; align-items: center;
     }
 
-    .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
-
-    @media (max-width: 480px) {
-      body { background: var(--bg-light); justify-content: flex-start; }
-      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; padding: 20px; }
+    /* FORMATO 16:9 VERTICAL */
+    .ticket-container {
+      width: 320px; height: 568px;
+      background: var(--white); border-radius: 20px;
+      overflow: hidden; display: flex; flex-direction: column;
+      position: relative;
     }
+
+    .ticket-header { 
+      background: var(--primary); color: white; 
+      padding: 20px; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* Logo dentro del ticket */
+    .logo-ticket {
+      width: 140px; height: auto; margin-bottom: 10px;
+      filter: brightness(0) invert(1); /* Lo hace blanco para que resalte en el fondo azul */
+    }
+
+    .ticket-body { padding: 25px 20px; flex-grow: 1; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+    
+    .watermark {
+      position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 35px; font-weight: 900; color: rgba(0,0,0,0.02); white-space: nowrap; pointer-events: none;
+    }
+
+    .info-group { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
+    .info-label { font-size: 9px; color: #888; text-transform: uppercase; }
+    .info-value { font-size: 16px; font-weight: 700; color: var(--primary-dark); display: block; }
+
+    .qr-area { display: flex; flex-direction: column; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 15px; border: 1px solid #eee; }
+
+    .btn-download { background: #2ecc71; color: white; margin-top: 20px; max-width: 320px; }
+    .btn-close { background: transparent; color: white; border: 1px solid white; margin-top: 10px; max-width: 320px; }
   </style>
 </head>
 
 <body>
 
-  <div class="overlay" id="overlay">
-    <div class="modal" id="modalContenido">
-      <div>Sincronizando...</div>
-    </div>
-  </div>
-
-  <main>
-    <img src="logo.png" alt="Logo Cátedra Toxicología" id="logo">
-    <h1>Talleres de Simulación</h1>
+  <main id="mainContent">
+    <img src="logo.png" alt="Logo" id="logo">
+    <h1>Inscripción Talleres</h1>
     
     <form id="inscripcionForm">
       <label>Nombre Completo:</label>
       <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
-      
       <label>Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
-      
       <label>Correo electrónico:</label>
       <input id="email" name="email" placeholder="correo electrónico" required type="email"/>
       
-      <label>Seleccione una fecha disponible: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
-      <div id="contenedorTurnos">
-        <p style="font-size: 12px; color: #999; padding: 10px;">Cargando turnos...</p>
-      </div>
+      <label>Seleccione fecha:</label>
+      <div id="contenedorTurnos"></div>
+      
       <input type="hidden" name="turno" id="turnoInput" required>
       <input type="hidden" id="turnoTextoSeleccionado">
       
-      <button type="submit" id="btnSubmit">Confirmar Inscripción</button>
+      <button type="submit" id="btnSubmit">Finalizar Registro</button>
     </form>
-
-    <div class="contacto">
-        © Cátedra de Toxicología, HoSiC<br/>
-        Facultad de Ciencias Médicas - UNLP
-    </div>
   </main>
 
-  <div id="verInscripcionModal">
-    <div class="modal">
-      <span class="modal-emoji">🔍</span>
-      <h2 style="color: var(--primary-dark);">CONSULTAR TURNO</h2>
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; border-color: var(--primary); text-align: center;"/>
-      <button class="btn-modal-main" onclick="buscarInscripcion()">Buscar Registro</button>
-      <div id="resultadoBusqueda"></div>
-      <button class="btn-modal-sec" style="color: #666; border-color: #ccc;" onclick="cerrarVerInscripcion()">Volver</button>
+  <div id="comprobanteModal">
+    <div class="ticket-container" id="ticketImage">
+      <div class="ticket-header">
+        <img src="logo.png" class="logo-ticket" alt="Logo Cátedra">
+        <div style="font-size: 9px; opacity: 0.8; letter-spacing: 1.5px; font-weight: 600;">COMPROBANTE OFICIAL</div>
+      </div>
+      
+      <div class="ticket-body">
+        <div class="watermark">SIMULACIÓN 2026</div>
+        <div>
+          <div class="info-group">
+            <span class="info-label">👤 Estudiante</span>
+            <span class="info-value" id="comp-nombre"></span>
+          </div>
+          <div class="info-group">
+            <span class="info-label">🆔 Legajo</span>
+            <span class="info-value" id="comp-legajo"></span>
+          </div>
+          <div class="info-group" style="background: #f0fbfc; padding: 10px; border-radius: 10px; border: 1px solid #d0eef2;">
+            <span class="info-label">📅 Turno Asignado</span>
+            <span class="info-value" id="comp-turno" style="color: var(--primary);"></span>
+          </div>
+        </div>
+
+        <div class="qr-area">
+          <div id="qrcode"></div>
+          <span style="font-size: 8px; margin-top: 8px; color: #666; text-align: center;">Válido para ingreso al taller<br>FCM - UNLP</span>
+        </div>
+      </div>
     </div>
+
+    <button class="btn-download" onclick="descargarTicket()">⬇️ Guardar Imagen</button>
+    <button class="btn-close" onclick="location.reload()">Cerrar</button>
   </div>
 
 <script>
+// (Aquí va el mismo script de procesamiento del paso anterior)
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
 
-function parsearFechaZero(str) {
-  const parts = str.trim().split('/');
-  return new Date(20 + parts[2], parts[1] - 1, parts[0], 0, 0, 0);
-}
-
-fetch(csvURL).then(res => res.text()).then(csv => {
-  const filas = csv.trim().split("\n").map(f => f.split(","));
-  const [inicioStr, finStr] = filas[1][5].split('-');
-  const fInicio = parsearFechaZero(inicioStr), fFin = parsearFechaZero(finStr), hoy = new Date();
-  const modal = document.getElementById('modalContenido');
-
-  if (hoy < fInicio) {
-    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><div class="modal-instrucciones" style="text-align:center;">Apertura de inscripciones:<br><strong>${inicioStr} - 00:00 hs</strong></div>`;
-  } else if (hoy >= fFin) {
-    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><div class="modal-instrucciones" style="text-align:center;">El período concluyó el ${finStr}.</div><button class="btn-modal-main" onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
-  } else {
-    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO IMPORTANTE</h2><div class="modal-instrucciones"><ol><li>Seleccione una <strong>fecha por única vez</strong>. No hay cambios.</li><li>Verifique su <strong>disponibilidad horaria</strong>.</li><li>Escriba su nombre: <strong>APELLIDO Y NOMBRE</strong>.</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Aceptar e inscribirme</button><button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver mi turno</button>`;
-    actualizarTurnos();
-  }
-});
-
-function cerrarModal() { document.getElementById('overlay').style.display = 'none'; }
-function abrirVerInscripcion() { document.getElementById('overlay').style.display = 'none'; document.getElementById('verInscripcionModal').style.display = 'flex'; }
-function cerrarVerInscripcion() { location.reload(); }
-
-function actualizarTurnos() {
+function cargarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
     const contenedor = document.getElementById('contenedorTurnos');
     contenedor.innerHTML = '';
-    
-    let sumatoriaCupoMax = 0;
-    let sumatoriaLibres = 0;
-
     data.forEach(t => { 
-      // Usamos parseInt para asegurar que sean números
-      sumatoriaCupoMax += parseInt(t.cupoMax) || 0;
-      sumatoriaLibres += parseInt(t.cupos) || 0;
-
       if(t.disponible) {
         const card = document.createElement('div');
         card.className = 'turno-card';
-        card.innerHTML = `<span>${t.texto.replace(/hs\b/i, " h")}</span><span class="cupos">${t.cupos} libres</span>`;
+        card.innerHTML = `<span>${t.texto.split(' (')[0]}</span><span style="font-size:11px; color:#888;">${t.cupos} lib.</span>`;
         card.onclick = () => {
           document.querySelectorAll('.turno-card').forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
           document.getElementById('turnoInput').value = t.id;
-          document.getElementById('turnoTextoSeleccionado').value = t.texto.split(' (Cupos:')[0];
+          document.getElementById('turnoTextoSeleccionado').value = t.texto.split(' (')[0];
         };
         contenedor.appendChild(card);
       }
     });
-
-    // Validación anti-NaN
-    let porcentaje = 0;
-    if (sumatoriaCupoMax > 0) {
-      const ocupados = sumatoriaCupoMax - sumatoriaLibres;
-      porcentaje = Math.round((ocupados / sumatoriaCupoMax) * 100);
-    }
-    
-    document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
   });
 }
+cargarTurnos();
 
 document.getElementById('inscripcionForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const idTurno = document.getElementById('turnoInput').value;
-  const textoTurno = document.getElementById('turnoTextoSeleccionado').value;
-  if(!idTurno) { alert("Por favor, seleccioná una fecha de la lista."); return; }
-  const confirmacion = confirm(`Estás por inscribirte al turno:\n\n📅 ${textoTurno}\n\n¿Es correcto?`);
-  if (!confirmacion) return;
+  if(!document.getElementById('turnoInput').value) return alert("Seleccioná un turno");
   const b = document.getElementById('btnSubmit');
-  b.disabled = true; b.textContent = 'Verificando cupo...';
+  b.disabled = true; b.textContent = 'Enviando...';
+
   try {
-    const checkRes = await fetch(scriptURL + '?action=turnos');
-    const dataTurnos = await checkRes.json();
-    const turnoActualizado = dataTurnos.find(t => t.id == idTurno);
-    if (!turnoActualizado || !turnoActualizado.disponible) {
-      alert("¡Lo sentimos! El cupo se acaba de agotar. Elegí otro turno.");
-      actualizarTurnos();
-      b.disabled = false; b.textContent = 'Confirmar Inscripción';
-      return;
-    }
-    b.textContent = 'Procesando...';
     const response = await fetch(scriptURL, { method: 'POST', body: new FormData(e.target) });
-    const resultado = await response.text();
-    if(resultado.toLowerCase().includes("duplicado")) alert("Ya figura una inscripción con este Legajo.");
-    else alert("¡Inscripción Exitosa!");
-    location.reload();
+    document.getElementById('comp-nombre').textContent = document.getElementById('nombre').value.toUpperCase();
+    document.getElementById('comp-legajo').textContent = document.getElementById('legajo').value;
+    document.getElementById('comp-turno').textContent = document.getElementById('turnoTextoSeleccionado').value;
+    
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+      text: "CERT: " + document.getElementById('legajo').value + " TALLER TOXICO",
+      width: 100, height: 100, colorDark : "#04545d",
+    });
+
+    document.getElementById('comprobanteModal').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'none';
   } catch (error) {
     alert("Error de conexión.");
-    b.disabled = false; b.textContent = 'Confirmar Inscripción';
+    b.disabled = false;
   }
 });
 
-function buscarInscripcion() {
-  const leg = document.getElementById('buscarLegajo').value.trim();
-  const resDiv = document.getElementById('resultadoBusqueda');
-  if(!leg) return;
-  resDiv.innerHTML = '<p>Buscando...</p>';
-  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
-    .then(res => res.text()).then(csv => {
-      const filas = csv.trim().split('\n').slice(1);
-      const f = filas.find(r => r.split(',')[1].trim() === leg);
-      if(f){
-        const c = f.split(',');
-        resDiv.innerHTML = `<div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);"><p style="font-weight:700; margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
-      } else { resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px; font-weight:700;">❌ Legajo no encontrado.</p>'; }
-    });
+function descargarTicket() {
+  const btn = document.querySelector('.btn-download');
+  btn.textContent = "Generando...";
+  html2canvas(document.getElementById('ticketImage'), {
+    scale: 3, useCORS: true, allowTaint: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `Ticket_Toxicologia.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    btn.textContent = "⬇️ Guardar Imagen";
+  });
 }
 
 document.getElementById('legajo').addEventListener('input', (e) => {
@@ -268,7 +240,6 @@ document.getElementById('legajo').addEventListener('input', (e) => {
 </script>
 </body>
 </html>
-
 
 
 
