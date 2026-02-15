@@ -12,9 +12,10 @@
       --primary: #0c8c9c;
       --primary-dark: #04545d;
       --accent: #c96d00;
-      --bg-light: #f9f8f5;
+      --bg-light: #f4f7f8;
       --white: #ffffff;
       --error: #b71c1c;
+      --success: #2e7d32;
     }
 
     html, body {
@@ -25,49 +26,65 @@
       display: flex; flex-direction: column; justify-content: center;
     }
 
+    /* CONTENEDOR PRINCIPAL */
     main {
-      background: rgba(249, 248, 245, 0.98); border-radius: 24px;
-      width: 95%; max-width: 520px; padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin: 20px auto;
+      background: rgba(255, 255, 255, 0.98); border-radius: 28px;
+      width: 95%; max-width: 480px; padding: 30px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3); margin: 20px auto;
+      box-sizing: border-box; transition: transform 0.3s ease;
     }
 
-    #logo { display: block; width: 100%; height: auto; margin-bottom: 20px; border-radius: 14px; }
-    h1 { text-align: center; color: var(--primary-dark); font-size: 20px; text-transform: uppercase; }
+    #logo { display: block; width: 100%; height: auto; margin-bottom: 20px; border-radius: 16px; }
+    h1 { text-align: center; color: var(--primary-dark); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; }
 
-    form { background: var(--white); padding: 20px; border-radius: 18px; border: 1px solid #eee; }
-    input, select { width: 100%; padding: 12px; margin-top: 6px; border-radius: 12px; border: 2px solid #e8e8e8; box-sizing: border-box; }
+    /* FORMULARIO */
+    form { background: var(--white); padding: 20px; border-radius: 20px; border: 1px solid #eee; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; }
+    input, select { 
+      width: 100%; padding: 14px; margin-top: 6px; border-radius: 12px; 
+      border: 2px solid #eef2f3; box-sizing: border-box; font-size: 15px; 
+      transition: all 0.3s ease; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--primary); background: #f0fbfc; }
 
-    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-    .btn-primary { background-color: var(--primary); color: white; }
+    button { 
+      width: 100%; padding: 16px; margin-top: 15px; border-radius: 14px; 
+      border: none; font-size: 16px; font-weight: 700; cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(12, 140, 156, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
-    /* --- CAPAS DE BLOQUEO (OVERLAYS) --- */
+    /* OVERLAYS (BLOQUEO Y CONSULTA) */
     .overlay {
-      position: fixed; inset: 0;
-      background: rgba(4, 84, 93, 0.98); /* Más opaco para no ver nada atrás */
-      backdrop-filter: blur(10px);
+      position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       display: flex; justify-content: center; align-items: center;
       z-index: 99999; padding: 20px;
     }
 
     .modal {
-      background: white; padding: 30px; border-radius: 24px;
-      max-width: 450px; width: 100%; text-align: center;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      background: white; padding: 35px; border-radius: 30px;
+      max-width: 420px; width: 100%; text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+    @keyframes modalPop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 
-    /* Estilo de la Tarjeta de Resultado */
+    /* TARJETA DE TICKET */
     .ticket-card { 
-      background: #f0f7f8; border-radius: 16px; padding: 20px; 
-      border-left: 6px solid var(--primary); margin-top: 20px; text-align: left; 
+      background: #f0fbfc; border-radius: 20px; padding: 20px; 
+      border-left: 8px solid var(--primary); margin-top: 20px; text-align: left;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     }
-    .ticket-card .t-nombre { font-size: 17px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
-    .ticket-card .t-info { font-weight: 700; color: var(--accent); font-size: 16px; margin-top: 5px; }
+    .ticket-card .t-nombre { font-size: 18px; font-weight: 700; color: var(--primary-dark); margin-bottom: 5px; }
+    .ticket-card .t-info { font-weight: 700; color: var(--accent); font-size: 16px; margin-top: 8px; }
 
-    .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; }
+    .contacto { margin-top: 30px; text-align: center; font-size: 13px; color: var(--primary-dark); opacity: 0.8; }
 
     @media (max-width: 480px) {
-      body { background: var(--bg-light); }
-      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; }
+      body { background: var(--bg-light); justify-content: flex-start; }
+      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; padding: 20px; }
     }
   </style>
 </head>
@@ -75,76 +92,84 @@
 
   <div class="overlay" id="overlay">
     <div class="modal" id="modalContenido">
-      <p style="color: white;">Cargando sistema...</p>
+      <p>Sincronizando con el servidor...</p>
     </div>
   </div>
 
   <div class="overlay" id="consultaOverlay" style="display: none;">
     <div class="modal">
-      <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
-      <h2>MI INSCRIPCIÓN</h2>
-      <p style="color:#666; font-size: 14px;">Ingresa tu legajo para verificar los datos.</p>
+      <div style="font-size: 45px; margin-bottom: 15px;">🔍</div>
+      <h2 style="color: var(--primary-dark); margin-bottom: 10px;">MI TURNO</h2>
+      <p style="color:#666; font-size: 14px; margin-bottom: 20px;">Ingresá tu legajo para ver tu inscripción.</p>
       
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; text-align: center; border: 2px solid var(--primary);"/>
+      <input type="text" id="buscarLegajo" placeholder="12345/6" style="text-align: center; border: 2px solid var(--primary); font-size: 18px;"/>
       
-      <button class="btn-primary" onclick="buscarInscripcion()">BUSCAR REGISTRO</button>
+      <button class="btn-primary" onclick="buscarInscripcion()">VER ESTADO</button>
       
       <div id="resultadoBusqueda"></div>
       
-      <button style="margin-top: 20px; background: #eee; color: #444; font-size: 14px;" onclick="cerrarConsulta()">VOLVER</button>
+      <button style="margin-top: 25px; background: #f0f2f3; color: #555; font-size: 14px;" onclick="cerrarConsulta()">VOLVER</button>
     </div>
   </div>
 
   <main>
-    <img src="logo.png" alt="Logo Cátedra Toxicología" id="logo">
+    <img src="logo.png" alt="Logo" id="logo">
     <h1>Talleres de Simulación</h1>
     
-    <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:15px; color:#b22222; font-weight:600; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 10px;"></div>
+    <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:20px; color:var(--error); font-weight:700; background:#fff0f0; padding:12px; border-radius:12px; border:1px solid #ffdada;"></div>
 
     <form id="inscripcionForm">
-      <label>Nombre Completo:</label>
-      <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
-      <label>Legajo:</label>
+      <label>ALUMNO:</label>
+      <input id="nombre" name="nombre" placeholder="APELLIDO Y NOMBRE" required type="text"/>
+      
+      <label>LEGAJO:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
-      <label>Correo Institucional:</label>
-      <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-      <label>Seleccione Turno: <span id="ocupacionTotal" style="font-size: 0.9em;"></span></label>
+      
+      <label>EMAIL:</label>
+      <input id="email" name="email" placeholder="ejemplo@gmail.com" required type="email"/>
+      
+      <label>TURNO DISPONIBLE: <span id="ocupacionTotal" style="color: var(--accent);"></span></label>
       <select id="turno" name="turno" required>
-        <option disabled selected value="">Cargando...</option>
+        <option disabled selected value="">Cargando horarios...</option>
       </select>
-      <button type="submit" class="btn-primary">CONFIRMAR INSCRIPCIÓN</button>
+      
+      <button type="submit" class="btn-primary" id="submitBtn">CONFIRMAR INSCRIPCIÓN</button>
     </form>
 
     <div class="contacto">
-        © Cátedra de Toxicología, HoSiC<br/>
-        <strong>toxicoalumnos@gmail.com</strong>
+      © Cátedra de Toxicología, HoSiC<br>
+      FCM - UNLP | <strong>toxicoalumnos@gmail.com</strong>
     </div>
   </main>
+
+  <canvas id="descargaCanvas" style="display:none;"></canvas>
 
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
 
-function parsearFecha(str) {
-  const parts = str.trim().split('/');
-  return new Date(20 + parts[2], parts[1] - 1, parts[0]);
+// Función para parsear dd/mm/aa a las 00:00:00
+function parsearFechaZero(str) {
+  const p = str.trim().split('/');
+  return new Date(20 + p[2], p[1] - 1, p[0], 0, 0, 0);
 }
 
-// Lógica de acceso por fecha (F2)
 fetch(csvURL).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
-  const [inicioRaw, finRaw] = filas[1][5].split('-');
-  const fechaInicio = parsearFecha(inicioRaw), fechaFin = parsearFecha(finRaw), hoy = new Date();
-  hoy.setHours(0,0,0,0);
+  const [inicioStr, finStr] = filas[1][5].split('-');
+  
+  const fInicio = parsearFechaZero(inicioStr);
+  const fFin = parsearFechaZero(finStr);
+  const ahora = new Date();
 
   const modal = document.getElementById('modalContenido');
 
-  if (hoy < fechaInicio) {
-    modal.innerHTML = `<div style="font-size: 50px;">⏳</div><h2>¡PRÓXIMAMENTE!</h2><p>Inscripciones habilitadas el ${inicioRaw}.</p>`;
-  } else if (hoy > fechaFin) {
-    modal.innerHTML = `<div style="font-size: 50px;">🏁</div><h2>ETAPA FINALIZADA</h2><p>El período cerró el ${finRaw}.</p><button class="btn-primary" onclick="abrirConsulta()">🔍 CONSULTAR MI TURNO</button>`;
+  if (ahora < fInicio) {
+    modal.innerHTML = `<div style="font-size: 55px;">⏳</div><h2>PRÓXIMAMENTE</h2><p>Inscripciones habilitadas el:<br><strong>${inicioStr} - 00:00 hs</strong></p>`;
+  } else if (ahora >= fFin) {
+    modal.innerHTML = `<div style="font-size: 55px;">🏁</div><h2>ETAPA FINALIZADA</h2><p>El período concluyó el ${finStr} a las 00:00 hs.</p><button class="btn-primary" onclick="abrirConsulta()">CONSULTAR MI TURNO</button>`;
   } else {
-    modal.innerHTML = `<div style="font-size: 50px;">📋</div><h2>AVISO</h2><ol><li>Solo una inscripción por alumno.</li><li>Verifique su horario.</li></ol><button class="btn-primary" onclick="cerrarModal()">ACEPTAR E INSCRIBIRME</button><button style="background:none; color:var(--primary); font-weight:700; border:none; margin-top:15px; cursor:pointer;" onclick="abrirConsulta()">YA ESTOY INSCRIPTO</button>`;
+    modal.innerHTML = `<div style="font-size: 55px;">📋</div><h2>BIENVENIDO</h2><p style="font-size:14px; color:#666;">El taller requiere inscripción previa.</p><ol style="text-align:left; font-size:13px; color:#444;"><li>Solo una inscripción por alumno.</li><li>Verificá bien tu turno antes de confirmar.</li></ol><button class="btn-primary" onclick="cerrarModal()">INGRESAR AHORA</button><button style="background:none; color:var(--primary); font-weight:700; border:none; margin-top:15px; cursor:pointer;" onclick="abrirConsulta()">YA ESTOY INSCRIPTO</button>`;
     actualizarTurnos();
   }
 });
@@ -154,38 +179,36 @@ function abrirConsulta() {
   document.getElementById('overlay').style.display = 'none'; 
   document.getElementById('consultaOverlay').style.display = 'flex'; 
 }
-function cerrarConsulta() {
-  document.getElementById('consultaOverlay').style.display = 'none';
-  document.getElementById('resultadoBusqueda').innerHTML = '';
-  // Reevaluamos si debe volver al bloqueo o no
-  location.reload(); 
-}
+function cerrarConsulta() { location.reload(); }
 
 function buscarInscripcion() {
   const leg = document.getElementById('buscarLegajo').value.trim();
   const resDiv = document.getElementById('resultadoBusqueda');
   if(!leg) return;
-  resDiv.innerHTML = 'Buscando...';
+  resDiv.innerHTML = '<p style="font-size:13px; margin-top:15px;">Buscando...</p>';
   fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
     .then(res => res.text()).then(csv => {
       const filas = csv.trim().split('\n').slice(1);
       const f = filas.find(r => r.split(',')[1].trim() === leg);
       if(f){
-        const cols = f.split(',');
-        resDiv.innerHTML = `<div class="ticket-card"><p class="t-nombre">${cols[0].replace(/"/g, '')}</p><p>Legajo: <strong>${cols[1]}</strong></p><p class="t-info">📍 ${cols[4].split(' (Cupos:')[0]}</p></div>`;
+        const c = f.split(',');
+        resDiv.innerHTML = `<div class="ticket-card"><div class="t-nombre">${c[0].replace(/"/g, '')}</div><div>Legajo: ${c[1]}</div><div class="t-info">✅ ${c[4].split(' (Cupos:')[0]}</div></div>`;
       } else {
-        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ Legajo no encontrado.</p>';
+        resDiv.innerHTML = '<p style="color:var(--error); margin-top:15px; font-weight:700;">❌ No se encontró inscripción.</p>';
       }
     });
 }
 
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
-    const ts = document.getElementById('turno');
-    ts.innerHTML = '<option disabled selected value="">Seleccione fecha...</option>';
-    let libres = 0;
+    const sel = document.getElementById('turno');
+    sel.innerHTML = '<option disabled selected value="">Elegí una fecha...</option>';
     data.forEach(t => { 
-      if(t.disponible) { libres += Number(t.cupos); const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.texto.replace(/hs\b/i, " h") + ` (${t.cupos})`; ts.appendChild(opt); }
+      if(t.disponible) {
+        const opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.texto.replace(/hs\b/i, " h") + ` (${t.cupos} libres)`;
+        sel.appendChild(opt);
+      }
     });
   });
 }
@@ -194,6 +217,19 @@ document.getElementById('legajo').addEventListener('input', (e) => {
   let v = e.target.value.replace(/[^0-9]/g, '');
   if (v.length > 5) v = v.slice(0, 5) + '/' + v.slice(5, 6);
   e.target.value = v;
+});
+
+document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'PROCESANDO...'; btn.disabled = true;
+  fetch(scriptURL, { method: 'POST', body: new FormData(e.target) })
+  .then(res => res.text())
+  .then(r => {
+    if(r.toLowerCase().includes('duplicado')) alert("Ya posees una reserva.");
+    else alert("¡Inscripción exitosa!");
+    location.reload();
+  });
 });
 </script>
 </body>
