@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <link rel="icon" href="logo2.png" type="image/png"/>
   <title>Taller de simulación - Toxicología-FCM, UNLP</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -16,45 +15,36 @@
       --bg-light: #f9f8f5;
       --white: #ffffff;
       --error: #b71c1c;
-      --success: #2e7d32;
     }
 
     html, body {
-      margin: 0; padding: 0;
-      min-height: 100vh;
+      margin: 0; padding: 0; min-height: 100vh;
       font-family: 'Open Sans', sans-serif;
       background: linear-gradient(135deg, #087882 0%, #0c8c9c 40%, #045c63 70%, #04545d 100%);
       background-attachment: fixed;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      display: flex; flex-direction: column; justify-content: center;
     }
 
     main {
-      background: rgba(249, 248, 245, 0.98);
-      border-radius: 24px;
-      width: 95%;
-      max-width: 520px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      margin: 20px auto;
-      box-sizing: border-box;
+      background: rgba(249, 248, 245, 0.98); border-radius: 24px;
+      width: 95%; max-width: 520px; padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin: 20px auto;
     }
 
     #logo { display: block; width: 100%; height: auto; margin-bottom: 20px; border-radius: 14px; }
-    h1 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    h1 { text-align: center; color: var(--primary-dark); font-size: 20px; text-transform: uppercase; }
 
-    form { background: var(--white); padding: 20px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; }
-    input, select { width: 100%; padding: 12px; margin-top: 6px; border-radius: 12px; border: 2px solid #e8e8e8; box-sizing: border-box; font-size: 15px; }
+    form { background: var(--white); padding: 20px; border-radius: 18px; border: 1px solid #eee; }
+    input, select { width: 100%; padding: 12px; margin-top: 6px; border-radius: 12px; border: 2px solid #e8e8e8; box-sizing: border-box; }
 
-    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
-    #inscripcionForm button[type="submit"] { background-color: var(--primary); color: white; }
+    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .btn-primary { background-color: var(--primary); color: white; }
 
-    /* --- ESTILOS DE BLOQUEO Y MODALES --- */
+    /* --- CAPAS DE BLOQUEO (OVERLAYS) --- */
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(4, 84, 93, 0.95); backdrop-filter: blur(8px);
+      background: rgba(4, 84, 93, 0.98); /* Más opaco para no ver nada atrás */
+      backdrop-filter: blur(10px);
       display: flex; justify-content: center; align-items: center;
       z-index: 99999; padding: 20px;
     }
@@ -65,38 +55,43 @@
       box-shadow: 0 25px 50px rgba(0,0,0,0.4);
     }
 
-    .modal h2 { color: var(--primary-dark); margin-top: 0; font-size: 20px; }
-    .modal ol { text-align: left; padding-left: 20px; color: #444; font-size: 14px; line-height: 1.6; }
-    .modal button { background-color: var(--primary); color: white; }
-    #verInscripBtn { background-color: transparent !important; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
-
-    /* --- TARJETA DE CONSULTA --- */
-    #verInscripcionModal {
-      display: none; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: white; padding: 25px; border-radius: 24px;
-      z-index: 100000; width: 92%; max-width: 400px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    /* Estilo de la Tarjeta de Resultado */
+    .ticket-card { 
+      background: #f0f7f8; border-radius: 16px; padding: 20px; 
+      border-left: 6px solid var(--primary); margin-top: 20px; text-align: left; 
     }
-
-    .ticket-card { background: #f0f7f8; border-radius: 16px; padding: 20px; border-left: 6px solid var(--primary); margin-top: 15px; text-align: left; }
     .ticket-card .t-nombre { font-size: 17px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
-    .ticket-card .t-info { font-weight: 700; color: var(--accent); font-size: 15px; }
+    .ticket-card .t-info { font-weight: 700; color: var(--accent); font-size: 16px; margin-top: 5px; }
 
     .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; }
 
     @media (max-width: 480px) {
-      body { background: var(--bg-light); justify-content: flex-start; }
-      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; padding: 20px; }
+      body { background: var(--bg-light); }
+      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; }
     }
   </style>
 </head>
-
 <body>
 
   <div class="overlay" id="overlay">
     <div class="modal" id="modalContenido">
-      <div id="spinnerCarga" style="font-size: 14px; color: white;">Verificando calendario...</div>
+      <p style="color: white;">Cargando sistema...</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="consultaOverlay" style="display: none;">
+    <div class="modal">
+      <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
+      <h2>MI INSCRIPCIÓN</h2>
+      <p style="color:#666; font-size: 14px;">Ingresa tu legajo para verificar los datos.</p>
+      
+      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; text-align: center; border: 2px solid var(--primary);"/>
+      
+      <button class="btn-primary" onclick="buscarInscripcion()">BUSCAR REGISTRO</button>
+      
+      <div id="resultadoBusqueda"></div>
+      
+      <button style="margin-top: 20px; background: #eee; color: #444; font-size: 14px;" onclick="cerrarConsulta()">VOLVER</button>
     </div>
   </div>
 
@@ -107,33 +102,22 @@
     <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:15px; color:#b22222; font-weight:600; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 10px;"></div>
 
     <form id="inscripcionForm">
-      <label for="nombre">Nombre Completo:</label>
+      <label>Nombre Completo:</label>
       <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
-      <label for="legajo">Legajo:</label>
+      <label>Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
-      <label for="email">Correo Institucional:</label>
+      <label>Correo Institucional:</label>
       <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-      <label for="turno">Seleccione Turno: <span id="ocupacionTotal" style="font-size: 0.9em;"></span></label>
+      <label>Seleccione Turno: <span id="ocupacionTotal" style="font-size: 0.9em;"></span></label>
       <select id="turno" name="turno" required>
-        <option disabled selected value="">Cargando fechas...</option>
+        <option disabled selected value="">Cargando...</option>
       </select>
-      <button type="submit" id="btnSubmitPrincipal">Confirmar Inscripción</button>
+      <button type="submit" class="btn-primary">CONFIRMAR INSCRIPCIÓN</button>
     </form>
-
-    <button id="guardarBtn" style="display:none; background-color: var(--success); color: white; margin-top: 20px;">Descargar Comprobante</button>
-    <canvas id="descargaCanvas" style="display:none;"></canvas>
-
-    <div id="verInscripcionModal">
-      <h2 style="font-size: 18px; color: var(--primary-dark); margin-bottom: 10px;">🔍 CONSULTAR TURNO</h2>
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 15px;"/>
-      <button onclick="buscarInscripcion()" style="background:var(--primary); color:white;">Buscar</button>
-      <div id="resultadoBusqueda"></div>
-      <button style="margin-top: 15px; background: #eee; color: #444;" onclick="cerrarVerInscripcion()">Cerrar</button>
-    </div>
 
     <div class="contacto">
         © Cátedra de Toxicología, HoSiC<br/>
-        <strong style="font-weight: 700;">toxicoalumnos@gmail.com</strong>
+        <strong>toxicoalumnos@gmail.com</strong>
     </div>
   </main>
 
@@ -141,95 +125,56 @@
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
 
-// Función para parsear fechas formato dd/mm/aa
 function parsearFecha(str) {
   const parts = str.trim().split('/');
   return new Date(20 + parts[2], parts[1] - 1, parts[0]);
 }
 
-// LÓGICA DE CONTROL POR FECHA (F2)
-fetch(csvURL)
-  .then(res => res.text())
-  .then(csv => {
-    const filas = csv.trim().split("\n").map(f => f.split(","));
-    const fechaRangoRaw = filas[1][5]; // Celda F2
-    const [inicioRaw, finRaw] = fechaRangoRaw.split('-');
-    
-    const fechaInicio = parsearFecha(inicioRaw);
-    const fechaFin = parsearFecha(finRaw);
-    const hoy = new Date();
-    hoy.setHours(0,0,0,0);
+// Lógica de acceso por fecha (F2)
+fetch(csvURL).then(res => res.text()).then(csv => {
+  const filas = csv.trim().split("\n").map(f => f.split(","));
+  const [inicioRaw, finRaw] = filas[1][5].split('-');
+  const fechaInicio = parsearFecha(inicioRaw), fechaFin = parsearFecha(finRaw), hoy = new Date();
+  hoy.setHours(0,0,0,0);
 
-    const modal = document.getElementById('modalContenido');
+  const modal = document.getElementById('modalContenido');
 
-    if (hoy < fechaInicio) {
-      // 🟢 CASO 1: AÚN NO INICIÓ (Bloqueo total)
-      modal.innerHTML = `
-        <div style="font-size: 50px;">⏳</div>
-        <h2>¡PRÓXIMAMENTE!</h2>
-        <p style="color:#666;">La etapa de inscripciones para el Taller de Simulación aún no ha comenzado.</p>
-        <div style="background:#f0f7f8; padding:15px; border-radius:12px; font-weight:700; color:var(--primary);">
-          Apertura: ${inicioRaw}
-        </div>
-        <p style="font-size:12px; margin-top:20px; color:#999;">Cátedra de Toxicología - FCM - UNLP</p>
-      `;
-    } 
-    else if (hoy > fechaFin) {
-      // 🔴 CASO 2: FINALIZÓ (Solo consulta)
-      modal.innerHTML = `
-        <div style="font-size: 50px;">🏁</div>
-        <h2>ETAPA FINALIZADA</h2>
-        <p style="color:#666;">El período de inscripción ha concluido el ${finRaw}.</p>
-        <button onclick="abrirVerInscripcion()" style="background:var(--primary); color:white;">🔍 CONSULTAR MI TURNO</button>
-        <p style="font-size:12px; margin-top:20px; color:#999;">Si no te inscribiste, contacta a la cátedra.</p>
-      `;
-    } 
-    else {
-      // 🔵 CASO 3: DENTRO DEL RANGO (Inscripción abierta)
-      modal.innerHTML = `
-        <div style="font-size: 50px;">📋</div>
-        <h2>AVISO IMPORTANTE</h2>
-        <ol>
-          <li>Seleccione una <strong>fecha por única vez</strong>.</li>
-          <li>Verifique su <strong>disponibilidad</strong> antes de confirmar.</li>
-          <li>Escriba: <strong>APELLIDO Y NOMBRE</strong>.</li>
-        </ol>
-        <button onclick="cerrarModal()">Aceptar e inscribirme</button>
-        <button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver turno</button>
-      `;
-      actualizarTurnos();
-    }
-  });
+  if (hoy < fechaInicio) {
+    modal.innerHTML = `<div style="font-size: 50px;">⏳</div><h2>¡PRÓXIMAMENTE!</h2><p>Inscripciones habilitadas el ${inicioRaw}.</p>`;
+  } else if (hoy > fechaFin) {
+    modal.innerHTML = `<div style="font-size: 50px;">🏁</div><h2>ETAPA FINALIZADA</h2><p>El período cerró el ${finRaw}.</p><button class="btn-primary" onclick="abrirConsulta()">🔍 CONSULTAR MI TURNO</button>`;
+  } else {
+    modal.innerHTML = `<div style="font-size: 50px;">📋</div><h2>AVISO</h2><ol><li>Solo una inscripción por alumno.</li><li>Verifique su horario.</li></ol><button class="btn-primary" onclick="cerrarModal()">ACEPTAR E INSCRIBIRME</button><button style="background:none; color:var(--primary); font-weight:700; border:none; margin-top:15px; cursor:pointer;" onclick="abrirConsulta()">YA ESTOY INSCRIPTO</button>`;
+    actualizarTurnos();
+  }
+});
 
 function cerrarModal() { document.getElementById('overlay').style.display = 'none'; }
-function abrirVerInscripcion() { 
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('verInscripcionModal').style.display = 'block'; 
+function abrirConsulta() { 
+  document.getElementById('overlay').style.display = 'none'; 
+  document.getElementById('consultaOverlay').style.display = 'flex'; 
 }
-function cerrarVerInscripcion() {
-  document.getElementById('verInscripcionModal').style.display = 'none';
-  // Si la fecha ya pasó, al cerrar la consulta, volvemos a mostrar el modal de bloqueo para que no usen el form
-  fetch(csvURL).then(res => res.text()).then(csv => {
-    const filas = csv.trim().split("\n").map(f => f.split(","));
-    const fechaFin = parsearFecha(filas[1][5].split('-')[1]);
-    if (new Date() > fechaFin) document.getElementById('overlay').style.display = 'flex';
-  });
+function cerrarConsulta() {
+  document.getElementById('consultaOverlay').style.display = 'none';
+  document.getElementById('resultadoBusqueda').innerHTML = '';
+  // Reevaluamos si debe volver al bloqueo o no
+  location.reload(); 
 }
 
 function buscarInscripcion() {
   const leg = document.getElementById('buscarLegajo').value.trim();
   const resDiv = document.getElementById('resultadoBusqueda');
   if(!leg) return;
-  resDiv.innerHTML = '<p style="font-size:12px; color:var(--primary);">Buscando...</p>';
+  resDiv.innerHTML = 'Buscando...';
   fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
     .then(res => res.text()).then(csv => {
       const filas = csv.trim().split('\n').slice(1);
       const f = filas.find(r => r.split(',')[1].trim() === leg);
       if(f){
         const cols = f.split(',');
-        resDiv.innerHTML = `<div class="ticket-card"><p class="t-nombre">${cols[0].replace(/"/g, '')}</p><p>Legajo: <strong>${cols[1]}</strong></p><p class="t-info">📅 ${cols[4].split(' (Cupos:')[0]}</p></div>`;
+        resDiv.innerHTML = `<div class="ticket-card"><p class="t-nombre">${cols[0].replace(/"/g, '')}</p><p>Legajo: <strong>${cols[1]}</strong></p><p class="t-info">📍 ${cols[4].split(' (Cupos:')[0]}</p></div>`;
       } else {
-        resDiv.innerHTML = '<p style="color:var(--error); font-size:13px; margin-top:10px;">❌ No encontrado.</p>';
+        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ Legajo no encontrado.</p>';
       }
     });
 }
@@ -240,15 +185,8 @@ function actualizarTurnos() {
     ts.innerHTML = '<option disabled selected value="">Seleccione fecha...</option>';
     let libres = 0;
     data.forEach(t => { 
-      if(t.disponible) {
-        libres += Number(t.cupos);
-        const opt = document.createElement('option');
-        opt.value = t.id; opt.textContent = `${t.texto.replace(/hs\b/i, " h")} (Libres: ${t.cupos})`;
-        ts.appendChild(opt);
-      }
+      if(t.disponible) { libres += Number(t.cupos); const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.texto.replace(/hs\b/i, " h") + ` (${t.cupos})`; ts.appendChild(opt); }
     });
-    const perc = Math.round(((TOTAL_CUPOS - libres) / TOTAL_CUPOS) * 100);
-    document.getElementById('ocupacionTotal').textContent = `(${perc}% ocupado)`;
   });
 }
 
@@ -257,12 +195,9 @@ document.getElementById('legajo').addEventListener('input', (e) => {
   if (v.length > 5) v = v.slice(0, 5) + '/' + v.slice(5, 6);
   e.target.value = v;
 });
-
-const TOTAL_CUPOS = 140;
 </script>
 </body>
 </html>
-
 
 
 
