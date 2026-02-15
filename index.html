@@ -184,9 +184,9 @@ function actualizarTurnos() {
     let sumatoriaLibres = 0;
 
     data.forEach(t => { 
-      // Cálculo de porcentajes: sumamos todos los datos que vienen del Excel
-      sumatoriaCupoMax += Number(t.cupoMax);
-      sumatoriaLibres += Number(t.cupos);
+      // Usamos parseInt para asegurar que sean números
+      sumatoriaCupoMax += parseInt(t.cupoMax) || 0;
+      sumatoriaLibres += parseInt(t.cupos) || 0;
 
       if(t.disponible) {
         const card = document.createElement('div');
@@ -202,9 +202,13 @@ function actualizarTurnos() {
       }
     });
 
-    // Porcentaje = ((Total - Libres) / Total) * 100
-    const ocupados = sumatoriaCupoMax - sumatoriaLibres;
-    const porcentaje = Math.round((ocupados / sumatoriaCupoMax) * 100);
+    // Validación anti-NaN
+    let porcentaje = 0;
+    if (sumatoriaCupoMax > 0) {
+      const ocupados = sumatoriaCupoMax - sumatoriaLibres;
+      porcentaje = Math.round((ocupados / sumatoriaCupoMax) * 100);
+    }
+    
     document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
   });
 }
