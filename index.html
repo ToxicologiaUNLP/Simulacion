@@ -239,7 +239,7 @@ function actualizarTurnos() {
       });
       const perc = Math.round(((TOTAL_CUPOS - sumCupos) / TOTAL_CUPOS) * 100);
       const span = document.getElementById('ocupacionTotal');
-      span.textContent = `(${perc}% lleno)`;
+      span.textContent = `(${perc}% ocupado)`;
       span.style.color = perc <= 50 ? '#2e7d32' : (perc <= 80 ? '#c96d00' : '#b71c1c');
     });
 }
