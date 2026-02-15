@@ -67,16 +67,6 @@
     button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
     #btnSubmit { background-color: var(--primary); color: white; }
 
-    /* ESTILOS COMPROBANTE (16:9) */
-    #comprobanteModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100001; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-    .ticket-container { width: 320px; height: 568px; background: white; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .ticket-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-    .ticket-body { padding: 25px 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .info-group { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-    .info-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; }
-    .info-value { font-size: 16px; font-weight: 700; color: var(--primary-dark); display: block; }
-    .qr-area { display: flex; flex-direction: column; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 15px; border: 1px solid #eee; }
-
     /* MODALES */
     .overlay { position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 99999; padding: 20px; }
     .modal { background: white; padding: 35px; border-radius: 28px; max-width: 450px; width: 100%; text-align: center; }
@@ -87,6 +77,17 @@
     .btn-modal-sec { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 12px; }
 
     #verInscripcionModal { display: none; position: fixed; inset: 0; background: rgba(4, 84, 93, 0.99); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 100000; padding: 20px; }
+    
+    /* COMPROBANTE */
+    #comprobanteModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100001; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+    .ticket-container { width: 320px; height: 568px; background: white; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+    .ticket-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+    .ticket-body { padding: 25px 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .info-group { margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+    .info-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: 700; }
+    .info-value { font-size: 15px; font-weight: 700; color: var(--primary-dark); }
+    .qr-area { display: flex; flex-direction: column; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 15px; border: 1px solid #eee; }
+
     .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
   </style>
 </head>
@@ -99,19 +100,19 @@
 
   <main id="mainContent">
     <img src="logo.png" alt="Logo" id="logo">
-    <h1>Talleres de Simulación</h1>
+    <h1>Inscripción Talleres</h1>
     <form id="inscripcionForm">
       <label>Nombre Completo:</label>
       <input id="nombre" name="nombre" placeholder="APELLIDO Y NOMBRE" required type="text"/>
       <label>Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
-      <label>Correo Institucional:</label>
+      <label>Correo electrónico:</label>
       <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-      <label>Seleccione una fecha disponible: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
+      <label>Seleccione una fecha: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
       <div id="contenedorTurnos"><p style="font-size: 12px; color: #999; padding: 10px;">Cargando turnos...</p></div>
       <input type="hidden" name="turno" id="turnoInput" required>
       <input type="hidden" id="turnoTextoSeleccionado">
-      <button type="submit" id="btnSubmit">Confirmar Inscripción</button>
+      <button type="submit" id="btnSubmit">Confirmar Registro</button>
     </form>
     <div class="contacto">© Cátedra de Toxicología, HoSiC<br/>FCM - UNLP</div>
   </main>
@@ -119,9 +120,9 @@
   <div id="verInscripcionModal">
     <div class="modal">
       <span class="modal-emoji">🔍</span>
-      <h2>CONSULTAR TURNO</h2>
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; text-align: center;"/>
-      <button class="btn-modal-main" onclick="buscarInscripcion()">Buscar Registro</button>
+      <h2>Ver mi inscripción</h2>
+      <input type="text" id="buscarLegajo" placeholder="12345/6" style="margin-bottom: 10px; text-align: center;"/>
+      <button class="btn-modal-main" onclick="buscarInscripcion()">Buscar</button>
       <div id="resultadoBusqueda"></div>
       <button class="btn-modal-sec" onclick="location.reload()">Volver</button>
     </div>
@@ -131,31 +132,22 @@
     <div class="ticket-container" id="ticketImage">
       <div class="ticket-header">
         <img src="logo.png" style="width:100px; filter: brightness(0) invert(1);">
-        <div style="font-size: 10px; margin-top: 5px; letter-spacing: 2px;">COMPROBANTE DE TURNO</div>
+        <div style="font-size: 9px; margin-top: 5px; letter-spacing: 1.5px;">COMPROBANTE DE TURNO</div>
       </div>
       <div class="ticket-body">
         <div>
-          <div class="info-group">
-            <span class="info-label">Alumno</span>
-            <span class="info-value" id="comp-nombre"></span>
-          </div>
-          <div class="info-group">
-            <span class="info-label">Legajo</span>
-            <span class="info-value" id="comp-legajo"></span>
-          </div>
-          <div class="info-group" style="background: #f0fbfc; padding: 10px; border-radius: 10px;">
-            <span class="info-label">Fecha y Hora</span>
+          <div class="info-group"><span class="info-label">👤 Estudiante</span><span class="info-value" id="comp-nombre"></span></div>
+          <div class="info-group"><span class="info-label">🆔 Legajo</span><span class="info-value" id="comp-legajo"></span></div>
+          <div class="info-group" style="background: #f0fbfc; padding: 10px; border-radius: 10px; border: 1px solid #d0eef2;">
+            <span class="info-label">📅 Turno</span>
             <span class="info-value" id="comp-turno" style="color: var(--primary);"></span>
           </div>
         </div>
-        <div class="qr-area">
-          <div id="qrcode"></div>
-          <span style="font-size: 9px; margin-top: 8px; color: #666;">Presentar al ingresar</span>
-        </div>
+        <div class="qr-area"><div id="qrcode"></div><span style="font-size: 8px; margin-top: 5px;">Presentar en el ingreso</span></div>
       </div>
     </div>
-    <button style="background: #2ecc71; color: white; width: 320px;" onclick="descargarTicket()">⬇️ Descargar Imagen</button>
-    <button style="background: white; color: #666; width: 320px; margin-top: 10px;" onclick="location.reload()">Cerrar</button>
+    <button style="background: #2ecc71; color: white; width: 320px;" onclick="descargarTicket()">⬇️ Guardar Imagen</button>
+    <button style="background: white; color: #666; width: 320px; margin-top: 10px;" onclick="location.reload()">Terminar</button>
   </div>
 
 <script>
@@ -167,6 +159,7 @@ function parsearFechaZero(str) {
   return new Date(20 + parts[2], parts[1] - 1, parts[0], 0, 0, 0);
 }
 
+// INICIO - CONFIGURACION Y MODAL
 fetch(csvURL).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
@@ -174,11 +167,11 @@ fetch(csvURL).then(res => res.text()).then(csv => {
   const modal = document.getElementById('modalContenido');
 
   if (hoy < fInicio) {
-    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><div class="modal-instrucciones" style="text-align:center;">Apertura: <strong>${inicioStr}</strong></div>`;
+    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><p>Inscripciones abiertas el ${inicioStr}</p>`;
   } else if (hoy >= fFin) {
-    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><button class="btn-modal-main" onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
+    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><button class="btn-modal-main" onclick="abrirVerInscripcion()">Ver mi turno</button>`;
   } else {
-    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO</h2><div class="modal-instrucciones"><ol><li>Nombre: <strong>APELLIDO Y NOMBRE</strong>.</li><li>Verifique su disponibilidad.</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Inscribirme</button>`;
+    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO IMPORTANTE</h2><div class="modal-instrucciones"><ol><li>Elegí tu turno por única vez.</li><li>Revisá tu disponibilidad horaria.</li><li>Nombre: APELLIDO Y NOMBRE.</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Inscribirme</button><button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>`;
     actualizarTurnos();
   }
 });
@@ -210,53 +203,41 @@ function actualizarTurnos() {
   });
 }
 
-// FORMATEO DE LEGAJO
 document.getElementById('legajo').addEventListener('input', (e) => {
   let v = e.target.value.replace(/[^0-9]/g, '');
   if (v.length > 5) v = v.slice(0, 5) + '/' + v.slice(5, 6);
   e.target.value = v;
 });
 
-// LOGICA DE ENVIO CON COMPROBANTE
 document.getElementById('inscripcionForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  if(!document.getElementById('turnoInput').value) { alert("Seleccioná un turno."); return; }
-  
+  if(!document.getElementById('turnoInput').value) { alert("Por favor, seleccioná una fecha."); return; }
   const b = document.getElementById('btnSubmit');
-  b.disabled = true; b.textContent = 'Enviando...';
+  b.disabled = true; b.textContent = 'Procesando...';
 
-  const formData = new FormData(this);
-  
-  fetch(scriptURL, { method: 'POST', body: formData })
+  fetch(scriptURL, { method: 'POST', body: new FormData(this) })
   .then(res => res.text())
   .then(texto => {
     if(texto.includes("duplicado")) {
-      alert("Ya estás inscripto con ese legajo.");
+      alert("Ya existe una inscripción con este legajo.");
       location.reload();
     } else {
-      // LLENAR COMPROBANTE
       document.getElementById('comp-nombre').textContent = document.getElementById('nombre').value.toUpperCase();
       document.getElementById('comp-legajo').textContent = document.getElementById('legajo').value;
       document.getElementById('comp-turno').textContent = document.getElementById('turnoTextoSeleccionado').value;
-      
-      // GENERAR QR
       document.getElementById('qrcode').innerHTML = "";
-      new QRCode(document.getElementById("qrcode"), { text: "LEGAJO:" + document.getElementById('legajo').value, width: 90, height: 90 });
-      
-      // MOSTRAR COMPROBANTE
+      new QRCode(document.getElementById("qrcode"), { text: "ID:" + document.getElementById('legajo').value, width: 90, height: 90 });
       document.getElementById('mainContent').style.display = 'none';
       document.getElementById('comprobanteModal').style.display = 'flex';
     }
-  })
-  .catch(err => { alert("Error de conexión"); b.disabled = false; b.textContent = 'Confirmar Inscripción'; });
+  }).catch(() => { alert("Error de conexión"); b.disabled = false; b.textContent = 'Confirmar Registro'; });
 });
 
 function descargarTicket() {
-  const ticket = document.getElementById('ticketImage');
-  html2canvas(ticket, { scale: 3 }).then(canvas => {
+  html2canvas(document.getElementById('ticketImage'), { scale: 3 }).then(canvas => {
     const link = document.createElement('a');
-    link.download = 'Comprobante_Simulacion.png';
-    link.href = canvas.toDataURL("image/png");
+    link.download = 'Comprobante_Turno.png';
+    link.href = canvas.toDataURL();
     link.click();
   });
 }
@@ -265,7 +246,7 @@ function buscarInscripcion() {
   const leg = document.getElementById('buscarLegajo').value.trim();
   const resDiv = document.getElementById('resultadoBusqueda');
   if(!leg) return;
-  resDiv.innerHTML = '<p>Buscando...</p>';
+  resDiv.innerHTML = 'Buscando...';
   fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
     .then(res => res.text()).then(csv => {
       const filas = csv.trim().split('\n').slice(1);
@@ -273,16 +254,12 @@ function buscarInscripcion() {
       if(f){
         const c = f.split(',');
         resDiv.innerHTML = `<div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);"><p style="font-weight:700; margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
-      } else { resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px; font-weight:700;">❌ No encontrado.</p>'; }
+      } else { resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ No encontrado.</p>'; }
     });
 }
 </script>
 </body>
 </html>
-
-
-
-
 
 
 
