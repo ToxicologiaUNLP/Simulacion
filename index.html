@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <link rel="icon" href="logo2.png" type="image/png"/>
   <title>Taller de simulación - Toxicología-FCM, UNLP</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -16,67 +15,52 @@
       --bg-light: #f9f8f5;
       --white: #ffffff;
       --error: #b71c1c;
-      --success: #2e7d32;
     }
 
     html, body {
-      margin: 0; padding: 0;
-      min-height: 100vh;
+      margin: 0; padding: 0; min-height: 100vh;
       font-family: 'Open Sans', sans-serif;
       background: linear-gradient(135deg, #087882 0%, #0c8c9c 40%, #045c63 70%, #04545d 100%);
       background-attachment: fixed;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      display: flex; flex-direction: column; justify-content: center;
     }
 
     main {
-      background: rgba(249, 248, 245, 0.98);
-      border-radius: 24px;
-      width: 95%;
-      max-width: 520px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      margin: 20px auto;
+      background: rgba(249, 248, 245, 0.98); border-radius: 24px;
+      width: 95%; max-width: 520px; padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin: 20px auto;
       box-sizing: border-box;
     }
 
-    #logo {
-      display: block; width: 100%; height: auto;
-      margin-bottom: 20px; border-radius: 14px;
-    }
+    #logo { display: block; width: 100%; height: auto; margin-bottom: 20px; border-radius: 14px; }
+    h1 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-    h1 {
-      text-align: center; color: var(--primary-dark);
-      margin-bottom: 20px; font-size: 20px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-
-    form {
-      background: var(--white);
-      padding: 20px; border-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      border: 1px solid #eee;
-    }
-
+    form { background: var(--white); padding: 20px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
     label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; }
 
     input, select {
       width: 100%; padding: 12px; margin-top: 6px;
       border-radius: 12px; border: 2px solid #e8e8e8;
       box-sizing: border-box; font-size: 15px; transition: all 0.3s ease;
+      background-color: #fafafa;
     }
 
-    button {
-      width: 100%; padding: 15px; margin-top: 15px;
-      border-radius: 12px; border: none;
-      font-size: 16px; font-weight: 700;
-      cursor: pointer; transition: all 0.3s ease;
+    /* Mejora visual del Select de Turnos */
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230c8c9c' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C2.185 5.355 2.402 5 2.806 5h9.388c.404 0 .621.355.355.658l-4.796 5.482a.5.5 0 0 1-.718 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: calc(100% - 15px) center;
+      appearance: none; -webkit-appearance: none; padding-right: 40px;
+      border: 2px solid #d0e6e9; font-weight: 600; color: #333;
     }
+    
+    input:focus, select:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(12, 140, 156, 0.1); }
 
-    #inscripcionForm button[type="submit"] { background-color: var(--primary); color: white; }
+    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    #inscripcionForm button[type="submit"] { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(12, 140, 156, 0.2); }
+    #inscripcionForm button[type="submit"]:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    /* --- OVERLAYS Y MODALES --- */
+    /* --- OVERLAYS Y MODALES RE-DISEÑADOS --- */
     .overlay {
       position: fixed; inset: 0;
       background: rgba(4, 84, 93, 0.98); backdrop-filter: blur(8px);
@@ -85,42 +69,43 @@
     }
 
     .modal {
-      background: white; padding: 30px; border-radius: 24px;
-      max-width: 450px; width: 100%;
+      background: white; padding: 35px; border-radius: 28px;
+      max-width: 450px; width: 100%; text-align: center;
       box-shadow: 0 25px 50px rgba(0,0,0,0.4);
     }
 
-    .modal h2 { text-align: center; color: var(--primary-dark); margin-top: 0; font-size: 22px; }
-    .modal ol { padding-left: 20px; color: #444; font-size: 14px; line-height: 1.6; }
-    .modal button { background-color: var(--primary); color: white; }
-    #verInscripBtn { background-color: transparent !important; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+    .modal-emoji { font-size: 60px; display: block; margin-bottom: 15px; line-height: 1; }
+    .modal h2 { color: var(--primary-dark); margin: 0 0 15px 0; font-size: 24px; font-weight: 800; }
+    
+    .modal-instrucciones { 
+      background: #f0f7f8; padding: 20px; border-radius: 18px; 
+      text-align: left; margin-bottom: 20px; border: 1px solid #d0e6e9;
+    }
+    .modal ol { margin: 0; padding-left: 20px; color: #333; font-size: 14px; line-height: 1.7; }
+    .modal ol li { margin-bottom: 8px; }
+    .modal ol li strong { color: var(--primary-dark); }
 
-    /* --- TARJETA DE CONSULTA --- */
+    /* Botones del Modal */
+    .btn-modal-main { background-color: var(--primary); color: white; margin-top: 5px; }
+    .btn-modal-sec { background-color: transparent !important; color: var(--primary); border: 2px solid var(--primary) !important; margin-top: 12px; }
+
+    /* --- MODO CONSULTA --- */
     #verInscripcionModal {
       display: none; position: fixed; inset: 0;
-      background: rgba(4, 84, 93, 0.98); backdrop-filter: blur(10px);
-      justify-content: center; align-items: center;
-      z-index: 100000; padding: 20px;
-    }
-
-    .consulta-box {
-      background: white; padding: 25px; border-radius: 24px;
-      width: 100%; max-width: 400px; text-align: center;
+      background: rgba(4, 84, 93, 0.99); backdrop-filter: blur(12px);
+      justify-content: center; align-items: center; z-index: 100000; padding: 20px;
     }
 
     .ticket-card {
       background: #f0f7f8; border-radius: 16px; padding: 20px;
-      border-left: 6px solid var(--primary); margin-top: 15px;
-      text-align: left;
+      border-left: 6px solid var(--primary); margin-top: 15px; text-align: left;
     }
-    .ticket-card .t-nombre { font-size: 18px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; }
-    .ticket-card .t-info { font-weight: 700; color: var(--accent); font-size: 15px; }
 
-    .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; }
+    .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
 
     @media (max-width: 480px) {
       body { background: var(--bg-light); justify-content: flex-start; }
-      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; padding: 20px; }
+      main { margin: 0; width: 100%; min-height: 100vh; border-radius: 0; padding: 20px; }
     }
   </style>
 </head>
@@ -129,7 +114,7 @@
 
   <div class="overlay" id="overlay">
     <div class="modal" id="modalContenido">
-      <p>Cargando cronograma...</p>
+      <div id="loader-inicial">Cargando cronograma...</div>
     </div>
   </div>
 
@@ -137,36 +122,41 @@
     <img src="logo.png" alt="Logo Cátedra Toxicología" id="logo">
     <h1>Talleres de Simulación</h1>
     
-    <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:15px; color:#b22222; font-weight:600; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 10px;"></div>
+    <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:15px; color:#b22222; font-weight:700; font-size: 14px; background: #ffebee; padding: 12px; border-radius: 12px; border: 1px solid #f5c6cb;"></div>
 
     <form id="inscripcionForm">
       <label for="nombre">Nombre Completo:</label>
       <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
+      
       <label for="legajo">Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
+      
       <label for="email">Correo Institucional:</label>
       <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
-      <label for="turno">Seleccione Turno: <span id="ocupacionTotal" style="font-size: 0.9em;"></span></label>
+      
+      <label for="turno">Seleccione Turno: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
       <select id="turno" name="turno" required>
         <option disabled selected value="">Cargando fechas...</option>
       </select>
+      
       <button type="submit">Confirmar Inscripción</button>
     </form>
 
     <div class="contacto">
         © Cátedra de Toxicología, HoSiC<br/>
         Facultad de Ciencias Médicas - UNLP<br/>
-        <strong style="font-weight: 700;">toxicoalumnos@gmail.com</strong>
+        <strong>toxicoalumnos@gmail.com</strong>
     </div>
   </main>
 
   <div id="verInscripcionModal">
-    <div class="consulta-box">
-      <h2 style="font-size: 18px; color: var(--primary-dark); margin-bottom: 15px;">CONSULTAR TURNO</h2>
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 15px;"/>
-      <button onclick="buscarInscripcion()" style="background:var(--primary); color:white;">Buscar Registro</button>
+    <div class="modal">
+      <span class="modal-emoji">🔍</span>
+      <h2>CONSULTAR TURNO</h2>
+      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; border-color: var(--primary);"/>
+      <button class="btn-modal-main" onclick="buscarInscripcion()">Buscar Registro</button>
       <div id="resultadoBusqueda"></div>
-      <button style="margin-top: 15px; background: #eee; color: #444;" onclick="cerrarVerInscripcion()">Volver</button>
+      <button class="btn-modal-sec" style="color: #666; border-color: #ccc !important;" onclick="cerrarVerInscripcion()">Volver</button>
     </div>
   </div>
 
@@ -187,11 +177,23 @@ fetch(csvURL).then(res => res.text()).then(csv => {
   const modal = document.getElementById('modalContenido');
 
   if (hoy < fInicio) {
-    modal.innerHTML = `<div style="font-size: 40px;">⏳</div><h2>AVISO IMPORTANTE</h2><p>Aún no inició la etapa de inscripciones.</p><p>Habilitación: <strong>${inicioStr} - 00:00 hs</strong></p>`;
+    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><div class="modal-instrucciones" style="text-align:center;">La etapa de inscripciones aún no inició.<br><br><strong>Apertura:</strong> ${inicioStr} - 00:00 hs</div>`;
   } else if (hoy >= fFin) {
-    modal.innerHTML = `<div style="font-size: 40px;">🏁</div><h2>ETAPA FINALIZADA</h2><p>El período de inscripción ha concluido el ${finStr}.</p><button onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
+    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><div class="modal-instrucciones" style="text-align:center;">El período de inscripción ha concluido el día ${finStr}.</div><button class="btn-modal-main" onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
   } else {
-    modal.innerHTML = `<div style="font-size: 40px;">📋</div><h2>AVISO IMPORTANTE</h2><ol><li>Seleccione una fecha por única vez. No hay cambios.</li><li>Verifique su disponibilidad horaria.</li><li>Escriba su nombre en orden: APELLIDO Y NOMBRE.</li></ol><button onclick="cerrarModal()">Aceptar e inscribirme</button><button id="verInscripBtn" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver mi turno</button>`;
+    modal.innerHTML = `
+      <span class="modal-emoji">📋</span>
+      <h2>AVISO IMPORTANTE</h2>
+      <div class="modal-instrucciones">
+        <ol>
+          <li>Seleccione una <strong>fecha por única vez</strong>. No hay cambios.</li>
+          <li>Verifique su <strong>disponibilidad horaria</strong>.</li>
+          <li>Escriba su nombre: <strong>APELLIDO Y NOMBRE</strong>.</li>
+        </ol>
+      </div>
+      <button class="btn-modal-main" onclick="cerrarModal()">Aceptar e inscribirme</button>
+      <button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver mi turno</button>
+    `;
     actualizarTurnos();
   }
 });
@@ -214,9 +216,9 @@ function buscarInscripcion() {
       const f = filas.find(r => r.split(',')[1].trim() === leg);
       if(f){
         const c = f.split(',');
-        resDiv.innerHTML = `<div class="ticket-card"><p class="t-nombre">${c[0].replace(/"/g, '')}</p><p>Legajo: ${c[1]}</p><p class="t-info">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
+        resDiv.innerHTML = `<div class="ticket-card"><p style="font-weight:700; color:var(--primary-dark); margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px;">Legajo: ${c[1]}</p><p class="t-info">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
       } else {
-        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ Legajo no encontrado.</p>';
+        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px; font-weight:700;">❌ Legajo no encontrado.</p>';
       }
     });
 }
@@ -246,6 +248,7 @@ document.getElementById('legajo').addEventListener('input', (e) => {
 
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
+  const b = e.target.querySelector('button'); b.disabled = true; b.textContent = 'Enviando...';
   fetch(scriptURL, { method: 'POST', body: new FormData(e.target) }).then(() => { alert("¡Inscripción Exitosa!"); location.reload(); });
 });
 </script>
