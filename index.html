@@ -179,7 +179,7 @@ fetch(csvURL).then(res => res.text()).then(csv => {
   } else if (hoy >= fFin) {
     modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>FINALIZADO</h2><button class="btn-modal-main" onclick="abrirVerInscripcion()">Ver mi turno</button>`;
   } else {
-    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO IMPORTANTE</h2><div class="modal-instrucciones"><ol><li>Seleccione una fecha por única vez.</li><li>Verifique su disponibilidad.</li><li>Apellido y Nombre en mayúsculas.</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Inscribirme</button><button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>`;
+    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO IMPORTANTE</h2><div class="modal-instrucciones"><ol><li>Seleccione una fecha por única vez.No se permiten cambios</li><li>Verifique su disponibilidad horaria.</li><li>Coloque su Apellido y Nombre/s (en ese orden).</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Inscribirme</button><button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>`;
     actualizarTurnos();
   }
 });
