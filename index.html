@@ -36,69 +36,57 @@
     h1 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
     form { background: var(--white); padding: 20px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; }
+    label { display: block; margin-top: 15px; font-weight: 700; color: var(--primary-dark); font-size: 13px; margin-bottom: 5px; }
 
-    input, select {
+    input {
       width: 100%; padding: 12px; margin-top: 6px;
       border-radius: 12px; border: 2px solid #e8e8e8;
       box-sizing: border-box; font-size: 15px; transition: all 0.3s ease;
       background-color: #fafafa;
     }
+    input:focus { border-color: var(--primary); outline: none; background-color: #fff; }
 
-    /* Mejora visual del Select de Turnos */
-    select {
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230c8c9c' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C2.185 5.355 2.402 5 2.806 5h9.388c.404 0 .621.355.355.658l-4.796 5.482a.5.5 0 0 1-.718 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: calc(100% - 15px) center;
-      appearance: none; -webkit-appearance: none; padding-right: 40px;
-      border: 2px solid #d0e6e9; font-weight: 600; color: #333;
+    /* NUEVO SELECTOR DE TURNOS TIPO CARDS */
+    #contenedorTurnos {
+      display: grid; grid-template-columns: 1fr; gap: 10px;
+      margin-top: 10px; max-height: 250px; overflow-y: auto;
+      padding: 5px; border: 1px inset #eee; border-radius: 12px;
     }
-    
-    input:focus, select:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(12, 140, 156, 0.1); }
 
-    button { width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-    #inscripcionForm button[type="submit"] { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(12, 140, 156, 0.2); }
-    #inscripcionForm button[type="submit"]:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .turno-card {
+      background: white; border: 2px solid #e8e8e8; padding: 12px;
+      border-radius: 12px; cursor: pointer; transition: 0.2s;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; font-weight: 600; color: #444;
+    }
+    .turno-card:hover { border-color: var(--primary); background: #f0fbfc; }
+    .turno-card.selected { border-color: var(--primary); background: var(--primary); color: white; transform: scale(0.98); }
+    .turno-card .cupos { font-size: 11px; opacity: 0.8; font-weight: 400; }
 
-    /* --- OVERLAYS Y MODALES RE-DISEÑADOS --- */
+    button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    #btnSubmit { background-color: var(--primary); color: white; }
+    #btnSubmit:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* MODALES */
     .overlay {
-      position: fixed; inset: 0;
-      background: rgba(4, 84, 93, 0.98); backdrop-filter: blur(8px);
-      display: flex; justify-content: center; align-items: center;
+      position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98);
+      backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center;
       z-index: 99999; padding: 20px;
     }
-
     .modal {
       background: white; padding: 35px; border-radius: 28px;
       max-width: 450px; width: 100%; text-align: center;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
     }
-
-    .modal-emoji { font-size: 60px; display: block; margin-bottom: 15px; line-height: 1; }
-    .modal h2 { color: var(--primary-dark); margin: 0 0 15px 0; font-size: 24px; font-weight: 800; }
-    
-    .modal-instrucciones { 
-      background: #f0f7f8; padding: 20px; border-radius: 18px; 
-      text-align: left; margin-bottom: 20px; border: 1px solid #d0e6e9;
-    }
+    .modal-emoji { font-size: 60px; display: block; margin-bottom: 15px; }
+    .modal-instrucciones { background: #f0f7f8; padding: 20px; border-radius: 18px; text-align: left; margin-bottom: 20px; border: 1px solid #d0e6e9; }
     .modal ol { margin: 0; padding-left: 20px; color: #333; font-size: 14px; line-height: 1.7; }
-    .modal ol li { margin-bottom: 8px; }
-    .modal ol li strong { color: var(--primary-dark); }
+    .btn-modal-main { background-color: var(--primary); color: white; }
+    .btn-modal-sec { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 12px; }
 
-    /* Botones del Modal */
-    .btn-modal-main { background-color: var(--primary); color: white; margin-top: 5px; }
-    .btn-modal-sec { background-color: transparent !important; color: var(--primary); border: 2px solid var(--primary) !important; margin-top: 12px; }
-
-    /* --- MODO CONSULTA --- */
     #verInscripcionModal {
       display: none; position: fixed; inset: 0;
       background: rgba(4, 84, 93, 0.99); backdrop-filter: blur(12px);
       justify-content: center; align-items: center; z-index: 100000; padding: 20px;
-    }
-
-    .ticket-card {
-      background: #f0f7f8; border-radius: 16px; padding: 20px;
-      border-left: 6px solid var(--primary); margin-top: 15px; text-align: left;
     }
 
     .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
@@ -114,7 +102,7 @@
 
   <div class="overlay" id="overlay">
     <div class="modal" id="modalContenido">
-      <div id="loader-inicial">Cargando cronograma...</div>
+      <div>Cargando sistema...</div>
     </div>
   </div>
 
@@ -125,38 +113,38 @@
     <div id="mensajeF2" style="display:none; text-align:center; margin-bottom:15px; color:#b22222; font-weight:700; font-size: 14px; background: #ffebee; padding: 12px; border-radius: 12px; border: 1px solid #f5c6cb;"></div>
 
     <form id="inscripcionForm">
-      <label for="nombre">Nombre Completo:</label>
-      <input id="nombre" name="nombre" placeholder="Apellido y Nombre" required type="text"/>
+      <label>Nombre Completo:</label>
+      <input id="nombre" name="nombre" placeholder="APELLIDO Y NOMBRE" required type="text"/>
       
-      <label for="legajo">Legajo:</label>
+      <label>Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
       
-      <label for="email">Correo Institucional:</label>
+      <label>Correo Institucional:</label>
       <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
       
-      <label for="turno">Seleccione Turno: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
-      <select id="turno" name="turno" required>
-        <option disabled selected value="">Cargando fechas...</option>
-      </select>
+      <label>Seleccione una fecha disponible: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
+      <div id="contenedorTurnos">
+        <p style="font-size: 12px; color: #999; padding: 10px;">Cargando turnos...</p>
+      </div>
+      <input type="hidden" name="turno" id="turnoInput" required>
       
-      <button type="submit">Confirmar Inscripción</button>
+      <button type="submit" id="btnSubmit">Confirmar Inscripción</button>
     </form>
 
     <div class="contacto">
         © Cátedra de Toxicología, HoSiC<br/>
-        Facultad de Ciencias Médicas - UNLP<br/>
-        <strong>toxicoalumnos@gmail.com</strong>
+        Facultad de Ciencias Médicas - UNLP
     </div>
   </main>
 
   <div id="verInscripcionModal">
     <div class="modal">
       <span class="modal-emoji">🔍</span>
-      <h2>CONSULTAR TURNO</h2>
-      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; border-color: var(--primary);"/>
+      <h2 style="color: var(--primary-dark);">CONSULTAR TURNO</h2>
+      <input type="text" id="buscarLegajo" placeholder="Ej: 12345/6" style="margin-bottom: 10px; border-color: var(--primary); text-align: center;"/>
       <button class="btn-modal-main" onclick="buscarInscripcion()">Buscar Registro</button>
       <div id="resultadoBusqueda"></div>
-      <button class="btn-modal-sec" style="color: #666; border-color: #ccc !important;" onclick="cerrarVerInscripcion()">Volver</button>
+      <button class="btn-modal-sec" style="color: #666; border-color: #ccc;" onclick="cerrarVerInscripcion()">Volver</button>
     </div>
   </div>
 
@@ -173,36 +161,21 @@ fetch(csvURL).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
   const fInicio = parsearFechaZero(inicioStr), fFin = parsearFechaZero(finStr), hoy = new Date();
-
+  
   const modal = document.getElementById('modalContenido');
 
   if (hoy < fInicio) {
-    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><div class="modal-instrucciones" style="text-align:center;">La etapa de inscripciones aún no inició.<br><br><strong>Apertura:</strong> ${inicioStr} - 00:00 hs</div>`;
+    modal.innerHTML = `<span class="modal-emoji">⏳</span><h2>PRÓXIMAMENTE</h2><div class="modal-instrucciones" style="text-align:center;">Apertura de inscripciones:<br><strong>${inicioStr} - 00:00 hs</strong></div>`;
   } else if (hoy >= fFin) {
-    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><div class="modal-instrucciones" style="text-align:center;">El período de inscripción ha concluido el día ${finStr}.</div><button class="btn-modal-main" onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
+    modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>ETAPA FINALIZADA</h2><div class="modal-instrucciones" style="text-align:center;">El período concluyó el ${finStr}.</div><button class="btn-modal-main" onclick="abrirVerInscripcion()">Consultar mi turno</button>`;
   } else {
-    modal.innerHTML = `
-      <span class="modal-emoji">📋</span>
-      <h2>AVISO IMPORTANTE</h2>
-      <div class="modal-instrucciones">
-        <ol>
-          <li>Seleccione una <strong>fecha por única vez</strong>. No hay cambios.</li>
-          <li>Verifique su <strong>disponibilidad horaria</strong>.</li>
-          <li>Escriba su nombre: <strong>APELLIDO Y NOMBRE</strong>.</li>
-        </ol>
-      </div>
-      <button class="btn-modal-main" onclick="cerrarModal()">Aceptar e inscribirme</button>
-      <button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver mi turno</button>
-    `;
+    modal.innerHTML = `<span class="modal-emoji">📋</span><h2>AVISO IMPORTANTE</h2><div class="modal-instrucciones"><ol><li>Seleccione una <strong>fecha por única vez</strong>. No hay cambios.</li><li>Verifique su <strong>disponibilidad horaria</strong>.</li><li>Escriba su nombre: <strong>APELLIDO Y NOMBRE</strong>.</li></ol></div><button class="btn-modal-main" onclick="cerrarModal()">Aceptar e inscribirme</button><button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto / Ver mi turno</button>`;
     actualizarTurnos();
   }
 });
 
 function cerrarModal() { document.getElementById('overlay').style.display = 'none'; }
-function abrirVerInscripcion() { 
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('verInscripcionModal').style.display = 'flex'; 
-}
+function abrirVerInscripcion() { document.getElementById('overlay').style.display = 'none'; document.getElementById('verInscripcionModal').style.display = 'flex'; }
 function cerrarVerInscripcion() { location.reload(); }
 
 function buscarInscripcion() {
@@ -216,27 +189,31 @@ function buscarInscripcion() {
       const f = filas.find(r => r.split(',')[1].trim() === leg);
       if(f){
         const c = f.split(',');
-        resDiv.innerHTML = `<div class="ticket-card"><p style="font-weight:700; color:var(--primary-dark); margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px;">Legajo: ${c[1]}</p><p class="t-info">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
-      } else {
-        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px; font-weight:700;">❌ Legajo no encontrado.</p>';
-      }
+        resDiv.innerHTML = `<div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);"><p style="font-weight:700; margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
+      } else { resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px; font-weight:700;">❌ Legajo no encontrado.</p>'; }
     });
 }
 
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
-    const sel = document.getElementById('turno');
-    sel.innerHTML = '<option disabled selected value="">Seleccione una fecha disponible...</option>';
-    let libres = 0;
+    const contenedor = document.getElementById('contenedorTurnos');
+    contenedor.innerHTML = '';
+    let libresTotal = 0;
     data.forEach(t => { 
       if(t.disponible) {
-        libres += Number(t.cupos);
-        const opt = document.createElement('option');
-        opt.value = t.id; opt.textContent = t.texto.replace(/hs\b/i, " h") + ` (Libres: ${t.cupos})`;
-        sel.appendChild(opt);
+        libresTotal += Number(t.cupos);
+        const card = document.createElement('div');
+        card.className = 'turno-card';
+        card.innerHTML = `<span>${t.texto.replace(/hs\b/i, " h")}</span><span class="cupos">${t.cupos} libres</span>`;
+        card.onclick = () => {
+          document.querySelectorAll('.turno-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          document.getElementById('turnoInput').value = t.id;
+        };
+        contenedor.appendChild(card);
       }
     });
-    document.getElementById('ocupacionTotal').textContent = `(${Math.round(((140-libres)/140)*100)}% lleno)`;
+    document.getElementById('ocupacionTotal').textContent = `(${Math.round(((140-libresTotal)/140)*100)}% lleno)`;
   });
 }
 
@@ -248,14 +225,13 @@ document.getElementById('legajo').addEventListener('input', (e) => {
 
 document.getElementById('inscripcionForm').addEventListener('submit', (e) => {
   e.preventDefault();
-  const b = e.target.querySelector('button'); b.disabled = true; b.textContent = 'Enviando...';
+  if(!document.getElementById('turnoInput').value) { alert("Por favor, seleccioná una fecha de la lista."); return; }
+  const b = document.getElementById('btnSubmit'); b.disabled = true; b.textContent = 'Procesando...';
   fetch(scriptURL, { method: 'POST', body: new FormData(e.target) }).then(() => { alert("¡Inscripción Exitosa!"); location.reload(); });
 });
 </script>
 </body>
 </html>
-
-
 
 
 
