@@ -46,7 +46,6 @@
     }
     input:focus { border-color: var(--primary); outline: none; background-color: #fff; }
 
-    /* CONTENEDOR DE TURNOS CON SCROLL */
     #contenedorTurnos {
       display: grid; grid-template-columns: 1fr; gap: 8px;
       margin-top: 10px; max-height: 220px; overflow-y: auto;
@@ -68,7 +67,6 @@
     #btnSubmit { background-color: var(--primary); color: white; }
     #btnSubmit:disabled { background-color: #ccc; cursor: not-allowed; }
 
-    /* OVERLAYS Y MODALES */
     .overlay {
       position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98);
       backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center;
@@ -103,7 +101,7 @@
 
   <div class="overlay" id="overlay">
     <div class="modal" id="modalContenido">
-      <div>Verificando disponibilidad...</div>
+      <div>Sincronizando...</div>
     </div>
   </div>
 
@@ -157,7 +155,6 @@ function parsearFechaZero(str) {
   return new Date(20 + parts[2], parts[1] - 1, parts[0], 0, 0, 0);
 }
 
-// Carga inicial y control de acceso
 fetch(csvURL).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
@@ -182,10 +179,16 @@ function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
     const contenedor = document.getElementById('contenedorTurnos');
     contenedor.innerHTML = '';
-    let libresTotal = 0;
+    
+    let sumatoriaCupoMax = 0;
+    let sumatoriaLibres = 0;
+
     data.forEach(t => { 
+      // Cálculo de porcentajes: sumamos todos los datos que vienen del Excel
+      sumatoriaCupoMax += Number(t.cupoMax);
+      sumatoriaLibres += Number(t.cupos);
+
       if(t.disponible) {
-        libresTotal += Number(t.cupos);
         const card = document.createElement('div');
         card.className = 'turno-card';
         card.innerHTML = `<span>${t.texto.replace(/hs\b/i, " h")}</span><span class="cupos">${t.cupos} libres</span>`;
@@ -198,53 +201,41 @@ function actualizarTurnos() {
         contenedor.appendChild(card);
       }
     });
-    document.getElementById('ocupacionTotal').textContent = `(${Math.round(((140-libresTotal)/140)*100)}% lleno)`;
+
+    // Porcentaje = ((Total - Libres) / Total) * 100
+    const ocupados = sumatoriaCupoMax - sumatoriaLibres;
+    const porcentaje = Math.round((ocupados / sumatoriaCupoMax) * 100);
+    document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
   });
 }
 
-// Envío con doble validación (Confirmación y Cupo en tiempo real)
 document.getElementById('inscripcionForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const idTurno = document.getElementById('turnoInput').value;
   const textoTurno = document.getElementById('turnoTextoSeleccionado').value;
-
   if(!idTurno) { alert("Por favor, seleccioná una fecha de la lista."); return; }
-
-  // 1. Mensaje de confirmación amigable
   const confirmacion = confirm(`Estás por inscribirte al turno:\n\n📅 ${textoTurno}\n\n¿Es correcto?`);
-  
   if (!confirmacion) return;
-
   const b = document.getElementById('btnSubmit');
   b.disabled = true; b.textContent = 'Verificando cupo...';
-
-  // 2. Verificación final antes de inscribir para que no se pisen
   try {
     const checkRes = await fetch(scriptURL + '?action=turnos');
     const dataTurnos = await checkRes.json();
     const turnoActualizado = dataTurnos.find(t => t.id == idTurno);
-
     if (!turnoActualizado || !turnoActualizado.disponible) {
-      alert("¡Lo sentimos! Alguien acaba de reservar el último lugar en este turno. Por favor, elegí otro disponible.");
+      alert("¡Lo sentimos! El cupo se acaba de agotar. Elegí otro turno.");
       actualizarTurnos();
       b.disabled = false; b.textContent = 'Confirmar Inscripción';
       return;
     }
-
-    // Si hay cupo, procedemos al registro
     b.textContent = 'Procesando...';
     const response = await fetch(scriptURL, { method: 'POST', body: new FormData(e.target) });
     const resultado = await response.text();
-    
-    if(resultado.toLowerCase().includes("duplicado")) {
-      alert("Ya figura una inscripción con este Legajo.");
-    } else {
-      alert("¡Inscripción Exitosa!");
-    }
+    if(resultado.toLowerCase().includes("duplicado")) alert("Ya figura una inscripción con este Legajo.");
+    else alert("¡Inscripción Exitosa!");
     location.reload();
-
   } catch (error) {
-    alert("Hubo un error de conexión. Intentá nuevamente.");
+    alert("Error de conexión.");
     b.disabled = false; b.textContent = 'Confirmar Inscripción';
   }
 });
@@ -273,9 +264,6 @@ document.getElementById('legajo').addEventListener('input', (e) => {
 </script>
 </body>
 </html>
-
-
-
 
 
 
