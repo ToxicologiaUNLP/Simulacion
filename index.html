@@ -201,8 +201,8 @@ function actualizarTurnos() {
     });
     
     // Cálculo basado en 30 cupos totales
-    const ocupados = 30 - libresTotal;
-    const porcentaje = Math.round((ocupados / 30) * 100);
+    const ocupados = 140 - libresTotal;
+    const porcentaje = Math.round((ocupados / 140) * 100);
     document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
   });
 }
