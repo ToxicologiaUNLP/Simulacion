@@ -183,13 +183,30 @@ fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv =>
   } else if (hoy >= fFin) {
     modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>INSCRIPCIÓN FINALIZADA</h2><p>El período cerró el día:<br><strong>${finStr}</strong></p><button class="btn-modal-main" onclick="abrirVerInscripcion()">Ver mi turno</button>`;
   } else {
-    // Si es horario de inscripción, cola virtual primero
-    iniciarColaEspera(modal);
+    // Si es horario de inscripción, primero mostramos las opciones directamente
+    mostrarOpcionesIniciales(modal);
     actualizarTurnos();
   }
 });
 
-function iniciarColaEspera(modal) {
+function mostrarOpcionesIniciales(modal) {
+  modal.innerHTML = `
+    <span class="modal-emoji">📋</span>
+    <h2>AVISO IMPORTANTE</h2>
+    <div class="modal-instrucciones">
+      <ol>
+        <li>La elección de turnos es por única vez, sin cambios.</li>
+        <li>Revisá tu disponibilidad horaria.</li>
+        <li>Orden requerido en datos: APELLIDO Y NOMBRE.</li>
+      </ol>
+    </div>
+    <button class="btn-modal-main" onclick="activarColaEspera()">Inscribirme ahora</button>
+    <button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>
+  `;
+}
+
+function activarColaEspera() {
+  const modal = document.getElementById('modalContenido');
   let tiempo = Math.floor(Math.random() * (40 - 20 + 1)) + 20;
   
   const interval = setInterval(() => {
@@ -203,29 +220,17 @@ function iniciarColaEspera(modal) {
     tiempo--;
     if (tiempo < 0) {
       clearInterval(interval);
-      mostrarInstruccionesFinales(modal);
+      cerrarModal();
     }
   }, 1000);
 }
 
-function mostrarInstruccionesFinales(modal) {
-  modal.innerHTML = `
-    <span class="modal-emoji">📋</span>
-    <h2>AVISO IMPORTANTE</h2>
-    <div class="modal-instrucciones">
-      <ol>
-        <li>La elección de turnos es por única vez, sin cambios.</li>
-        <li>Revisá tu disponibilidad horaria.</li>
-        <li>Orden requerido en datos: APELLIDO Y NOMBRE.</li>
-      </ol>
-    </div>
-    <button class="btn-modal-main" onclick="cerrarModal()">Inscribirme ahora</button>
-    <button class="btn-modal-sec" onclick="abrirVerInscripcion()">Ya estoy inscripto</button>
-  `;
-}
-
 function cerrarModal() { document.getElementById('overlay').style.display = 'none'; }
-function abrirVerInscripcion() { document.getElementById('overlay').style.display = 'none'; document.getElementById('verInscripcionModal').style.display = 'flex'; }
+
+function abrirVerInscripcion() { 
+  document.getElementById('overlay').style.display = 'none'; 
+  document.getElementById('verInscripcionModal').style.display = 'flex'; 
+}
 
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
