@@ -67,7 +67,6 @@
     button { width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
     #btnSubmit { background-color: var(--primary); color: white; }
 
-    /* MODALES */
     .overlay { position: fixed; inset: 0; background: rgba(4, 84, 93, 0.98); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 99999; padding: 20px; }
     .modal { background: white; padding: 35px; border-radius: 28px; max-width: 450px; width: 100%; text-align: center; }
     .modal-emoji { font-size: 60px; display: block; margin-bottom: 15px; }
@@ -76,7 +75,6 @@
     .btn-modal-main { background-color: var(--primary); color: white; }
     .btn-modal-sec { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 12px; }
 
-    /* ESTILO CONTADOR CIRCULAR */
     .timer-circle {
       font-size: 40px; font-weight: bold; color: var(--primary); 
       margin: 20px 0; border: 4px solid var(--primary); 
@@ -86,7 +84,6 @@
 
     #verInscripcionModal { display: none; position: fixed; inset: 0; background: rgba(4, 84, 93, 0.99); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 100000; padding: 20px; }
     
-    /* COMPROBANTE */
     #comprobanteModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100001; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
     .ticket-container { width: 320px; height: 568px; background: white; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
     .ticket-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
@@ -168,7 +165,6 @@ function parsearFechaZero(str, hora, min) {
   return new Date(year, parts[1] - 1, parts[0], hora, min, 0);
 }
 
-// INICIO DEL SISTEMA
 fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
@@ -183,7 +179,6 @@ fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv =>
   } else if (hoy >= fFin) {
     modal.innerHTML = `<span class="modal-emoji">🏁</span><h2>INSCRIPCIÓN FINALIZADA</h2><p>El período cerró el día:<br><strong>${finStr}</strong></p><button class="btn-modal-main" onclick="abrirVerInscripcion()">Ver mi turno</button>`;
   } else {
-    // Si es horario de inscripción, primero mostramos las opciones directamente
     mostrarOpcionesIniciales(modal);
     actualizarTurnos();
   }
@@ -226,11 +221,7 @@ function activarColaEspera() {
 }
 
 function cerrarModal() { document.getElementById('overlay').style.display = 'none'; }
-
-function abrirVerInscripcion() { 
-  document.getElementById('overlay').style.display = 'none'; 
-  document.getElementById('verInscripcionModal').style.display = 'flex'; 
-}
+function abrirVerInscripcion() { document.getElementById('overlay').style.display = 'none'; document.getElementById('verInscripcionModal').style.display = 'flex'; }
 
 function actualizarTurnos() {
   fetch(scriptURL + '?action=turnos').then(res => res.json()).then(data => {
@@ -254,8 +245,9 @@ function actualizarTurnos() {
       }
     });
     
-    const ocupados = 140 - libresTotal;
-    const porcentaje = Math.round((ocupados / 140) * 100);
+    // CORRECCIÓN PARA 212 ALUMNOS
+    const ocupados = 212 - libresTotal;
+    const porcentaje = Math.round((ocupados / 212) * 100);
     document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
   });
 }
@@ -317,7 +309,6 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
-
 
 
 
