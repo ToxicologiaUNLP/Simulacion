@@ -209,16 +209,15 @@ function cargarListaAlumnos() {
     .then(csv => {
       const filas = csv.trim().split(/\r?\n/);
       listaAlumnos = filas.slice(1).map(f => {
-        // Explicación: Si la fila está entre comillas (común en CSVs con comas internas), 
-        // eliminamos las comillas externas pero mantenemos el contenido completo.
-        let nombreCompleto = f.trim();
-        if (nombreCompleto.startsWith('"') && nombreCompleto.endsWith('"')) {
-          nombreCompleto = nombreCompleto.substring(1, nombreCompleto.length - 1);
+        // Esta expresión regular separa por comas, pero ignora las que están entre comillas
+        const columnas = f.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        
+        if (columnas && columnas[0]) {
+          // Tomamos solo la primera columna (Columna A) y limpiamos las comillas
+          return columnas[0].replace(/^"|"$/g, '').trim();
         }
-        // Si el CSV no usa comillas pero sí comas, tomamos toda la fila 
-        // (asumiendo que el nombre es el dato principal de esa hoja)
-        return nombreCompleto.replace(/""/g, '"').trim(); 
-      }).filter(n => n.length > 2);
+        return null;
+      }).filter(n => n !== null && n.length > 2);
     });
 }
 
