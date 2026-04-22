@@ -358,14 +358,7 @@ function descargarTicket() {
     link.click();
   });
 }
-
 function buscarInscripcion() {
-  const leg = document.getElementById('buscarLegajo').value.trim();
-  const resDiv = document.getElementById('resultadoBusqueda');
-  if(!leg) return;
-  resDiv.innerHTML = 'Buscando...';
-  
-  fetch('https://docs.gofunction buscarInscripcion() {
   const leg = document.getElementById('buscarLegajo').value.trim();
   const resDiv = document.getElementById('resultadoBusqueda');
   if(!leg) return;
@@ -379,15 +372,11 @@ function buscarInscripcion() {
       const f = filas.find(r => r.includes(leg));
 
       if(f){
-        // Esta es la forma correcta de separar columnas respetando comas dentro de comillas
         const columnas = f.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
         
         if (columnas) {
-          // Columna A (índice 0): Nombre. Quitamos comillas.
           const nombreLimpio = columnas[0].replace(/"/g, '').trim();
           
-          // Columna E (índice 4): Turno. Quitamos comillas y el texto de cupos.
-          // Si por alguna razón el índice 4 no es el turno, buscamos el que tenga "/"
           let turnoRaw = columnas[4] || "";
           if (!turnoRaw.includes('/')) {
               turnoRaw = columnas.find(c => c.includes('/')) || "Turno confirmado";
@@ -403,6 +392,9 @@ function buscarInscripcion() {
       } else { 
         resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ No encontrado.</p>'; 
       }
+    }).catch(err => {
+      console.error(err);
+      resDiv.innerHTML = '<p style="color:var(--error);">Error de conexión.</p>';
     });
 }
 </script>
