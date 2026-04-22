@@ -364,14 +364,33 @@ function buscarInscripcion() {
   const resDiv = document.getElementById('resultadoBusqueda');
   if(!leg) return;
   resDiv.innerHTML = 'Buscando...';
+  
   fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=1122482966&single=true&output=csv')
     .then(res => res.text()).then(csv => {
       const filas = csv.trim().split('\n').slice(1);
-      const f = filas.find(r => r.split(',')[1].trim() === leg);
+      
+      // Buscamos la fila donde el legajo coincida
+      const f = filas.find(r => {
+        // Usamos la misma lógica para separar columnas respetando las comillas
+        const columnas = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        // El legajo suele estar en la segunda columna (índice 1)
+        return columnas && columnas[1] && columnas[1].replace(/"/g, '').trim() === leg;
+      });
+
       if(f){
-        const c = f.split(',');
-        resDiv.innerHTML = `<div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);"><p style="font-weight:700; margin:0;">${c[0].replace(/"/g, '')}</p><p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${c[4].split(' (Cupos:')[0]}</p></div>`;
-      } else { resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ No encontrado.</p>'; }
+        const c = f.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        // c[0] es el Nombre, c[4] es el Turno
+        const nombreLimpio = c[0].replace(/"/g, '');
+        const turnoLimpio = c[4].replace(/"/g, '').split(' (Cupos:')[0];
+
+        resDiv.innerHTML = `
+          <div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);">
+            <p style="font-weight:700; margin:0;">${nombreLimpio}</p>
+            <p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${turnoLimpio}</p>
+          </div>`;
+      } else { 
+        resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ No encontrado.</p>'; 
+      }
     });
 }
 </script>
