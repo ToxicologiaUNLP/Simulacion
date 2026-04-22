@@ -95,7 +95,6 @@
 
     .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
     
-    /* Estilo para el buscador de nombres */
     #sugerenciasNombres {
       position: absolute; width: 100%; background: white; border: 1px solid #ddd;
       border-radius: 0 0 12px 12px; z-index: 1000; display: none;
@@ -116,7 +115,7 @@
     <img src="logo.png" alt="Logo" id="logo">
     <h1>Inscripción Talleres</h1>
     <form id="inscripcionForm">
-      <label>Apellido y Nombre Completo (Busca tu nombre):</label>
+      <label>Seleccioná tu nombre:</label>
       <div style="position: relative; width: 100%;">
         <input id="nombre" name="nombre" placeholder="Escribí tu apellido..." required type="text" autocomplete="off"/>
         <div id="sugerenciasNombres"></div>
@@ -174,7 +173,7 @@
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
-const urlNotasCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVGN4hiXvWv575TNG-VQTdQPYU0sCluwD-wWjegpzhmr-iEneswO-h8dnlfnEdTiReiKxcb_JtfDWT/pub?output=csv";
+const urlNotasCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuzuaNqAZG0G2My9L6H3Gs5tuCnJjYh1t7H3kEdzieyg_jrtc8j2b5vtn00IhQv0t2dJxBrn4RJJxI/pub?output=csv";
 
 let listaAlumnos = [];
 
@@ -184,7 +183,6 @@ function parsearFechaZero(str, hora, min) {
   return new Date(year, parts[1] - 1, parts[0], hora, min, 0);
 }
 
-// Cargar fechas y lista de alumnos
 fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
@@ -209,34 +207,22 @@ function cargarListaAlumnos() {
   fetch(urlNotasCSV + "&t=" + Date.now())
     .then(res => res.text())
     .then(csv => {
-      // Dividimos por filas
       const filas = csv.trim().split(/\r?\n/);
-      
-      // Procesamos cada fila para extraer el nombre (Columna A)
       listaAlumnos = filas.slice(1).map(f => {
-        // Esta lógica detecta si la separación es por coma o punto y coma
-        const columnas = f.includes(';') ? f.split(';') : f.split(',');
-        // Limpiamos comillas y espacios en blanco
-        return columnas[0].replace(/"/g, '').trim();
-      }).filter(n => n.length > 2); // Evitamos celdas vacías o muy cortas
-      
-      console.log("Lista cargada:", listaAlumnos.length, "alumnos");
+        const cols = f.includes(';') ? f.split(';') : f.split(',');
+        return cols[0].replace(/"/g, '').trim();
+      }).filter(n => n.length > 2);
     })
-    .catch(err => console.error("Error cargando lista:", err));
+    .catch(err => console.error("Error nombres:", err));
 }
 
-// Lógica del buscador de nombres
 const inputNombre = document.getElementById('nombre');
 const divSugerencias = document.getElementById('sugerenciasNombres');
 
 inputNombre.addEventListener('input', function() {
   const busqueda = this.value.toUpperCase();
   divSugerencias.innerHTML = '';
-  
-  if (busqueda.length < 3) {
-    divSugerencias.style.display = 'none';
-    return;
-  }
+  if (busqueda.length < 3) { divSugerencias.style.display = 'none'; return; }
 
   const filtrados = listaAlumnos.filter(a => a.toUpperCase().includes(busqueda)).slice(0, 6);
 
@@ -268,8 +254,8 @@ function mostrarOpcionesIniciales(modal) {
     <div class="modal-instrucciones">
       <ol>
         <li>La elección de turnos es por única vez, sin cambios.</li>
-        <li>Revisá tu disponibilidad horaria.</li>
-        <li>Buscá tu apellido en el primer casillero y seleccionalo.</li>
+        <li>Buscá tu nombre en el primer casillero y seleccionalo.</li>
+        <li>Orden requerido: APELLIDO NOMBRE.</li>
       </ol>
     </div>
     <button class="btn-modal-main" onclick="activarColaEspera()">Inscribirme ahora</button>
@@ -280,20 +266,16 @@ function mostrarOpcionesIniciales(modal) {
 function activarColaEspera() {
   const modal = document.getElementById('modalContenido');
   let tiempo = Math.floor(Math.random() * (40 - 20 + 1)) + 20;
-  
   const interval = setInterval(() => {
     modal.innerHTML = `
       <span class="modal-emoji">⏳</span>
       <h2>SALA DE ESPERA</h2>
-      <p>Para asegurar tu inscripción al taller, habilitamos los accesos de forma escalonada.</p>
+      <p>Habilitamos los accesos de forma escalonada.</p>
       <div class="timer-circle">${tiempo}</div>
-      <p style="font-size:13px; color:#666;">Tu turno se activará automáticamente al llegar a cero.</p>
+      <p style="font-size:13px; color:#666;">Tu turno se activará automáticamente.</p>
     `;
     tiempo--;
-    if (tiempo < 0) {
-      clearInterval(interval);
-      cerrarModal();
-    }
+    if (tiempo < 0) { clearInterval(interval); cerrarModal(); }
   }, 1000);
 }
 
@@ -305,7 +287,6 @@ function actualizarTurnos() {
     const contenedor = document.getElementById('contenedorTurnos');
     contenedor.innerHTML = '';
     let libresTotal = 0;
-    
     data.forEach(t => { 
       if(t.disponible) {
         libresTotal += Number(t.cupos);
@@ -321,7 +302,6 @@ function actualizarTurnos() {
         contenedor.appendChild(card);
       }
     });
-    
     const ocupados = 212 - libresTotal;
     const porcentaje = Math.round((ocupados / 212) * 100);
     document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
@@ -336,17 +316,13 @@ document.getElementById('legajo').addEventListener('input', (e) => {
 
 document.getElementById('inscripcionForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  if(!document.getElementById('turnoInput').value) { alert("Por favor, seleccioná una fecha."); return; }
+  if(!document.getElementById('turnoInput').value) { alert("Seleccioná una fecha."); return; }
   const b = document.getElementById('btnSubmit');
   b.disabled = true; b.textContent = 'Procesando...';
-
   fetch(scriptURL, { method: 'POST', body: new FormData(this) })
-  .then(res => res.text())
-  .then(texto => {
-    if(texto.includes("duplicado")) {
-      alert("Ya existe una inscripción con este legajo.");
-      location.reload();
-    } else {
+  .then(res => res.text()).then(texto => {
+    if(texto.includes("duplicado")) { alert("Ya existe una inscripción con este legajo."); location.reload(); }
+    else {
       document.getElementById('comp-nombre').textContent = document.getElementById('nombre').value.toUpperCase();
       document.getElementById('comp-legajo').textContent = document.getElementById('legajo').value;
       document.getElementById('comp-turno').textContent = document.getElementById('turnoTextoSeleccionado').value;
