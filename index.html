@@ -94,6 +94,15 @@
     .qr-area { display: flex; flex-direction: column; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 15px; border: 1px solid #eee; }
 
     .contacto { margin-top: 25px; text-align: center; font-size: 13px; color: var(--primary-dark); border-top: 1px solid #eee; padding-top: 15px; opacity: 0.8; }
+    
+    /* Estilo para el buscador de nombres */
+    #sugerenciasNombres {
+      position: absolute; width: 100%; background: white; border: 1px solid #ddd;
+      border-radius: 0 0 12px 12px; z-index: 1000; display: none;
+      max-height: 200px; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .sugerencia-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; text-align: left; }
+    .sugerencia-item:hover { background-color: #f0fbfc; color: var(--primary); }
   </style>
 </head>
 
@@ -107,14 +116,21 @@
     <img src="logo.png" alt="Logo" id="logo">
     <h1>Inscripción Talleres</h1>
     <form id="inscripcionForm">
-      <label>Apellido y Nombre Completo (respete orden):</label>
-      <input id="nombre" name="nombre" placeholder="Apellido/s Nombre/s" required type="text"/>
+      <label>Apellido y Nombre Completo (Busca tu nombre):</label>
+      <div style="position: relative; width: 100%;">
+        <input id="nombre" name="nombre" placeholder="Escribí tu apellido..." required type="text" autocomplete="off"/>
+        <div id="sugerenciasNombres"></div>
+      </div>
+
       <label>Legajo:</label>
       <input id="legajo" name="legajo" placeholder="12345/6" required type="text"/>
+      
       <label>Correo electrónico:</label>
       <input id="email" name="email" placeholder="alumno@gmail.com" required type="email"/>
+      
       <label>Seleccione una fecha: <span id="ocupacionTotal" style="font-weight: 400; color: var(--accent);"></span></label>
       <div id="contenedorTurnos"><p style="font-size: 12px; color: #999; padding: 10px;">Cargando turnos...</p></div>
+      
       <input type="hidden" name="turno" id="turnoInput" required>
       <input type="hidden" id="turnoTextoSeleccionado">
       <button type="submit" id="btnSubmit">Confirmar Registro</button>
@@ -158,6 +174,9 @@
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw0efPHaFlA2WSfvS2otcQpyT7QtG0M6n9erz_6v3Bag-z8yEV6tjk1ZkcU3qxUkM7GFQ/exec';
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQl056VY6Tv-hIeNjQrcElL4zusVkjizmfO8YJLqe6IhGwk4eYY3D1SeqpUFIP9RnESYuNGsc_sn7J3/pub?gid=0&single=true&output=csv";
+const urlNotasCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVGN4hiXvWv575TNG-VQTdQPYU0sCluwD-wWjegpzhmr-iEneswO-h8dnlfnEdTiReiKxcb_JtfDWT/pub?output=csv";
+
+let listaAlumnos = [];
 
 function parsearFechaZero(str, hora, min) {
   const parts = str.trim().split('/');
@@ -165,6 +184,7 @@ function parsearFechaZero(str, hora, min) {
   return new Date(year, parts[1] - 1, parts[0], hora, min, 0);
 }
 
+// Cargar fechas y lista de alumnos
 fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv => {
   const filas = csv.trim().split("\n").map(f => f.split(","));
   const [inicioStr, finStr] = filas[1][5].split('-');
@@ -181,7 +201,54 @@ fetch(csvURL + "&t=" + new Date().getTime()).then(res => res.text()).then(csv =>
   } else {
     mostrarOpcionesIniciales(modal);
     actualizarTurnos();
+    cargarListaAlumnos();
   }
+});
+
+function cargarListaAlumnos() {
+  fetch(urlNotasCSV + "&t=" + Date.now())
+    .then(res => res.text())
+    .then(csv => {
+      const filas = csv.trim().split("\n");
+      // Empieza en fila 2 (índice 1) y toma la Columna A
+      listaAlumnos = filas.slice(1).map(f => f.split(",")[0].replace(/"/g, '').trim()).filter(n => n.length > 0);
+    });
+}
+
+// Lógica del buscador de nombres
+const inputNombre = document.getElementById('nombre');
+const divSugerencias = document.getElementById('sugerenciasNombres');
+
+inputNombre.addEventListener('input', function() {
+  const busqueda = this.value.toUpperCase();
+  divSugerencias.innerHTML = '';
+  
+  if (busqueda.length < 3) {
+    divSugerencias.style.display = 'none';
+    return;
+  }
+
+  const filtrados = listaAlumnos.filter(a => a.toUpperCase().includes(busqueda)).slice(0, 6);
+
+  if (filtrados.length > 0) {
+    filtrados.forEach(alumno => {
+      const item = document.createElement('div');
+      item.className = 'sugerencia-item';
+      item.innerHTML = `<strong>${alumno}</strong>`;
+      item.onclick = function() {
+        inputNombre.value = alumno;
+        divSugerencias.style.display = 'none';
+      };
+      divSugerencias.appendChild(item);
+    });
+    divSugerencias.style.display = 'block';
+  } else {
+    divSugerencias.style.display = 'none';
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (e.target !== inputNombre) divSugerencias.style.display = 'none';
 });
 
 function mostrarOpcionesIniciales(modal) {
@@ -192,7 +259,7 @@ function mostrarOpcionesIniciales(modal) {
       <ol>
         <li>La elección de turnos es por única vez, sin cambios.</li>
         <li>Revisá tu disponibilidad horaria.</li>
-        <li>Orden requerido en datos: APELLIDO Y NOMBRE.</li>
+        <li>Buscá tu apellido en el primer casillero y seleccionalo.</li>
       </ol>
     </div>
     <button class="btn-modal-main" onclick="activarColaEspera()">Inscribirme ahora</button>
@@ -245,7 +312,6 @@ function actualizarTurnos() {
       }
     });
     
-    // CORRECCIÓN PARA 212 ALUMNOS
     const ocupados = 212 - libresTotal;
     const porcentaje = Math.round((ocupados / 212) * 100);
     document.getElementById('ocupacionTotal').textContent = `(${porcentaje}% lleno)`;
@@ -309,7 +375,6 @@ function buscarInscripcion() {
 </script>
 </body>
 </html>
-
 
 
 
