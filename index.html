@@ -368,33 +368,37 @@ function buscarInscripcion() {
     .then(res => res.text()).then(csv => {
       const filas = csv.trim().split('\n').slice(1);
       
-      // Buscamos la fila que contenga el legajo exacto
+      // Buscamos la fila que contenga el legajo
       const f = filas.find(r => r.includes(leg));
 
       if(f){
-        const columnas = f.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-        
-        if (columnas) {
-          const nombreLimpio = columnas[0].replace(/"/g, '').trim();
-          
-          let turnoRaw = columnas[4] || "";
-          if (!turnoRaw.includes('/')) {
-              turnoRaw = columnas.find(c => c.includes('/')) || "Turno confirmado";
-          }
-          const turnoLimpio = turnoRaw.replace(/"/g, '').split(' (Cupos:')[0].trim();
-
-          resDiv.innerHTML = `
-            <div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);">
-              <p style="font-weight:700; margin:0;">${nombreLimpio}</p>
-              <p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${turnoLimpio}</p>
-            </div>`;
+        // 1. EXTRAER EL NOMBRE
+        let nombre = "";
+        if (f.startsWith('"')) {
+          // Si empieza con comillas, el nombre completo está entre la 1ra y 2da comilla
+          nombre = f.split('"')[1];
+        } else {
+          // Si no hay comillas, es lo que esté antes de la primera coma
+          nombre = f.split(',')[0];
         }
+
+        // 2. EXTRAER EL TURNO (Buscamos el pedazo que tenga la fecha '/' y diga 'hs')
+        const partes = f.split(',');
+        const fechaTurno = partes.find(p => p.includes('/') && p.toLowerCase().includes('hs')) || "Turno confirmado";
+        
+        // Limpiamos comillas y el texto de cupos si existiera
+        const turnoLimpio = fechaTurno.replace(/"/g, '').split(' (Cupos:')[0].trim();
+
+        resDiv.innerHTML = `
+          <div style="background:#f0f7f8; padding:15px; border-radius:12px; margin-top:15px; text-align:left; border-left:5px solid var(--primary);">
+            <p style="font-weight:700; margin:0;">${nombre.replace(/"/g, '').trim()}</p>
+            <p style="margin:5px 0; font-size:13px; color:var(--accent); font-weight:700;">📅 ${turnoLimpio}</p>
+          </div>`;
       } else { 
         resDiv.innerHTML = '<p style="color:var(--error); margin-top:10px;">❌ No encontrado.</p>'; 
       }
-    }).catch(err => {
-      console.error(err);
-      resDiv.innerHTML = '<p style="color:var(--error);">Error de conexión.</p>';
+    }).catch(e => {
+      resDiv.innerHTML = 'Error de conexión';
     });
 }
 </script>
